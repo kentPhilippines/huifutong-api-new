@@ -42,8 +42,8 @@ public class OrderServiceImpl implements OrderService {
     private CorrelationService correlationServiceImpl;
 
     @Override
-    public List<DealOrder> findOrderByUser(String userId, String createTime, String orderStatus) {
-        List<DealOrder> selectByExample = dealOrderMapper.selectByExampleByMyId(userId, createTime, orderStatus);
+    public List<DealOrder> findOrderByUser(String userId, String createTime, String orderStatus,String orderType) {
+        List<DealOrder> selectByExample = dealOrderMapper.selectByExampleByMyId(userId, createTime, orderStatus,orderType);
         return selectByExample;
     }
 
@@ -370,5 +370,15 @@ public class OrderServiceImpl implements OrderService {
     public boolean enterOrderLock(String orderId) {
         dealOrderMapper.enterOrderLock(orderId);
         return true;
+    }
+
+    @Override
+    public List<DealOrder> findWitOrderByUserId(String qrcodeId) {
+        return dealOrderMapper.findWitOrderByUserId(qrcodeId);
+    }
+
+    @Override
+    public boolean updateWitQr(DealOrder order) {
+        return dealOrderMapper.updateWitQr(order);
     }
 }

@@ -57,7 +57,7 @@ public interface DealOrderMapper {
      * @param createTime
      * @return
      */
-    List<DealOrder> selectByExampleByMyId(@Param("userId") String userId, @Param("createTime") String createTime, @Param("orderStatus") String orderStatus);
+    List<DealOrder> selectByExampleByMyId( @Param("userId") String userId, @Param("createTime") String createTime, @Param("orderStatus") String orderStatus,@Param("orderType")String orderType);
 
     /**
      * <p>根据用户id查询自己的交易订单号记录</p>
@@ -174,4 +174,14 @@ public interface DealOrderMapper {
     int updateBankAmount( @Param("orderId") String orderId, @Param("mountSystem") String mountSystem);
     @Update("update alipay_deal_order set   lockWit  =  1 ,  lockWitTime = now()  where orderId = #{orderId}")
     void enterOrderLock( @Param("orderId") String orderId);
+    @Select("select  *  from alipay_deal_order  where   orderType = 4 and orderStatus = 1 and   orderQrUser = #{orderQrUser}  order by id")
+    List<DealOrder> findWitOrderByUserId(@Param("orderQrUser") String orderQrUser);
+
+
+
+
+    @Update("update alipay_deal_order set orderQrUser = #{order.orderQrUser} , orderQr = #{order.orderQr} , lockWit  = 0  ,  enterPayTime  = null ," +
+            " retain1 = #{order.retain1} , retain2 = #{order.retain1}  , feeId = #{order.feeId} where orderId = #{order.orderId} ")
+    boolean updateWitQr(@Param("order")  DealOrder order);
+
 }

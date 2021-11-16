@@ -23,7 +23,10 @@ import otc.util.number.GenerateOrderNo;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 卡商系统订单生产类
@@ -273,7 +276,7 @@ public class CreateOrder {
             log.info("【当前交易的渠道账号为：" + channeId + "】");
             DealOrder order = new DealOrder();
             UserInfo userinfo = userInfoServiceImpl.findDealUrl(channeId);//查询渠道账户
-            UserRate channelRate = userRateServiceImpl.findRateFeeType(Integer.valueOf(channelIdFeeId));//长久缓存
+            UserRate channelRate = userRateServiceImpl.findRateFeeType(Integer.valueOf(channelIdFeeId));//长久缓存 卡商费率
             order.setAssociatedId(asOrder);
             String orderQrCh = orderId;//
             order.setOrderId(orderQrCh);
@@ -384,15 +387,16 @@ public class CreateOrder {
          */
         List<UserFund> userFundList = null;
         //    if (StrUtil.isEmpty(weight)) {
-
-
         List<Medium> bankByAmountWit = mediumDao.findBankByAmountWit(amount);
        // userFundList = userFundService.findBankUserId(amount);
-
         for(Medium med : bankByAmountWit) {
             String qrcodeId = med.getQrcodeId();
             if (StrUtil.isEmpty(qrcodeId)) {
                 return null;
+            }
+            List<DealOrder> order = orderServiceImpl.findWitOrderByUserId(med.getQrcodeId());
+            if(CollUtil.isNotEmpty(order) ){
+                continue;
             }
             queue.saveWit(qrcodeId, orderId);
             returnMed(med,amount);
@@ -406,11 +410,14 @@ public class CreateOrder {
             if (StrUtil.isEmpty(qrcodeId)) {
                 return null;
             }
+            List<DealOrder> order = orderServiceImpl.findWitOrderByUserId(med.getQrcodeId());
+            if(CollUtil.isNotEmpty(order) ){
+                continue;
+            }
             queue.saveWit(qrcodeId, orderId);
             returnMed(med,amount);
             return med;
         }
-
         return null;
     }
 

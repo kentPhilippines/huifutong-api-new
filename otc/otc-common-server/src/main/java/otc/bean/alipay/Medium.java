@@ -35,6 +35,17 @@ public class Medium implements Serializable {
     private String isQueue;
 
 
+    private  String witAmount;
+
+
+    public String getWitAmount() {
+        return witAmount;
+    }
+
+    public void setWitAmount(String witAmount) {
+        this.witAmount = witAmount;
+    }
+
     public Integer getVersion() {
         return version;
     }

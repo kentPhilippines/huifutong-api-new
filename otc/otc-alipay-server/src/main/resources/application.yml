@@ -10,8 +10,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://10.170.0.3:8768/eureka/
-      #defaultZone: http://127.0.0.1:8768/eureka/
+      defaultZone: http://10.170.0.2:8768/eureka/
   instance:
     # 是否使用ip注册
     prefer-ip-address: true

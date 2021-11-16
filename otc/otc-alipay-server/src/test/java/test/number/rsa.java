@@ -18,7 +18,7 @@ public class rsa {
 
 
     public static void main(String[] args) {
-        String s = PayUtil.md5("11");
+        String s = PayUtil.md5("6222030804001679318");
 
         System.out.println(s);
 

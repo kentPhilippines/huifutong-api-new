@@ -627,6 +627,7 @@
     <if test="orderStatus != '' and orderStatus != null">
       and q1.orderStatus = #{orderStatus}
     </if>
+      and q1.orderType = #{orderType}
     order by createTime desc
   </select>
 <!--  q2.qrcodeNumber as orderQr,  q1.payType as payType, -->

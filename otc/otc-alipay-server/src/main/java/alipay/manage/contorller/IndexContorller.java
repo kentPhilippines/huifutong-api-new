@@ -1,13 +1,15 @@
 package alipay.manage.contorller;
-import javax.servlet.http.HttpServletRequest;
 
+import alipay.config.annotion.LogMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import alipay.config.annotion.LogMonitor;
+
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 public class IndexContorller {
 	Logger log= LoggerFactory.getLogger(IndexContorller.class);
@@ -123,15 +125,21 @@ public class IndexContorller {
 	public String receiveOrder() {
 		return "receive-order";
 	}
+	@LogMonitor(required = true)
+	@GetMapping("/audit-order-re")
+	public String auditOrderRe() {
+		return "audit-order-re";
+	}
 	/**
 	 *	 审核订单
 	 * @return
 	 */
 	@LogMonitor(required = true)
-	@GetMapping("/audit-order")
-	public String auditOrder() {
-		return "audit-order";
+	@GetMapping("/audit-order-wit")
+	public String auditOrderWit() {
+		return "audit-order-wit";
 	}
+
 	/**
 	 * 	接单记录
 	 * @return

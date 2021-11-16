@@ -18,7 +18,7 @@ public interface OrderService {
 	 * @param createTime 时间
 	 * @return
 	 */
-	List<DealOrder> findOrderByUser(String userId, String createTime, String orderStatus);
+	List<DealOrder> findOrderByUser( String userId, String createTime, String orderStatus,String orderType);
 
 	/**
 	 * <p>根据关联订单号查询唯一的订单信息</p>
@@ -189,4 +189,8 @@ public interface OrderService {
 	boolean updateBankAmount(String bankAccount, String orderId);
 
 	boolean enterOrderLock(String orderId);
+
+	List<DealOrder> findWitOrderByUserId(String qrcodeId);
+
+	boolean updateWitQr(DealOrder order);
 }

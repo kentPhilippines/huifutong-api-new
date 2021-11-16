@@ -23,6 +23,7 @@
         <result column="mountNow" property="mountNow" jdbcType="DECIMAL"/>
         <result column="mountSystem" property="mountSystem" jdbcType="DECIMAL"/>
         <result column="mountLimit" property="mountLimit" jdbcType="DECIMAL"/>
+        <result column="witAmount" property="witAmount" jdbcType="DECIMAL"/>
 
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="otc.bean.alipay.Medium" extends="BaseResultMap">
@@ -91,7 +92,7 @@
 
     <sql id="Base_Column_List">
     id, mediumNumber, mediumId, mediumHolder,mediumNote, mediumPhone, qrcodeId, code, createTime,
-    submitTime, status, isDeal,attr,bankcode,account,mountNow,mountSystem,mountLimit,notfiyMask
+    submitTime, status, isDeal,attr,bankcode,account,mountNow,mountSystem,mountLimit,notfiyMask,witAmount
   </sql>
     <sql id="Blob_Column_List">
     mediumNote
