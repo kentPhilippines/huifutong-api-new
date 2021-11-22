@@ -2,11 +2,14 @@ package alipay.manage.api;
 
 import alipay.config.redis.RedisUtil;
 import alipay.manage.util.file.StorageUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ImageUtil;
 import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -91,6 +94,8 @@ public class StorageApi {
 	  }
     
 	String addFile(MultipartFile file) {
+
+
 	    try {
 	    	InputStream inputStream = file.getInputStream(); 
 			long size = file.getSize();

@@ -1,3 +1,28 @@
+server:
+  session:
+    store-type: redis
+    #  timeout: 3600s
+    redis:
+      flush-mode: on_save
+      namespace: spring:session
+  tomcat :
+    url-encoding : UTF-8
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8768/eureka/
+  instance:
+    # 是否使用ip注册
+    prefer-ip-address: true
+    # ${spring.cloud.client.ip-address}:${server.port}  局域网这样配置
+    #  本地调试则要直接写死ip 【这个ip为注册时候的 调用ip】
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    # 注册ip地址 公网注册地址112.121.162.162
+    ip-address: ${spring.cloud.client.ip-address}
+    # 注册ip端口
+    non-secure-port : ${server.port}
+    hostname: ${spring.cloud.client.ip-address}:${server.port}
+    # status-page-url : c.biancheng.net
 spring:
   datasource:
     url: jdbc:mysql://rm-0iw59mny5050jpg70jo.mysql.japan.rds.aliyuncs.com:3306/zongbang-alipay?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
@@ -22,6 +47,38 @@ spring:
       min-idle: 10
       max-active: 1000
       max-wait: -1
-
-
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: otc-alipay-server
+  cloud:
+    config:
+      label: master
+      profile: dev
+      discovery:
+        serviceId: otc-alipay-server
+      refresh:
+        refreshable: none
+    bus:
+      enabled: true
+      trace:
+        enabled: true
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+      #发布时修改为online配置文件
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+    session:
+      store-type: redis
+      timeout: 7200s
+  #断路器开启
+  feign.hystrix.enabled: true
+  logging:
+    level:
+      alipay.*: debug
 #以上为本地测试配置文件

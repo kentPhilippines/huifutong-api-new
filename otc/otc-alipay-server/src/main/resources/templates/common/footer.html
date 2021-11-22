@@ -33,8 +33,9 @@
 	<div id="footer" v-cloak><!-- #00a0e9 -->
 		<nav class="navbar fixed-bottom bg-light footer-navbar" v-show="showFooterFlag">
 <!-- 			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/'}"><i class="fa fa-home" aria-hidden="true"></i> <span>首页</span> </a>  -->
-			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/receive-order')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/receive-order'}"><i class="fa fa-shopping-cart" aria-hidden="true"></i><span>接单</span></a> 
-			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/audit-order')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/audit-order'}"><i class="fa fa-hourglass" aria-hidden="true"></i><span>审核</span></a> 
+			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/receive-order')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/receive-order'}"><i class="fa fa-shopping-cart" aria-hidden="true"></i><span>接单</span></a>
+			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/audit-order-re')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/audit-order-re'}"><i class="fa fa-hourglass" aria-hidden="true"></i><span>入审核</span></a>
+			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/audit-order-wit')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/audit-order-wit'}"><i class="fa fa-hourglass" aria-hidden="true"></i><span>出审核</span></a>
 			<a class="navbar-brand footer-navbar-brand" v-on:click="goTo('/my-home-page')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/my-home-page'}"><i class="fa fa-user" aria-hidden="true"></i><span>我的</span></a>
 		</nav>
 	</div>
@@ -46,7 +47,7 @@
 				showFooterFlag : true
 			},
 			computed : {},
-			created : function() {
+				created : function() {
 				this.currentPathName = window.location.pathname;
 			},
 			methods : {

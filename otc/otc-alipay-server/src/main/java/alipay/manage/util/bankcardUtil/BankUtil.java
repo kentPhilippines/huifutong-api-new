@@ -60,6 +60,7 @@ public class BankUtil {
 	private static final Long LOCK_TIME = 800L;
 	private static final Long LOCK_TIME_OPEN = 500L;
 	private static final String WIT_BANK_COUNT = "WIT:BANK:COUNT:";//代付出款缓存数据统计
+	private static final String WIAT_BANK = "WIAT:BANK:";//代付出款缓存数据统计
 
 
 	/**
@@ -152,6 +153,10 @@ public class BankUtil {
 	 */
 
 	static List<String> userList3000 = new ArrayList<>();
+	static List<String> userList1500 = new ArrayList<>();
+	static List<String> userList1000 = new ArrayList<>();
+	static List<String> userList4000 = new ArrayList<>();
+	static List<String> userList5000 = new ArrayList<>();
 
 	/**
 	 * 存储当前代付缓存数据统计
@@ -183,9 +188,12 @@ public class BankUtil {
 	}
 
 	static {
-		userList3000.add("wuxin666");
-		userList3000.add("gx5566");
-		userList3000.add("gx0327");
+		userList5000.add("ww985125");
+		userList4000.add("wudi56789");
+		userList3000.add("lhfa123");
+		userList1500.add("xiaowen");
+		userList1500.add("l1391101");
+		userList1500.add("w852754");
 	}
 
 	/**
@@ -244,6 +252,9 @@ public class BankUtil {
 		List<UserFund> userList = userInfoServiceImpl.findUserByAmount(amount, flag);
 		List<Medium> qcList = mediumService.findBankByAmount(amount, code);
 		log.info("【银行卡个数：" + qcList.size() + "】");
+
+
+
 		if (CollUtil.isEmpty(userList) || CollUtil.isEmpty(qcList)) {
 			return null;
 		}
@@ -277,12 +288,14 @@ public class BankUtil {
 			if (openPayment(qr.getAccount())) {//是否开启姓名验证
 				name = "";
 			}
+			Object waitBank = null;
+
 			String notify = qr.getMediumNumber().trim() + qr.getMediumPhone().trim() + dealAmount.toString().trim() + name;
-			log.info("【核心回调控制数据：" + notify + "】");
+			log.info("【核心回调控制数据：" + notify + " , 核心回调订单号-"+orderNo+", 核心回调时间："+ DateUtil.format(new Date(), Common.Order.DATE_TYPE)+"】");
 			Object object2 = redisUtil.get(notify);//回调数据
 			//	Object object = redisUtil.get(qr.getPhone());
 			boolean clickAmount = riskUtil.isClickAmount(qr.getQrcodeId(), amount, usercollect, flag);
-			if (ObjectUtil.isNull(object2) && clickAmount) {
+			if (ObjectUtil.isNull(object2) && clickAmount  ) {
 				time = LOCK_TIME_OPEN;
 				if (BankOpen.BANK_LIST.contains(qr.getMediumNumber())) {
 					time = LOCK_TIME_OPEN;
@@ -323,6 +336,24 @@ public class BankUtil {
 			} else {
 				return false;
 			}
+		}if (userList1500.contains(userId)) {
+			if (amount.compareTo(new BigDecimal("1500")) > -1) {
+				return true;
+			} else {
+				return false;
+			}
+		}if (userList4000.contains(userId)) {
+			if (amount.compareTo(new BigDecimal("4000")) > -1) {
+				return true;
+			} else {
+				return false;
+			}
+		}if (userList1000.contains(userId)) {
+			if (amount.compareTo(new BigDecimal("1000")) > -1) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 		return  true;
 	}
@@ -341,11 +372,14 @@ public class BankUtil {
 	 * @return
 	 */
 	boolean openPayment(String bankName){
-		if (bankName.contains("中国银行")
+		if (
+				bankName.contains("中国银行")
 				|| bankName.contains("平安")
 				|| bankName.contains("长沙银行")
 				|| bankName.contains("广东农信")
 				|| bankName.contains("河南农信")
+				|| bankName.contains("中信银行")
+				|| bankName.contains("天津银行")
 		) {
 			return true;
 		}

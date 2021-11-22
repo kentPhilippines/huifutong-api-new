@@ -65,7 +65,7 @@
 
 <body>
 <div th:replace="common/header::html"></div>
-<div id="auditOrder" v-cloak>
+<div id="auditOrder-wit" v-cloak>
 	<div class="page-body" v-show="orderShow">
 		<div class="platform-order-list-area" v-show="showWaitConfirmOrderFlag">
 			<div class="input-group" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
@@ -136,13 +136,13 @@
 						<button class="btn btn-outline-info btn-lg"
 								type="button"
 								v-on:click="confirmToPaid(order.orderId)"
-								v-show="order.orderStatus == 1 &&  ( order.orderQr != null  && order.orderQr != '') && ( order.payImg != null)">
+								v-show="order.orderStatus == 1 &&  ( order.orderQr != null  && order.orderQr != '') && (order.payImg != null) ">
                             确认已付款
                         </button>
 						<button class="btn btn-outline-info btn-lg"
 								type="button"
 								v-on:click="addQr(order.orderId)"
-								v-show="order.orderStatus == 1 &&  ( order.orderQr != null  && order.orderQr != '') && (order.payImg == null)">
+								v-show="order.orderStatus == 1   && (order.payImg == null)">
 							上传凭证
 						</button>
 					</div>
@@ -236,6 +236,6 @@
 	</div>
 </div>
 <div th:replace="common/footer::html"></div>
-<script src="/static/js/audit-order.js?v=1" type="text/javascript"></script>
+<script src="/static/js/audit-order-wit.js?v=2" type="text/javascript"></script>
 </body>
 </html>

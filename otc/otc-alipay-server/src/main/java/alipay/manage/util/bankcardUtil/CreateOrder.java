@@ -94,7 +94,7 @@ public class CreateOrder {
         userFeeId = rateFee.getId();
         String witprople = "";
         //出款选卡算法
-        Medium bankinfo = getBankInfo(userId, accountInfo.getQueueList(), bc,wit.getAmount());//出款人
+        Medium bankinfo =  null; // getBankInfo(userId, accountInfo.getQueueList(), bc,wit.getAmount());//出款人   采取手动配单
         if (null == bankinfo) {
             witprople =   "zhongbang-bank";
             bankInfo =  "";
@@ -378,6 +378,11 @@ public class CreateOrder {
     @Autowired
     private MediumService mediumService;
     Medium getBankInfo(String userId, String weight, String orderId, BigDecimal amount) {
+
+
+
+
+
         /**
          * #################出款选卡逻辑################
          * 如果指定出款人出款则直接选中出款人直接出款，如果未指定出款人，则按照以下逻辑选择出款

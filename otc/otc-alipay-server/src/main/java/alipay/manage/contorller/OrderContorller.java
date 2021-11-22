@@ -118,7 +118,7 @@ public class OrderContorller {
 			if(orderDealSu.isSuccess()){
 				ThreadUtil.execute(()->{
 					//重新抓一个公共切款的出款订单
-					reWit.rewit(user.getUserId());
+				//	reWit.rewit(user.getUserId());
 				});
 			}
 			return orderDealSu;

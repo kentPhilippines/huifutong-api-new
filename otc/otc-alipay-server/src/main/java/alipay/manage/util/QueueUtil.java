@@ -37,9 +37,6 @@ public class QueueUtil {
 				String mediumNo = mediumId.getMediumId();
 				log.info("【当前操作的媒介id为："+mediumNo+"】");
 				addNode = queueServiceClienImpl.addNode(mediumId);	// addNode - queue
-					if (redisUtil.hasKey(MEDIUM_QUEUE + mediumNo)) {
-						return Result.buildFailMessage("本地标记已存在");
-					}
 					redisUtil.set(MEDIUM_QUEUE + mediumNo, mediumNo);
 					boolean flag = mediumServiceImpl.updataMediumStatusSu(medium.getId().toString());// open Medium
 					if (!flag) {

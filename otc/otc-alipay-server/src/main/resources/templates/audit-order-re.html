@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+	<title>审核订单</title>
+	<!--收款码绑定  -->
+	<script src="/static/js/layui/layui.all.js"></script>
+	<link href="/static/js/layui/css/layui.mobile.css" rel="stylesheet" type="text/css">
+	<link href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+	<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+	<script src="https://cdn.bootcss.com/dayjs/1.7.8/dayjs.min.js"></script>
+	<script src="https://cdn.bootcss.com/layer/2.3/layer.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.0.1/css/fileinput.min.css" media="all"
+		  rel="stylesheet" type="text/css"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.0.1/js/fileinput.min.js"></script>
+	<script src="/static/js/common/common.js"></script>
+	<link href="/static/css/common/common.css" rel="stylesheet" type="text/css">
+	<style type="text/css">
+		.platform-order-list-area {
+
+		}
+
+		.platform-order {
+			background: rgb(242, 242, 242);
+			margin-bottom: 1rem;
+			display: flex;
+			padding-left: 1.2rem;
+			padding-right: 0.2rem;
+			padding-top: 0.5rem;
+			padding-bottom: 0.5rem;
+		}
+
+		.platform-order-body {
+			flex: 4;
+			display: flex;
+			flex-direction: column;
+			margin-top: 0.5rem;
+		}
+
+		.platform-order-body-item label {
+			text-align: end;
+			width: 5rem;
+			margin-right: 0.5rem;
+		}
+
+		.platform-order-body-item span {
+			min-width: 5rem;
+			/* display: inline-block; */
+		}
+
+		.platform-order-body-item button {
+			width: 32%;
+		}
+
+		.platform-order-body-item-highlight {
+			color: #c3606a;
+		}
+	</style>
+</head>
+
+<body>
+<div th:replace="common/header::html"></div>
+<div id="audit-order-re" v-cloak>
+	<div class="page-body" v-show="orderShow">
+		<div class="platform-order-list-area" v-show="showWaitConfirmOrderFlag">
+			<div class="input-group" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
+				<input type="date" class="form-control" style="width: 8rem;" v-model="receiveOrderTime">
+				<label>状态:</label> <select class="form-control" v-model="orderStatus">
+				<option value="1">处理中</option>
+				<option value="2">成功</option>
+				<option value="3">未确认订单</option>
+				<option value="4">失败订单</option>
+			</select>
+				<div class="input-group-append">
+					<button class="btn btn-outline-secondary" type="button" v-on:click="loadPlatformOrder()">查询</button>
+				</div>
+			</div>
+			<div class="platform-order" v-for="order in waitConfirmOrders1">
+				<div class="platform-order-body">
+					<div class="platform-order-body-item">
+						<img
+								src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1437076556,2698044114&fm=26&gp=0.jpg"
+								style="float: right; width: 40px; height: 40px;">
+						<label>订单号:</label> <span>{{order.orderId}}</span>
+					</div>
+					<div class="platform-order-body-item">
+						<label>接单时间:</label> <span>{{order.createTime | dateFilter("yyyy-mm-dd hh:mm:ss") }}</span>
+					</div>
+					<div class="platform-order-body-item" v-show="order.orderQr != '' || null !=  order.orderQr ">
+						<label>银行卡:</label> <span>{{order.orderQr}}</span>
+					</div>
+					<div class="platform-order-body-item" v-show="order.orderQr == '' || null ==  order.orderQr ">
+						<label>银行卡:</label>
+						<select :class="order.orderId" class="form-control" v-model="bankCard">
+							<option disabled value="">请选择出款卡</option>
+							<option v-bind:value="bankCardValue.id" v-for="bankCardValue in bankCardList">
+								{{ bankCardValue.account + ':' + bankCardValue.mediumHolder + ':' + bankCardValue.mediumNumber
+								}}
+							</option>
+						</select>
+					</div>
+					<div class="platform-order-body-item" v-show="order.orderType == 1 ||order.orderType == 3">
+						<label>类型:</label> <span class="platform-order-body-item-highlight">入款接单</span>
+						<label>收款金额:</label> <span
+							class="platform-order-body-item-highlight">{{order.dealAmount}}元</span>
+					</div>
+					<div class="platform-order-body-item" v-show="order.orderType == 4">
+						<label>类型:</label> <span class="platform-order-body-item-highlight">出款接单</span>
+						<label>出款金额:</label> <span
+							class="platform-order-body-item-highlight">{{order.dealAmount}}元</span>
+					</div>
+					<div class="platform-order-body-item">
+						<label>状 态:</label> <span>{{
+							order.orderStatus == 1 ? '处理中' :
+									order.orderStatus == 2 ? '成功' :
+											order.orderStatus == 3 ? '未收到回调' :
+													order.orderStatus == 4 ? '失败' :
+															order.orderStatus == 5 ? '超时' : '其他'
+						}}</span>
+						<!-- 	<button v-show ="order.orderStatus == 1" class="btn btn-outline-info btn-lg" style="padding: 0.5rem 1rem;font-size: 0.9rem;float: right;margin-right: 0.5rem;line-height: 0.9rem;border-radius: .3rem;" type="button" v-on:click="confirmToPaid(order.associatedId)">确认已支付</button> -->
+					</div>
+					<div class="platform-order-body-item" v-show="order.orderType == 4 ">
+						<button class="btn btn-outline-info btn-lg" type="button"
+								v-on:click="enterOrder(order.orderId,order.orderQr )"
+								v-show="order.orderStatus == 1">查看出款详情
+						</button>
+						<!--<button class="btn btn-outline-info btn-lg" type="button"
+								v-on:click="enterOrderLock(order.orderId,order.orderQr )"
+								v-show="order.lockWit != 1">锁定出款
+						</button>-->
+						<button class="btn btn-outline-info btn-lg"
+								type="button"
+								v-on:click="confirmToPaid(order.orderId)"
+								v-show="order.orderStatus == 1 &&  ( order.orderQr != null  && order.orderQr != '') && ( order.payImg != null)">
+                            确认已付款
+                        </button>
+						<button class="btn btn-outline-info btn-lg"
+								type="button"
+								v-on:click="addQr(order.orderId)"
+								v-show="order.orderStatus == 1 &&  ( order.orderQr != null  && order.orderQr != '') && (order.payImg == null)">
+							上传凭证
+						</button>
+					</div>
+                    <!--<div class="platform-order-body-item" v-show="order.orderType == 3 || order.orderType == 1">
+                        <button class="btn btn-outline-info btn-lg"
+                                type="button"
+                                v-on:click="confirmToPaid(order.orderId)"
+                                v-show="order.orderStatus == 1">确认已支付
+                        </button>
+                    </div>-->
+
+
+                    <div class="platform-order-body-item">
+						<!-- <button class="btn btn-outline-danger btn-lg" type="button" v-on:click="showAppealPage(order)">申诉</button> -->
+					</div>
+				</div>
+			</div>
+			<div style="padding-left: 13rem;">
+				<ul class="pagination">
+					<li class="page-item"><a class="page-link" v-show="totalPage > 0 && pageNum > 1"
+											 v-on:click="prePage">上一页</a></li>
+					<li class="page-item"><a class="page-link" v-show="pageNum >= 1 && pageNum < totalPage"
+											 v-on:click="nextPage">下一页</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="order-appeal-area" v-show="!showWaitConfirmOrderFlag">
+			<div class="platform-order">
+				<div class="platform-order-body">
+					<div class="platform-order-body-item">
+						<label>订单号:</label> <span>{{selectedOrder.orderNo}}</span>
+					</div>
+					<div class="platform-order-body-item">
+						<label>接单时间:</label>
+						<span>{{selectedOrder.createTime | dateFilter("yyyy-mm-dd hh:mm:ss")}}</span>
+					</div>
+					<div class="platform-order-body-item">
+						<label>收款渠道:</label> <span>{{selectedOrder.gatheringChannelName}}</span><label>收款金额:</label>
+						<span class="platform-order-body-item-highlight">{{selectedOrder.gatheringAmount}}元</span>
+					</div>
+				</div>
+			</div>
+			<div class="container" style="margin-top: 1.3rem;">
+				<form>
+					<div class="form-group">
+						<label>申诉类型:</label> <select class="form-control" v-model="appealType">
+						<option value="">请选择</option>
+						<option value="1">已支付但未自动回调</option>
+						<option value="2">实际支付金额小于订单金额</option>
+						<option value="3">交易点数扣款错误</option>
+						<!-- <option v-for="dictItem in appealTypeDictItems" :value="dictItem.dictItemCode" v-if="dictItem.dictItemCode == '1' || dictItem.dictItemCode == '2'">{{dictItem.dictItemName}}</option> -->
+					</select>
+					</div>
+					<div class="form-group" v-show="appealType == '2'">
+						<label>实际支付金额:</label> <input class="form-control" type="number" v-model="actualPayAmount">
+					</div>
+					<div class="form-group" v-show="appealType == '2'">
+						<label>截图:</label> <input class="form-control sreenshot" multiple type="file">
+					</div>
+					<button class="btn btn-danger btn-lg btn-block" type="button" v-on:click="userStartAppeal">发起申诉
+					</button>
+					<button class="btn btn-light btn-lg btn-block" type="button" v-on:click="showWaitConfirmOrderPage">
+						返回
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 二维码上传 -->
+	<div class="page-body" style="background: #f2f2f2;" v-show="addQrShow">
+		<div class="container" style="margin-top: 1.3rem;">
+			<div class="form-group">
+				<div class="form-group">
+					<label>收款凭证:</label> <input class="form-control gathering-code-pic" type="file">
+				</div>
+				<button class="btn bg-primary btn-lg btn-block" style="background-color:#00a0e9" type="button"
+						v-on:click="addImg()">保存
+				</button>
+				<button class="btn btn-light btn-lg btn-block" type="button" v-on:click="forQrManage()">返回</button>
+			</div>
+		</div>
+	</div>
+	<div style="padding-left: 13rem;">
+		<ul class="pagination">
+			<li class="page-item"><a class="page-link" v-on:click="prePage"
+									 v-show="totalPage > 0 && pageNum > 1">上一页</a>
+			</li>
+			<li class="page-item"><a class="page-link" v-on:click="nextPage"
+									 v-show="pageNum >= 1 && pageNum < totalPage">下一页</a></li>
+		</ul>
+	</div>
+</div>
+<div th:replace="common/footer::html"></div>
+<script src="/static/js/audit-order-re.js?v=2s" type="text/javascript"></script>
+</body>
+</html>

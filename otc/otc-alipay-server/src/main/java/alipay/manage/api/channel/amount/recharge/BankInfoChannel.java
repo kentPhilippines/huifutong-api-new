@@ -25,6 +25,7 @@ public class BankInfoChannel extends PayOrderService {
         if(StrUtil.isEmpty(dealOrderApp.getDealDescribe())){
             return Result.buildFailMessage("付款人为空");
         }else if("充值交易".equals(dealOrderApp.getDealDescribe())){
+            orderAppEr(dealOrderApp,"付款人为空");
             return Result.buildFailMessage("付款人为空");
         }
         Result result = createOrder.dealAddOrder(dealOrderApp);
