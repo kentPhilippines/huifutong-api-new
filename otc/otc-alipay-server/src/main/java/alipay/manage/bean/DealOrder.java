@@ -37,6 +37,7 @@ public class DealOrder implements Serializable{
     private String payType;                    //产品类型
     private Integer feeId;
     private Integer status;
+    private Integer grabOrder;                  // 0 默认值  1 抢单   2 没钱出款
     private String retain1;
     private String retain2;             //卡商入款   渠道  成本
     private String retain3;             //当笔预交易系统分润【未扣除代理商分润】
@@ -49,6 +50,13 @@ public class DealOrder implements Serializable{
     private String payer;
     private String bankAmountNow;//交易完成之后银行卡余额
 
+    public Integer getGrabOrder() {
+        return grabOrder;
+    }
+
+    public void setGrabOrder(Integer grabOrder) {
+        this.grabOrder = grabOrder;
+    }
 
     public String getBankAmountNow() {
         return bankAmountNow;

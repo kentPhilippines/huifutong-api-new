@@ -2,6 +2,7 @@ package alipay.manage.service.impl;
 
 import alipay.manage.bean.DealOrder;
 import alipay.manage.bean.UserFund;
+import alipay.manage.bean.UserInfo;
 import alipay.manage.mapper.DealOrderMapper;
 import alipay.manage.mapper.MediumMapper;
 import alipay.manage.mapper.UserFundMapper;
@@ -96,6 +97,14 @@ public class UserFundServiceImpl implements UserFundService {
 
 
 		return fundList;
+	}
+
+	@Override
+	public List<UserFund> findFundAllQr() {
+
+
+
+		return userFundDao.findFundAllQr();
 	}
 
 }

@@ -3,6 +3,7 @@ package alipay.manage.mapper;
 import alipay.manage.bean.Amount;
 import alipay.manage.bean.UserFund;
 import alipay.manage.bean.UserFundExample;
+import alipay.manage.bean.UserInfo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -31,14 +32,15 @@ public interface UserFundMapper {
 
     @Select("select * from alipay_user_fund auf " +
             " left join alipay_user_info aui on auf.userId = aui.userId " +
-            " where aui.userType = 2 and  ( auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance > #{amount}  ) " +
+            " where aui.userType = 2 and  ( （ auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance - ((100 - aui.credit   ) / 100 *  (auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance)) ) > #{amount}  ) and" +
+            " ( auf.accountBalance + auf.quota  - auf.sumProfit  <=  auf.deposit ) " +
             " and aui.switchs = 1 and aui.receiveOrderState = 1 ")
     List<UserFund> findUserByAmount(@Param("amount") BigDecimal amount);
 
     @Select(" select  id, userId, userName, cashBalance, rechargeNumber, freezeBalance, accountBalance, " +
             "    sumDealAmount, sumRechargeAmount, sumProfit, sumAgentProfit, sumOrderCount, todayDealAmount, " +
             "    todayProfit, todayOrderCount, todayAgentProfit, userType, agent, isAgent, createTime, " +
-            "    version ,quota  , sumOtherWitAmount,todayWitAmount,sumWitAmount,todayOtherWitAmount  from alipay_user_fund  NOLOCK where userId=#{userId}")
+            "    version ,quota  , sumOtherWitAmount,todayWitAmount,sumWitAmount,todayOtherWitAmount , deposit   from alipay_user_fund  NOLOCK where userId=#{userId}")
     UserFund findUserFundByUserId(@Param("userId") String userId);
 
     @Update("update alipay_user_fund set rechargeNumber = rechargeNumber + #{deduct}, freezeBalance = freezeBalance - #{deduct}, " +
@@ -75,4 +77,8 @@ public interface UserFundMapper {
             " ( select userId from alipay_user_info where " +
             "remitOrderState = 1 and `switchs` = 1 ) order by todayDealAmount desc ")
     List<UserFund> findBankUserId(BigDecimal amount);
+
+
+    @Select("select * from alipay_user_fund where userType = 2  ")
+    List<UserFund> findFundAllQr();
 }

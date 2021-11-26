@@ -111,6 +111,23 @@ public class OrderContorller {
 		pageR.setTotalPage(pageInfo.getPages());
 		return Result.buildSuccessResult(pageR);
 	}
+		@GetMapping("/grabAnOrderListFind")
+	@ResponseBody
+	public Result grabAnOrderListFind(HttpServletRequest request,String orderType) {
+		UserInfo user = sessionUtil.getUser(request);
+		if (ObjectUtil.isNull(user)) {
+			return Result.buildFailMessage("当前用户未登录");
+		}
+
+		//按时间段查询
+		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType,DateTools.getDayEndTime(new Date()));
+
+
+		return Result.buildSuccessResult(listOrder);
+	}
+
+
+
 	@Autowired IsDealIpUtil isDealIpUtil;
 	@Autowired EnterOrderUtil enterOrderUtil;
 	@GetMapping("/userConfirmToPaid")

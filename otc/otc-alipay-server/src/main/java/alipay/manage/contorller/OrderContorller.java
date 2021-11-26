@@ -33,10 +33,7 @@ import otc.exception.user.UserException;
 import otc.result.Result;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -99,7 +96,18 @@ public class OrderContorller {
 		pageR.setTotalPage(pageInfo.getPages());
 		return Result.buildSuccessResult(pageR);
 	}
-
+	@GetMapping("/grabAnOrderListFind")
+	@ResponseBody
+	public Result grabAnOrderListFind(HttpServletRequest request,String orderType) {
+		UserInfo user = sessionUtil.getUser(request);
+		if (ObjectUtil.isNull(user)) {
+			return Result.buildFailMessage("当前用户未登录");
+		}
+		//按时间段查询
+		log.info("当前用户进入抢单查询："+user.getUserId());
+		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType );
+		return Result.buildSuccessResult(listOrder);
+	}
 
 	@Autowired
 	private ReWit reWit;

@@ -2,13 +2,17 @@ package alipay.manage.contorller;
 
 import alipay.config.redis.RedisUtil;
 import alipay.manage.bean.DealOrder;
+import alipay.manage.bean.UserFund;
 import alipay.manage.bean.UserInfo;
 import alipay.manage.bean.util.PageResult;
 import alipay.manage.service.MediumService;
 import alipay.manage.service.OrderService;
+import alipay.manage.service.UserFundService;
 import alipay.manage.service.WithdrawService;
 import alipay.manage.util.QueueUtil;
 import alipay.manage.util.SessionUtil;
+import alipay.manage.util.bankcardUtil.ReWit;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -45,7 +49,12 @@ public class QrcodeContorller {
     @Autowired
     private MediumService mediumServiceImpl;
     @Autowired
-    WithdrawService withdrawServiceImpl;
+    private WithdrawService withdrawServiceImpl;
+    @Autowired
+    private UserFundService userFundService;
+    @Autowired
+    private ReWit reWit;
+
     @GetMapping("/findIsMyQrcodePage")
     @ResponseBody
     public Result findIsMyQrcodePage(HttpServletRequest request, String pageNum, String pageSize) {
@@ -247,4 +256,83 @@ public class QrcodeContorller {
 
         return Result.buildSuccess();
     }
+
+
+
+
+
+
+    @GetMapping("/grabOrder")
+    @ResponseBody
+    public Result grabOrder(HttpServletRequest request , String orderId) {
+        UserInfo user = sessionUtil.getUser(request);
+        if (ObjectUtil.isNull(user)) {
+            return Result.buildFailResult("用户未登录");
+        }
+        ThreadUtil.execute(()->{
+            /**
+             * 抢单要求
+             * 1，当前订单抢到后总出款单 不超过4单
+             * 2, 当前订单金额不超过总押金额度-处理中的出款订单
+             */
+
+            String publicAccount = "zhongbang-bank";
+            DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
+
+
+            if(null == orderWit ){
+                log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前订单已被抢");
+                return ;
+            }
+            log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+""+"");
+            List<DealOrder> witOrderByUserId = orderServiceImpl.findWitOrderByUserId(user.getUserId());
+            if( witOrderByUserId.size()>=5){
+                log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前账户抢单过多，请先出款");
+                return ;
+            }
+            BigDecimal amount = BigDecimal.ZERO;
+            if(CollUtil.isNotEmpty(witOrderByUserId)){
+                for (DealOrder order : witOrderByUserId){
+                    BigDecimal dealAmount = order.getDealAmount();
+                     amount = amount.add(dealAmount);
+                }
+            }
+            amount =  amount.add(orderWit.getDealAmount());
+            UserFund userFund = userFundService.findUserInfoByUserId(user.getUserId());
+            BigDecimal deposit = userFund.getDeposit();
+            if(deposit.compareTo(amount) < 0 ){
+                log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"抢单失败，可用额度不足");
+                return ;
+            }
+            reWit.grabOrder(user.getUserId(),orderWit);
+        });
+        return Result.buildSuccessMessage("抢单已处理，请到出款页面查看结果");
+    }
+    @GetMapping("/unGrabOrder")
+    @ResponseBody
+    public Result unGrabOrder(HttpServletRequest request , String orderId) {
+        UserInfo user = sessionUtil.getUser(request);
+        if (ObjectUtil.isNull(user)) {
+            return Result.buildFailResult("用户未登录");
+        }
+        ThreadUtil.execute(()->{
+            /**
+             * 抢单要求
+             * 1，当前订单抢到后总出款单 不超过4单
+             * 2, 当前订单金额不超过总押金额度-处理中的出款订单
+             */
+            DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,user.getUserId());
+
+            orderServiceImpl.unGrabOrder(orderWit.getOrderId());//放弃出款按钮
+
+
+
+
+        });
+        return Result.buildSuccessMessage("已经放弃出款,等待客服切款");
+    }
+
+
+
+
 }

@@ -36,7 +36,7 @@ import java.util.concurrent.TimeoutException;
 public class AlipayApplication {
 	public static void main(String[] args) {
 		int port = 0;
-		int defaultPort = 9110;
+		int defaultPort = 9010;
 		Future<Integer> future = ThreadUtil.execAsync(() -> {
 			int p = 0;
 			Scanner scanner = new Scanner(System.in);

@@ -193,4 +193,12 @@ public interface OrderService {
 	List<DealOrder> findWitOrderByUserId(String qrcodeId);
 
 	boolean updateWitQr(DealOrder order);
+
+    List<DealOrder> grabAnOrderListFind(String orderType);
+
+    DealOrder findOrderByUserqr(String orderId, String userId);
+
+    boolean updateGrabOrder(DealOrder order);
+
+    void unGrabOrder(String orderId);
 }

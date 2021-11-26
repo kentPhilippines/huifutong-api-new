@@ -2,11 +2,15 @@ package alipay.manage.api;
 
 import alipay.config.redis.RedisUtil;
 import alipay.manage.api.feign.QueueServiceClien;
+import alipay.manage.bean.UserFund;
 import alipay.manage.bean.UserInfo;
 import alipay.manage.service.BankListService;
 import alipay.manage.service.MediumService;
+import alipay.manage.service.UserFundService;
 import alipay.manage.service.UserInfoService;
 import alipay.manage.util.QueueUtil;
+import alipay.manage.util.bankcardUtil.BankUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
@@ -22,9 +26,12 @@ import otc.result.Result;
 import otc.util.RSAUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequestMapping("/out")
@@ -35,8 +42,9 @@ OutApi {
     private static final Log log = LogFactory.get();
     private static final String UTF_8 = "utf-8";
     private static final String ENCODE_TYPE = "md5";
+    @Autowired UserInfoService userInfoServiceImpl;
     @Autowired
-    UserInfoService userInfoServiceImpl;
+    private UserFundService uerFundServiceImpl;
     private static final String REDISKEY_QUEUE = RedisConstant.Queue.QUEUE_REDIS;//卡商入列标识
 
     public static String md5(String a) {
@@ -56,12 +64,18 @@ OutApi {
         return result;
     }
 
+
+    @Autowired
+    BankUtil bankUtil;
     @Autowired
     private QueueServiceClien queueServiceClienFeignImpl;
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
     private MediumService mediumServiceImpl;
+
+
+
 
     /**
      * 通过顶代卡商查询信息
@@ -74,8 +88,11 @@ OutApi {
         try {
             List<BankInfo> list = new ArrayList<>();
             Map<String, Medium> medMap = mediumServiceImpl.findBankOpen();
+            List<UserFund> fundAllQr  =  uerFundServiceImpl.findFundAllQr();
+            ConcurrentHashMap<String, UserFund> usercollect = fundAllQr.stream().collect(Collectors.toConcurrentMap(UserFund::getUserId, Function.identity(), (o1, o2) -> o1, ConcurrentHashMap::new));
             if (StrUtil.isEmpty(cardInfo)) {
                 List<UserInfo> agentQr = userInfoServiceImpl.findAgentQr();
+
                 for (UserInfo info : agentQr) {
                     String queueKey = REDISKEY_QUEUE + info.getUserId();
                     log.info("【查询队列数据key：" + queueKey + "】");
@@ -103,6 +120,20 @@ OutApi {
                         bank.setUserId(medium.getQrcodeId());
                         bank.setBankAccount(medium.getMediumHolder());
                         bank.setBankName(medium.getAccount());
+                        UserFund userFund = usercollect.get(medium.getQrcodeId());
+                        if(null != userFund){
+                            BigDecimal subtract = userFund.getAccountBalance().subtract(userFund.getSumProfit());
+                            bank.setFund(subtract+"");
+                        }
+                        try {
+                            bank.setStartFund(bankUtil.limitAmountOpenAmount(medium.getQrcodeId()));
+                            bank.setDeposit(userFund.getDeposit().toString());
+                            if(null != bankUtil.getUserAmount(medium.getQrcodeId())){
+                                bank.setFreezeBalance(bankUtil.getUserAmount(medium.getQrcodeId()).toString());
+                            }
+                        }catch (Exception e ){
+
+                        }
                         log.info("【银行卡："+value.toString()+"】");
                         list.add(bank);
                     }
@@ -132,6 +163,20 @@ OutApi {
                     bank.setAmount(medium.getMountNow());
                     bank.setBankAccount(medium.getMediumHolder());
                     bank.setBankName(medium.getAccount());
+                    UserFund userFund = usercollect.get(medium.getQrcodeId());
+                    if(null != userFund){
+                        BigDecimal subtract = userFund.getAccountBalance().subtract(userFund.getSumProfit());
+                        bank.setFund(subtract+"");
+                    }
+                    try {
+                        bank.setStartFund(bankUtil.limitAmountOpenAmount(medium.getQrcodeId()));
+                        bank.setDeposit(userFund.getDeposit().toString());
+                        if(null != bankUtil.getUserAmount(medium.getQrcodeId())){
+                            bank.setFreezeBalance(bankUtil.getUserAmount(medium.getQrcodeId()).toString());
+                        }
+                    }catch (Exception e ){
+
+                    }
                     log.info("【银行卡："+value.toString()+"】");
                     list.add(bank);
                 }
@@ -189,8 +234,53 @@ class BankInfo {
     private String bankId;
     private String gourp;
     private String userId;
+    private String startFund;//起收额度
+    private String fund;//小组额度
+    private String deposit;//小组押金
+    private String status;//小组额度      1 正常     12 仅收单    13 仅出单 0 暂停
+    private String freezeBalance;// 锁定额度
+
     private Double score;
 
+    public String getDeposit() {
+        return deposit;
+    }
+
+    public void setDeposit(String deposit) {
+        this.deposit = deposit;
+    }
+
+    public String getFreezeBalance() {
+        return freezeBalance;
+    }
+
+    public void setFreezeBalance(String freezeBalance) {
+        this.freezeBalance = freezeBalance;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getFund() {
+        return fund;
+    }
+
+    public void setFund(String fund) {
+        this.fund = fund;
+    }
+
+    public String getStartFund() {
+        return startFund;
+    }
+
+    public void setStartFund(String startFund) {
+        this.startFund = startFund;
+    }
 
     private String bankName;            //银行名
     private String bankAccount;         //银行账号

@@ -40,7 +40,8 @@ spring:
       connection-init-sql: SET NAMES utf8mb4
   redis:
     port: 6379
-    host: 10.128.0.2
+    database : 1
+    host: r-3nsnbeyh1ym8vjo2vfpd.redis.rds.aliyuncs.com
     timeout: 5000
     password: kentredis:Bffdasdsdada9ijnasd6
     pool:
@@ -79,7 +80,7 @@ spring:
       store-type: redis
       timeout: 7200s
   #断路器开启
-  feign.hystrix.enabled: true
-  logging:
+feign.hystrix.enabled: true
+logging:
     level:
       alipay.*: debug

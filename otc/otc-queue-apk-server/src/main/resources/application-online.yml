@@ -37,7 +37,8 @@ spring:
           enabled: true
   redis:
     port: 6379
-    host: 10.128.0.2
+    database : 1
+    host: r-3nsnbeyh1ym8vjo2vfpd.redis.rds.aliyuncs.com
     timeout: 5000
     password: kentredis:Bffdasdsdada9ijnasd6
     pool:

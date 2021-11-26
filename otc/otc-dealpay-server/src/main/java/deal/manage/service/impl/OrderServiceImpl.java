@@ -166,4 +166,14 @@ public class OrderServiceImpl implements OrderService {
 		return a  > 0 && a  < 2;
 	}
 
+	@Override
+	public List<DealOrder> grabAnOrderListFind(String orderType, Date dayEndTime) {
+
+
+
+
+
+		return null;
+	}
+
 }

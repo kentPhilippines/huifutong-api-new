@@ -58,8 +58,8 @@ public class MasterControlController {
 	public Result getRegisterSetting() {
 		RegisterSetting bean = new RegisterSetting();
 		bean.setInviteCodeEffectiveDuration(50000000);
-		Result config = configServiceClientFeignImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.REGISTER_ENABLED);
-		bean.setRegisterEnabled(settingFile.getName(SettingFile.REGISTER_ENABLED) != null ? true : false);//是否开放注册功能 config.getResult().toString().equals("1")?true:false
+		//Result config = configServiceClientFeignImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.REGISTER_ENABLED);
+		bean.setRegisterEnabled( false);//是否开放注册功能 config.getResult().toString().equals("1")?true:false
 		bean.setInviteRegisterEnabled(false);
 		bean.setRegitserDefaultRebate(0.01);
 		return Result.buildSuccessResult(bean);

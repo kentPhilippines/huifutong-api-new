@@ -86,5 +86,36 @@ public class ReWit {
   }
 
 
+   public Result grabOrder(String userId,DealOrder order){
+       BigDecimal dealAmount = order.getDealAmount();
+       order.setOrderQrUser(userId);
+       order.setOrderQr("");
+       UserRate rateFeeType = userRateServiceImpl.findUserRateWitByUserIdApp(order.getOrderAccount());
+       UserRate channnelFee = userRateServiceImpl.findUserRateWitByUserIdApp(userId);
+       BigDecimal fee = channnelFee.getFee();                  //渠道成本费率  卡出款费率
+       log.info("【当前渠道成本费率为：" + fee + "】");
+       fee = fee.multiply(order.getDealAmount());
+       /*长久缓存*/
+       BigDecimal fee1 = rateFeeType.getFee();  //商户出款 手续费
+       log.info("【当前出款账户交易扣除手续费为：" + fee1 + "】");
+       log.info("【当前出款账户交易实际手续费为：" + dealAmount + "】");
+       log.info("【当前渠道收取手续费：" + fee + "】");
+       log.info("【当前收取商户手续费：" + fee1 + "】");
+       BigDecimal subtract = fee1.subtract(fee);
+       log.info("【当前订单系统盈利：" + subtract + "】");
+       order.setFeeId(channnelFee.getId());
+       order.setRetain2(fee.toString());  //出款款渠道成本， 即为卡商结算费率
+       order.setRetain3(subtract.toString());  //当前系统利润       =      收款费率金额  - 渠道成本
+       String orderMark = "ORDER:" + order.getOrderQrUser() + ":AUTO";
+       redisUtil.set(orderMark, orderMark, 10);//金额锁定时间标记     , 如果在20分钟内回调就会删除锁定金额
+       order.setGrabOrder(1);//抢单
+       boolean flag =   orderServiceImpl.updateGrabOrder(order);
+       if(flag){
+           return Result.buildSuccess();
+       }
+       return Result.buildSuccess();
+    }
+
+
 
 }

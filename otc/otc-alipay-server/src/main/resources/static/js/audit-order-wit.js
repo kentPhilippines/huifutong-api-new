@@ -2,6 +2,7 @@ var auditOrderVM = new Vue({
 	el : '#auditOrder-wit',
 	data : {
 		appealTypeDictItems: [],
+		grabAnOrderList: [],
 		showWaitConfirmOrderFlag: true,
 		waitConfirmOrders: [],
 		bankCardList: [],
@@ -176,6 +177,15 @@ var auditOrderVM = new Vue({
 				that.pageNum = res.body.result.pageNum;
 				that.totalPage = res.body.result.totalPage;
 			});
+		},grabAnOrderListFind: function () {
+			var that = this;
+			that.$http.get('/order/grabAnOrderListFind', {//抢单
+				params: {
+					orderType: 4,
+				}
+			}).then(function (res) {
+				that.grabAnOrderList = res.body.result;
+			});
 		},
 		confirmToPaid : function(orderId) {
 			var that = this;
@@ -308,6 +318,61 @@ var auditOrderVM = new Vue({
 			this.orderId1 = null;
 			this.loadPlatformOrder();
 		},
+
+		grabAnOrder:function(){//抢单数据
+			this.showWaitConfirmOrderFlag = false;
+			this.grabAnOrderListFind();
+
+		},waitOrder:function(){//等待配单
+			this.showWaitConfirmOrderFlag = true;
+			this.loadPlatformOrder();
+
+		},
+
+		grabOrder:function(orderId){
+			var that = this;
+			that.$http.get('/qrcode/grabOrder', {
+				params: {
+					orderId: orderId
+				}
+			}).then(function (res) {
+					layer.alert(res.body.message, {
+						icon: 1,
+						time: 2000,
+						shade: false
+					});
+				this.showWaitConfirmOrderFlag = true;
+				this.grabAnOrderListFind();
+				this.loadPlatformOrder();
+			});
+		},
+
+
+
+		unGrabOrder:function(orderId){
+			var that = this;
+			that.$http.get('/qrcode/unGrabOrder', {
+				params: {
+					orderId: orderId
+				}
+			}).then(function (res) {
+					layer.alert(res.body.message, {
+						icon: 1,
+						time: 2000,
+						shade: false
+					});
+				this.grabAnOrderListFind();
+				this.loadPlatformOrder();
+			});
+		},
+
+
+
+
+
+
+
+
 		initFileUploadWidget: function (storageId) {
 			var initialPreview = [];
 			var initialPreviewConfig = [];

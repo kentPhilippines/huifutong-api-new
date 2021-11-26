@@ -125,7 +125,7 @@ public class BankUtil {
 				Date parse = formatter.parse(subSuf);
 				Object object = hmget.get(obj.toString());// 当前金额
 				if (!DateUtil.isExpired(parse, DateField.SECOND,
-						Integer.valueOf(configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.FREEZE_PLAIN_VIRTUAL).getResult().toString()), new Date())) {
+						Integer.valueOf(900 ), new Date())) {
 					redisUtil.hdel(userId, obj.toString());
 				}
 			}
@@ -139,6 +139,7 @@ public class BankUtil {
 		} catch (ParseException ex) {
 			ex.printStackTrace();
 		}
+
 		return amount;
 	}
 
@@ -152,11 +153,12 @@ public class BankUtil {
 	 * @return
 	 */
 
-	static List<String> userList3000 = new ArrayList<>();
-	static List<String> userList1500 = new ArrayList<>();
-	static List<String> userList1000 = new ArrayList<>();
-	static List<String> userList4000 = new ArrayList<>();
-	static List<String> userList5000 = new ArrayList<>();
+	public  static List<String> userList3000 = new ArrayList<>();
+	public static List<String> userList1500 = new ArrayList<>();
+	public static List<String> userList1000 = new ArrayList<>();
+	public static List<String> userList4000 = new ArrayList<>();
+	public static List<String> userList2000 = new ArrayList<>();
+	public static List<String> userList5000 = new ArrayList<>();
 
 	/**
 	 * 存储当前代付缓存数据统计
@@ -189,7 +191,11 @@ public class BankUtil {
 
 	static {
 		userList5000.add("ww985125");
+		userList5000.add("waa669966");
+		userList4000.add("qiang168");
 		userList4000.add("wudi56789");
+		userList4000.add("dawin8888");
+		userList2000.add("atai999");
 		userList3000.add("lhfa123");
 		userList1500.add("xiaowen");
 		userList1500.add("l1391101");
@@ -348,8 +354,20 @@ public class BankUtil {
 			} else {
 				return false;
 			}
+		}if (userList2000.contains(userId)) {
+			if (amount.compareTo(new BigDecimal("2000")) > -1) {
+				return true;
+			} else {
+				return false;
+			}
 		}if (userList1000.contains(userId)) {
 			if (amount.compareTo(new BigDecimal("1000")) > -1) {
+				return true;
+			} else {
+				return false;
+			}
+		}if (userList5000.contains(userId)) {
+			if (amount.compareTo(new BigDecimal("5000")) > -1) {
 				return true;
 			} else {
 				return false;
@@ -380,6 +398,8 @@ public class BankUtil {
 				|| bankName.contains("河南农信")
 				|| bankName.contains("中信银行")
 				|| bankName.contains("天津银行")
+				|| bankName.contains("民生银行")
+				|| bankName.contains("河北农信")
 		) {
 			return true;
 		}
@@ -393,7 +413,23 @@ public class BankUtil {
 		return 0L;
 	}
 
-
+	public String limitAmountOpenAmount( String userId) {
+		log.info("开放接单权限，给部分卡商限制金额，卡商id：" + userList3000.toString() + "，当前进入卡商：" + userId + "");
+		if (userList3000.contains(userId)) {
+				return "3000";
+		}if (userList1500.contains(userId)) {
+				return "1500";
+		}if (userList4000.contains(userId)) {
+				return "4000";
+		}if (userList2000.contains(userId)) {
+				return "2000";
+		}if (userList1000.contains(userId)) {
+				return "1000";
+		}if (userList5000.contains(userId)) {
+				return "5000";
+		}
+		return  "通道配额";
+	}
 
 
 }

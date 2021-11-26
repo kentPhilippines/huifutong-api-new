@@ -1,5 +1,6 @@
 package deal.manage.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -83,4 +84,12 @@ public interface OrderService {
 	
 	boolean updateOrderStatus(String orderId, String orderStatusSu);
 
+
+	/**
+	 *  获取所有在公共切款中的出款订单
+	 * @param orderType
+	 * @param dayEndTime
+	 * @return
+	 */
+    List<DealOrder> grabAnOrderListFind(String orderType, Date dayEndTime);
 }

@@ -181,7 +181,20 @@ public interface DealOrderMapper {
 
 
     @Update("update alipay_deal_order set orderQrUser = #{order.orderQrUser} , orderQr = #{order.orderQr} , lockWit  = 0  ,  enterPayTime  = null ," +
-            " retain1 = #{order.retain1} , retain2 = #{order.retain1}  , feeId = #{order.feeId} where orderId = #{order.orderId} ")
+            " retain1 = #{order.retain1} ,  retain3 = #{order.retain3}  , retain2 = #{order.retain2}  , feeId = #{order.feeId} where orderId = #{order.orderId} ")
     boolean updateWitQr(@Param("order")  DealOrder order);
 
+
+
+
+
+    @Select("select  *  from alipay_deal_order  where   orderType = #{orderType} and orderStatus = 1 and   orderQrUser = #{orderQrUser}  order by id")
+    List<DealOrder> grabAnOrderListFind(@Param("orderType") String orderType,@Param("orderQrUser") String orderQrUser);
+    @Select("select  *  from alipay_deal_order  where   orderType = 4 and orderStatus = 1 and   orderQrUser = #{orderQrUser} and orderId = #{orderId}  ")
+    DealOrder findOrderByUserqr(@Param("orderId")String orderId,@Param("orderQrUser")  String orderQrUser);
+    @Update("update alipay_deal_order set orderQrUser = #{order.orderQrUser} , orderQr = #{order.orderQr} , lockWit  = 0  , grabOrder = 1, enterPayTime  = null ," +
+            " retain1 = #{order.retain1} ,  retain3 = #{order.retain3}  , retain2 = #{order.retain2}  , feeId = #{order.feeId} where orderId = #{order.orderId}  and  orderQrUser = #{orderQrUser}")
+    int updateGrabOrder(@Param("order") DealOrder order, @Param("orderQrUser") String orderQrUser);
+    @Update("update alipay_deal_order set grabOrder = 2   where orderId  = #{orderId} " )
+    void unGrabOrder(@Param("orderId")  String orderId);
 }

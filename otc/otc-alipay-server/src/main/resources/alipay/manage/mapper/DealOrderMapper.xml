@@ -6,6 +6,7 @@
     <result column="orderId" property="orderId" jdbcType="CHAR" />
     <result column="associatedId" property="associatedId" jdbcType="CHAR" />
     <result column="orderStatus" property="orderStatus" jdbcType="BIT" />
+    <result column="grabOrder" property="grabOrder" jdbcType="BIT" />
     <result column="dealAmount" property="dealAmount" jdbcType="DECIMAL" />
     <result column="dealFee" property="dealFee" jdbcType="DECIMAL" />
     <result column="actualAmount" property="actualAmount" jdbcType="DECIMAL" />
@@ -93,7 +94,7 @@
   </sql>
   <sql id="Base_Column_List" >
     id, orderId, associatedId, orderStatus, dealAmount, dealFee, actualAmount, orderType, 
-    orderAccount, orderQrUser, orderQr, externalOrderId, generationIp, notify, back, payImg ,
+    orderAccount, orderQrUser, orderQr, externalOrderId, generationIp, notify, back, payImg ,grabOrder,
     isNotify, createTime, submitTime,payer, feeId, status, retain1, retain2, retain3, retain4,currency
   </sql>
   <sql id="Blob_Column_List" >
@@ -618,6 +619,7 @@
     q1.orderAccount as orderAccount,
     q1.externalOrderId as externalOrderId,
     q1.createTime as createTime,
+    q1.grabOrder as grabOrder,
     q1.orderQrUser as orderQrUser,
     q1.payImg as payImg
     FROM alipay_deal_order q1
@@ -641,6 +643,7 @@
       	q1.orderType as orderType,
       	q1.retain1 as retain1,
       	q1.orderQr as orderQr,
+      	q1.grabOrder as grabOrder,
       	q1.orderAccount as orderAccount,
       	q1.externalOrderId as externalOrderId,
       	q1.createTime as createTime,

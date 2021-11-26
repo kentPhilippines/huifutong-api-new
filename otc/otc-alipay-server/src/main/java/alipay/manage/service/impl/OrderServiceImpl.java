@@ -381,4 +381,27 @@ public class OrderServiceImpl implements OrderService {
     public boolean updateWitQr(DealOrder order) {
         return dealOrderMapper.updateWitQr(order);
     }
+
+    @Override
+    public List<DealOrder> grabAnOrderListFind(String orderType) {
+        String publicAccount = "zhongbang-bank";
+        return dealOrderMapper.grabAnOrderListFind(orderType,publicAccount);
+    }
+
+    @Override
+    public DealOrder findOrderByUserqr(String orderId, String userId) {
+        return dealOrderMapper.findOrderByUserqr(orderId,userId);
+    }
+
+    @Override
+    public boolean updateGrabOrder(DealOrder order) {
+        String publicAccount = "zhongbang-bank";
+        return dealOrderMapper.updateGrabOrder(order,publicAccount)>1;
+    }
+
+    @Override
+    public void unGrabOrder(String orderId) {
+          dealOrderMapper.unGrabOrder(orderId);
+
+    }
 }
