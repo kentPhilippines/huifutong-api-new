@@ -5,6 +5,7 @@ import alipay.manage.bean.util.AddressIpBean;
 import alipay.manage.bean.util.AreaIp;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class IsDealIpUtil {
 	 */
 	private AreaIp addIp(HttpServletRequest request ) throws UnsupportedEncodingException{
 		String ipAddr = getIpAddr(request);
-		AddressIpBean addresses =  new AddressIpBean();// addressUtils.getAddresses(ipAddr);
+		AddressIpBean addresses =  new AddressIpBean();
+	//	addresses = addressUtils.getAddresses(ipAddr);
 		/****
 		 * 	系统邮编功能现在暂时不上
 		 * #######################'
@@ -55,7 +57,7 @@ public class IsDealIpUtil {
 		ip.setCountryId(StrUtil.isBlank(addresses.getCountry_id())?"":addresses.getCountry_id());
 		ip.setRegion(StrUtil.isBlank(addresses.getRegion())?"":addresses.getRegion());
 		ip.setRegionId(StrUtil.isBlank(addresses.getRegion_id())?"":addresses.getRegion_id());
-		ip.setIsp(StrUtil.isBlank(addresses.getIsp())?"":addresses.getIsp());
+		ip.setIsp(ipAddr);
 		ip.setIspId(StrUtil.isBlank(addresses.getIsp_id()) ? "" : addresses.getIsp_id());
 		ip.setCounty(StrUtil.isBlank(addresses.getCounty()) ? "" : addresses.getCounty());
 		ip.setCountyId(StrUtil.isBlank(addresses.getCounty_id()) ? "" : addresses.getCounty_id());
@@ -74,33 +76,8 @@ public class IsDealIpUtil {
 	 * @return
 	 */
 	public static String getIpAddr(HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
-		if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip))
-		// 多次反向代理后会有多个ip值，第一个ip才是真实ip
-		{
-			if (ip.indexOf(",") != -1) {
-				ip = ip.split(",")[0];
-			}
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("HTTP_CLIENT_IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("X-Real-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getRemoteAddr();
-		}
-		return ip;
+		String clientIP = HttpUtil.getClientIP(request);
+		return clientIP;
 	}
 
 	/**

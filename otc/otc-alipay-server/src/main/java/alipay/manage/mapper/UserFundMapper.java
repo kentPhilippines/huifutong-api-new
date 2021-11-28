@@ -32,7 +32,7 @@ public interface UserFundMapper {
 
     @Select("select * from alipay_user_fund auf " +
             " left join alipay_user_info aui on auf.userId = aui.userId " +
-            " where aui.userType = 2 and  ( （ auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance - ((100 - aui.credit   ) / 100 *  (auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance)) ) > #{amount}  ) and" +
+            " where aui.userType = 2 and  ( ( auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance - ((100 - aui.credit   ) / 100 *  (auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance)) ) > #{amount}  ) and" +
             " ( auf.accountBalance + auf.quota  - auf.sumProfit  <=  auf.deposit ) " +
             " and aui.switchs = 1 and aui.receiveOrderState = 1 ")
     List<UserFund> findUserByAmount(@Param("amount") BigDecimal amount);

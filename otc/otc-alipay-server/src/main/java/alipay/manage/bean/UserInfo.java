@@ -28,7 +28,7 @@ public class UserInfo implements Serializable{
     private String isAgent;				//是否为代理商:1代理商2普通码商【分润结算类型看用户类型userType】
     private BigDecimal credit;			//信用等级为默认为100,掉单一次,或者出现故障一次减分0.001分,可人为加分
     private Integer receiveOrderState;	//是否处于入款接单状态 1 接单 2 暂停接单【下游商户则为是否可以交易】
-    private Integer remitOrderState;	//是否处于入款接单状态 1 接单 2 暂停接单【下游商户则为是否可以代付】
+    private Integer remitOrderState;	//是否处于出款接单状态 1 接单 2 暂停接单【下游商户则为是否可以代付】
     private String QQ;					//联系方式
     private String telegram;			//联系方式
     private String skype;				//联系方式

@@ -31,7 +31,7 @@ public class BankInfoChannel extends PayOrderService {
         Result result = createOrder.dealAddOrder(dealOrderApp);
         log.info("【自营渠道返回数据为：" + result.toString() + " 】");
         if (!result.isSuccess()) {
-            orderAppEr(dealOrderApp, result.getMessage());
+            orderAppEr(dealOrderApp, dealOrderApp.getDealDescribe());
             return result;
         }
         return Result.buildSuccessResult("支付处理中", ResultDeal.sendUrlAndPayInfo(result.getResult(), result.getMessage()));

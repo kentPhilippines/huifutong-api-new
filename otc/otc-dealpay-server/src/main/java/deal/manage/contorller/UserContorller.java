@@ -395,7 +395,7 @@ public class UserContorller {
 	}
 	
 	/**
-	 * <p>接单入款开启状态</p>
+	 * <p>接单开启状态</p>
 	 * @param request
 	 * @return
 	 */
@@ -406,11 +406,12 @@ public class UserContorller {
 		if (ObjectUtil.isNull(user)) {
 			return Result.buildFailMessage("当前用户未登录");
 		}
-		boolean flag = userInfoServiceImpl.updataReceiveOrderStateNO(user.getUserId());
+		return Result.buildFailMessage("暂无权限");
+	/*	boolean flag = userInfoServiceImpl.updataReceiveOrderStateNO(user.getUserId());
 		if (flag) {
 			return Result.buildSuccessResult();
 		}
-		return Result.buildFailResult("状态修改失败");
+		return Result.buildFailResult("状态修改失败");*/
 	}
 	/**
 	 * <p>接单入款开启状态</p>
@@ -424,11 +425,13 @@ public class UserContorller {
 		if (ObjectUtil.isNull(user)) {
 			return Result.buildFailMessage("当前用户未登录");
 		}
+		return Result.buildFailMessage("暂无权限");
+ /*
 		boolean flag = userInfoServiceImpl.updataReceiveOrderStateOFF(user.getUserId());
 		if (flag) {
 			return Result.buildSuccessResult();
 		}
-		return Result.buildFailResult("状态修改失败");
+		return Result.buildFailResult("状态修改失败");*/
 	}
 	/**
 	 * <p>收款接单开启</p>

@@ -2,5 +2,6 @@ spring:
   profiles:
     #active: druid            #测试数据库
     #active: aliyun-online-data  # aliyun数据库      使用aliyun缓存服务
-    active: google-online-data  #google云数据库       使用aliyun 缓存服务
+    active: huifutong  #google云数据库       使用aliyun 缓存服务
+    #active: zongbang  #google云数据库       使用aliyun 缓存服务
     #active: online-online-data   #google云数据库，但是使用服务器本地redis

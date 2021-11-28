@@ -100,7 +100,7 @@ public class AmountPrivate extends Util {
 		userFund.setFreezeBalance(freezeBalance);
 		userFund.setCashBalance(cashBalance);
 		userFund.setRechargeNumber(rechargeNumber);
-		Boolean updataAmount = updateAccountEr(userFund.getUserId());
+		Boolean updataAmount = userInfoServiceImpl.updataAmount(userFund);
 		if (updataAmount) {
 			log.info("【当前解冻资金执行成功，操作的金额为：" + amount + "】");
 			log.info("【解冻资金后的账户金额为：账户总余额：" + accountBalance + "，当前利润账户【现金账户】：" + cashBalance + "，当前冻结账户：" + freezeBalance + "当前操作金额为：" + amount + "】");

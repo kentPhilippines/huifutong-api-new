@@ -5,10 +5,7 @@ import alipay.manage.bean.DealOrder;
 import alipay.manage.bean.UserFund;
 import alipay.manage.bean.UserInfo;
 import alipay.manage.bean.util.PageResult;
-import alipay.manage.service.MediumService;
-import alipay.manage.service.OrderService;
-import alipay.manage.service.UserFundService;
-import alipay.manage.service.WithdrawService;
+import alipay.manage.service.*;
 import alipay.manage.util.QueueUtil;
 import alipay.manage.util.SessionUtil;
 import alipay.manage.util.bankcardUtil.ReWit;
@@ -52,6 +49,8 @@ public class QrcodeContorller {
     private WithdrawService withdrawServiceImpl;
     @Autowired
     private UserFundService userFundService;
+    @Autowired
+    private UserInfoService userInfoServer;
     @Autowired
     private ReWit reWit;
 
@@ -247,16 +246,17 @@ public class QrcodeContorller {
             return Result.buildFailMessage("当前银行卡 正在出款， 请更换银行卡出款");
         }
         bankInfo = account + MARK + mediumHolder + MARK + mediumNumber + MARK + "电话" + MARK + mediumPhone;
+
         boolean b = orderServiceImpl.updateBankInfoByOrderId(bankInfo, orderId);
         if (b) {
             String amount = getAmount(order.getDealAmount());
             String witNotify = mediumNumber + mediumPhone + amount; //代付回调成功 标记
+            log.info("当前订单号为："+witNotify+"");
             redisUtil.set("WIT:" + witNotify, order.getOrderId(), 600);
         }
 
         return Result.buildSuccess();
     }
-
 
 
 
@@ -270,6 +270,11 @@ public class QrcodeContorller {
             return Result.buildFailResult("用户未登录");
         }
         ThreadUtil.execute(()->{
+            UserInfo user1 = userInfoServer.findUserInfoByUserId(user.getUserId());
+            Integer receiveOrderState = user1.getReceiveOrderState();
+            if(2 == receiveOrderState){
+                return;
+            }
             /**
              * 抢单要求
              * 1，当前订单抢到后总出款单 不超过4单
@@ -278,8 +283,6 @@ public class QrcodeContorller {
 
             String publicAccount = "zhongbang-bank";
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
-
-
             if(null == orderWit ){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前订单已被抢");
                 return ;

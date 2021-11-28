@@ -136,9 +136,9 @@
                         class="account-change-body-item-highlight">{{qrcode.fixationAmount == '' || qrcode.fixationAmount == null ? '不固定' : qrcode.fixationAmount + '元'}}</span>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-secondary   btn-block" style="background-color:#00a0e9" type="button"
+                 <!--   <button class="btn btn-secondary   btn-block" style="background-color:#00a0e9" type="button"
                             v-on:click="dealeteQr(qrcode.fileId)">删除
-                    </button>
+                    </button>-->
                 </div>
             </div>
         </div>
@@ -223,9 +223,9 @@
                         v-on:click="addMedium">保存
                 </button>
                 <div v-show="editShow">
-                    <button class="btn btn-warning btn-lg btn-block" type="button"
+                  <!--  <button class="btn btn-warning btn-lg btn-block" type="button"
                             v-on:click="delMedium(medium.mediumId)">删除
-                    </button>
+                    </button>-->
                 </div>
                 <button class="btn btn-light btn-lg btn-block" type="button" v-on:click="hideEditGatheringCodePage">返回
                 </button>

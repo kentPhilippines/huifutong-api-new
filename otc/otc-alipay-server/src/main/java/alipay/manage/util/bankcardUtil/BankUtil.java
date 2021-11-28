@@ -57,8 +57,8 @@ public class BankUtil {
 	DateFormat formatter = new SimpleDateFormat(Common.Order.DATE_TYPE);
 	@Autowired
 	private MediumService mediumService;
-	private static final Long LOCK_TIME = 800L;
-	private static final Long LOCK_TIME_OPEN = 500L;
+	private static final Long LOCK_TIME = 600L;
+	private static final Long LOCK_TIME_OPEN = 300L;
 	private static final String WIT_BANK_COUNT = "WIT:BANK:COUNT:";//代付出款缓存数据统计
 	private static final String WIAT_BANK = "WIAT:BANK:";//代付出款缓存数据统计
 
@@ -200,6 +200,7 @@ public class BankUtil {
 		userList1500.add("xiaowen");
 		userList1500.add("l1391101");
 		userList1500.add("w852754");
+		userList1000.add("mn89562322");
 	}
 
 	/**
@@ -400,6 +401,8 @@ public class BankUtil {
 				|| bankName.contains("天津银行")
 				|| bankName.contains("民生银行")
 				|| bankName.contains("河北农信")
+				|| bankName.contains("湖南农信")
+				|| bankName.contains("海南农信社")
 		) {
 			return true;
 		}
