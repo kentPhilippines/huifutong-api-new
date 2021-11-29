@@ -622,7 +622,7 @@ public class OrderUtil {
             return witFrzen;
         }
         Result witFeeFrzen = transactionTemplate.execute((Result) -> {
-            Result withdraws = amountPublic.deleteWithdraw(userFund, wit.getFee(), wit.getOrderId());
+            Result withdraws = amountPublic.deleteBankprofit(userFund, wit.getFee(), wit.getOrderId());
             if (!withdraws.isSuccess()) {
                 return withdraws;
             }
@@ -938,8 +938,6 @@ public class OrderUtil {
         }
         return result1;
     }
-
-
     /**
      * <p>代付成功渠道结算</p>
      *
@@ -1004,8 +1002,6 @@ public class OrderUtil {
             return Result.buildFail();
         }
     }
-
-
     /**
      * 自动结算
      *
@@ -1017,7 +1013,6 @@ public class OrderUtil {
     public Result agentDpayChannel(Withdraw wit, String ip, boolean flag1) {
         return agentDpayChannel(wit, true, null, ip, flag1);
     }
-
     /**
      * 手动结算
      *
@@ -1030,7 +1025,6 @@ public class OrderUtil {
     public Result agentDpayChannel(Withdraw wit, String ip, String product, boolean flag1) {
         return agentDpayChannel(wit, false, product, ip, flag1);
     }
-
     /**
      * 【当前为代付代理商结算     配置渠道结算的时候  出款渠道费率为配置出款渠道   实际出款渠道时候，当前出款渠道为实际出款】
      * 代理商代付利润结算
@@ -1063,8 +1057,6 @@ public class OrderUtil {
         }
         return Result.buildSuccessMessage("代付代理商结算");
     }
-
-
     private Result witAgent(Withdraw wit, String username, String product, String channelId, UserRate rate, String ip, boolean flag) {
         UserRate userRate = userRateDao.findProductFeeByAll(username, product, channelId);//查询当前代理费率情况
         UserInfo userInfo = userInfoServiceImpl.findUserAgent(username);
@@ -1140,7 +1132,6 @@ public class OrderUtil {
      * @param clientIP
      * @return
      */
-
      private static final String AMOUNT_TYPE_R = "0";//对于当前账户来说是   收入
      public Result backOrder(DealOrder order,  String clientIP) {
         log.info("【进入卡商代付订单回滚方法，当前卡商代付订单号："+order.getOrderId()+"】");
@@ -1159,27 +1150,53 @@ public class OrderUtil {
             UserFund userFund = new UserFund();
             userFund.setUserId(run.getOrderAccount());
             String amountType = run.getAmountType();
-            if(AMOUNT_TYPE_R.equals(amountType)){//当前流水为收入流水 ， 现在我们要处理该笔流水为 支出
-                Result result1 = amountPublic.deleteAmount(userFund, run.getAmount(), run.getOrderId());
-                if (!result1.isSuccess()) {
-                    log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
-                    return result1;
+            if(run.getRunOrderType().equals(34)){
+                if(AMOUNT_TYPE_R.equals(amountType)){//当前流水为收入流水 ， 现在我们要处理该笔流水为 支出
+                    Result result1 = amountPublic.deleteAmount(userFund, run.getAmount(), run.getOrderId());
+                    if (!result1.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
+                        return result1;
+                    }
+                    Result result2 = amountRunUtil.deleteBackBank(userFund.getUserId(),order.getOrderId(),run.getAmount(),clientIP);
+                    if (!result2.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
+                        return result2;
+                    }
+                }else{//当前流水为 收入流水 现在我们处理该笔流水为  收入
+                    Result result1 = amountPublic.addAmountAdd(userFund, run.getAmount(), run.getOrderId());
+                    if (!result1.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前订单号：" + order.getOrderId() + "】");
+                        return result1;
+                    }
+                    Result result2 = amountRunUtil.addBackBank(userFund.getUserId(),order.getOrderId(),run.getAmount(),clientIP);
+                    if (!result2.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
+                        return result2;
+                    }
                 }
-                Result result2 = amountRunUtil.deleteBackBank(userFund.getUserId(),order.getOrderId(),run.getAmount(),clientIP);
-                if (!result2.isSuccess()) {
-                    log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
-                    return result2;
-                }
-            }else{//当前流水为 收入流水 现在我们处理该笔流水为  收入
-                Result result1 = amountPublic.addAmountAdd(userFund, run.getAmount(), run.getOrderId());
-                if (!result1.isSuccess()) {
-                    log.info("【当前单笔资金退回出错，请详细查看原因，当前订单号：" + order.getOrderId() + "】");
-                    return result1;
-                }
-                Result result2 = amountRunUtil.addBackBank(userFund.getUserId(),order.getOrderId(),run.getAmount(),clientIP);
-                if (!result2.isSuccess()) {
-                    log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
-                    return result2;
+            }else{
+                if(AMOUNT_TYPE_R.equals(amountType)){//当前流水为收入流水 ， 现在我们要处理该笔流水为 支出
+                    Result result1 = amountPublic.deleteBankprofit(userFund, run.getAmount(), run.getOrderId());
+                    if (!result1.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
+                        return result1;
+                    }
+                    Result result2 = amountRunUtil.deleteBackBank(userFund.getUserId(),order.getOrderId(),run.getAmount(),clientIP);
+                    if (!result2.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
+                        return result2;
+                    }
+                }else{//当前流水为 收入流水 现在我们处理该笔流水为  收入
+                    Result result1 = amountPublic.addAmountAdd(userFund, run.getAmount(), run.getOrderId());
+                    if (!result1.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前订单号：" + order.getOrderId() + "】");
+                        return result1;
+                    }
+                    Result result2 = amountRunUtil.addBackBank(userFund.getUserId(),order.getOrderId(),run.getAmount(),clientIP);
+                    if (!result2.isSuccess()) {
+                        log.info("【当前单笔资金退回出错，请详细查看原因，当前代付订单号：" + order.getOrderId() + "】");
+                        return result2;
+                    }
                 }
             }
         }
