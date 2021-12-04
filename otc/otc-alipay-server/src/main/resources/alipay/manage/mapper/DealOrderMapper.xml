@@ -660,7 +660,7 @@
           and q1.retain1 = #{retain1}
       </if>
       	and   to_days(q1.createTime) = to_days(#{time})  
-      	order by createTime desc
+      	order by createTime
   </select>
 
 </mapper>

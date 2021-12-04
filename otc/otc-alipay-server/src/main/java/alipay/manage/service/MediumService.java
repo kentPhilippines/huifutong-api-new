@@ -143,4 +143,14 @@ public interface MediumService {
     Map<String, Medium> findBankOpen();
 
     boolean updateMount(String bankId, String amount, String type,String orderSuccess);
+
+    Medium findMedByBankNo(String bankNo);
+
+    boolean upBuAmount(Integer version, Integer id, BigDecimal addToDayDeal, BigDecimal addSumDayDeal);
+
+    boolean upBuAmountWit(Integer version, Integer id, BigDecimal addToDayWit, BigDecimal addSumDayWit);
+
+
+    void updateMountWit(String bankno, String amount);
+
 }

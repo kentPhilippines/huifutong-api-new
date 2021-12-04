@@ -6,6 +6,7 @@ import alipay.manage.bean.RunOrder;
 import otc.bean.dealpay.Recharge;
 import otc.bean.dealpay.Withdraw;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrderService {
@@ -184,9 +185,10 @@ public interface OrderService {
 	 * 修改订单 标记银行卡余额
 	 * @param bankAccount
 	 * @param orderId
+	 * @param o
 	 * @return
 	 */
-	boolean updateBankAmount(String bankAccount, String orderId);
+	boolean updateBankAmount(String bankAccount, String orderId, String amount);
 
 	boolean enterOrderLock(String orderId);
 
@@ -201,4 +203,7 @@ public interface OrderService {
     boolean updateGrabOrder(DealOrder order);
 
     void unGrabOrder(String orderId);
+
+    void updateSystemBankAmount(BigDecimal bu, String orderId);
+
 }

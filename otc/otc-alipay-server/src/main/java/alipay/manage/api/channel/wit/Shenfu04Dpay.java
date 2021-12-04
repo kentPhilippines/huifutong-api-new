@@ -35,18 +35,6 @@ public class Shenfu04Dpay extends PayOrderService {
     private static String getNowDateStr() {
         return DateUtil.format(new Date(), DatePattern.PURE_DATETIME_FORMAT);
     }
-
-    private static boolean isNumber(String str) {
-        BigDecimal a = new BigDecimal(str);
-        double dInput = a.doubleValue();
-        long longPart = (long) dInput;
-        BigDecimal bigDecimal = new BigDecimal(Double.toString(dInput));
-        BigDecimal bigDecimalLongPart = new BigDecimal(Double.toString(longPart));
-        double dPoint = bigDecimal.subtract(bigDecimalLongPart).doubleValue();
-        System.out.println("整数部分为:" + longPart + "\n" + "小数部分为: " + dPoint);
-        return dPoint > 0;
-    }
-
     @Override
     public Result withdraw(Withdraw wit) {
         log.info("【进入申付代付】");

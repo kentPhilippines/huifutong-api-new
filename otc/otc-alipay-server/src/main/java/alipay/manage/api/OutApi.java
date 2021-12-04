@@ -126,7 +126,7 @@ OutApi {
                             bank.setFund(subtract+"");
                         }
                         try {
-                            bank.setStartFund(bankUtil.limitAmountOpenAmount(medium.getQrcodeId()));
+                            bank.setStartFund( medium.getStartAmount().toString());
                             bank.setDeposit(userFund.getDeposit().toString());
                             if(null != bankUtil.getUserAmount(medium.getQrcodeId())){
                                 bank.setFreezeBalance(bankUtil.getUserAmount(medium.getQrcodeId()).toString());

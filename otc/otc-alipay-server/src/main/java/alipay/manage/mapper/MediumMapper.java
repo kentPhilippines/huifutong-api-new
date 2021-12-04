@@ -1,10 +1,7 @@
 package alipay.manage.mapper;
 
 import alipay.manage.bean.MediumExample;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import otc.bean.alipay.Medium;
 
 import java.math.BigDecimal;
@@ -59,7 +56,10 @@ public interface MediumMapper {
      * @param amount
      * @return
      */
-    @Select("select * from alipay_medium where status = 1  and  isDeal = '2'   and black = 1  and error  = 0  and  #{amount}  + mountSystem  < mountLimit   ")
+    @Select(" select * from alipay_medium where status = 1  and  isDeal = '2'   " +
+            " and black = 1  and error  = 0  and         (     #{amount}  > startAmount)  and    ( ( toDayDeal - toDayWit  + yseToday +  #{amount} ) < sumAmounlimit )   " +
+            "                and ( now() < endTime  and now() >  submitTime  )     "
+             )
     List<Medium> findBankByAmount(@Param("amount") BigDecimal amount);
     /**
      * 无权重查询当前在线接单媒介
@@ -74,7 +74,7 @@ public interface MediumMapper {
     /**
      * 带权重查询当前在线接单媒介
      *
-     * @param bankInfo
+     * @param
      * @param code
      * @return
      */
@@ -115,4 +115,36 @@ public interface MediumMapper {
     int addMountNowWit(@Param("bankId") String bankId, @Param("amount") BigDecimal amount, @Param("version") Integer version);
     @Update("update alipay_medium set `version` =  `version` + 1 , witAmount = witAmount - #{amount} where mediumNumber = #{bankId} and `version`  = #{version} ")
     int subMountNowWit(@Param("bankId") String bankId, @Param("amount") BigDecimal amount, @Param("version")  Integer version);
+    @Select("select * from alipay_medium where  isDeal = 2   and  mediumNumber  = #{bankNo}")
+    Medium findMedByBankNo( @Param("bankNo") String bankNo);
+
+
+
+
+    @Update("update alipay_medium set `version` =  `version` + 1 , toDayWit = #{toDayWit} ,sumDayWit  = #{sumDayWit}  where id = #{id} and `version`  = #{version} ")
+    int upBuAmountWit(@Param("version") Integer version, @Param("toDayWit") BigDecimal toDayWit, @Param("sumDayWit") BigDecimal sumDayWit, @Param("id") Integer id);
+
+    @Update("update alipay_medium set `version` =  `version` + 1 , toDayDeal = #{toDayDeal} , sumDayDeal = #{sumDayDeal}  where id = #{id} and `version`  = #{version} ")
+    int upBuAmount(@Param("version") Integer version, @Param("toDayDeal") BigDecimal toDayDeal, @Param("sumDayDeal") BigDecimal sumDayDeal, @Param("id") Integer id);
+
+
+
+
+
+    @Insert("insert into  alipay_medium_bak (mediumNumber, mediumId, mediumHolder, mediumPhone, bankcode, account,  " +
+            "    mountNow, mountSystem, mountLimit, qrcodeId, code,   " +
+            "    submitTime, status, isDeal, mediumNote, attr  ,notfiyMask ,toDayDeal ,sumDayDeal  ,startAmount  ," +
+            " toDayWit , sumDayWit  , sumAmounlimit , yseToday)  " +
+            "" +
+            "select mediumNumber, mediumId, " +
+            "mediumHolder, mediumPhone, bankcode, account,  " +
+            "    mountNow, mountSystem, mountLimit, qrcodeId, code ,  " +
+            "    submitTime, status, isDeal, mediumNote, attr ,notfiyMask ,toDayDeal ,sumDayDeal   ,startAmount , " +
+            " toDayWit  , sumDayWit ,sumAmounlimit  , yseToday  FROM alipay_medium")
+    void bak();
+
+
+
+    @Update("  update alipay_medium set  yseToday = ( toDayDeal -  toDayWit  + yseToday ) ,toDayDeal = 0 ,toDayWit = 0  ")
+    void updateUserTime();
 }

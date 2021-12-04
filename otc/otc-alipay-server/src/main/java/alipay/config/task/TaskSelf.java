@@ -51,7 +51,7 @@ public class TaskSelf {
             return;
         }
         log.info("【开始放开银行卡限制】");
-        banks.updateBnakAmount();
+       // banks.updateBnakAmount();
     }
 
     @Scheduled(cron = "0 0 1 * * ?")

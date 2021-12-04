@@ -2,6 +2,8 @@ package alipay.config.task;
 
 import alipay.config.redis.RedisUtil;
 import alipay.manage.api.channel.deal.jiabao.RSAUtil;
+import alipay.manage.bean.DealOrder;
+import alipay.manage.service.MediumService;
 import alipay.manage.service.OrderService;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.http.HttpRequest;
@@ -13,8 +15,10 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import otc.bean.alipay.Medium;
 import otc.util.RSAUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +53,14 @@ public class BankOpen {
     }
 
 
+    @Autowired
+    private  MediumService mediumServiceImpl;
+
     /**
      * 银行卡余额自动更新定时任务
      */
-    public void updateBnakAmount() {
+    public void updateBnakAmount(DealOrder order) {
+        log.info("进入结算银行卡余额的方法,当前订单号："+ order.getOrderId());
         /**
          *  更新核心字段
          *  1,业务余额   =  入款订单 - 出款订单 (成功的订单)
@@ -74,19 +82,53 @@ public class BankOpen {
          * 6,修改订单为以结算
          * 7,银行卡余额变更完成
          */
-
-
-
         //查询所有未结算的订单 每次更新 10 条数据
        //  orderServiceImpl.
 
+        //先更新银行卡余额
+        //更新交易订单业务余额
+        //生成银行卡简要流水
 
+        //银行卡 当日入款
+        // 累计入款
+        //当日出款
+        // 累计出款
+        // 业务余额 = 当日入款 -当日出款 +
+        //昨日余额 =  当日入款 - 当日出款 + 昨日余额   依次类推
+        // 也就是   昨日余额不用更新 有每日定时清算直接算出   今日余额也直接算出
+        try {
+            String orderQr = order.getOrderQr();
+            String[] split = orderQr.split(":");//
+            String bankNo  = split[2];
+            log.info("银行卡号："+bankNo);
+            Medium bankInfo =  mediumServiceImpl.findMedByBankNo(bankNo);
+            String orderType = order.getOrderType();
+            boolean flag = Boolean.FALSE;
+            if( "1".equals(orderType) ) {//入款更新
+                BigDecimal toDayDeal = bankInfo.getToDayDeal();
+                BigDecimal sumDayDeal = bankInfo.getSumDayDeal();
+                BigDecimal addToDayDeal = toDayDeal.add(order.getDealAmount());
+                BigDecimal addSumDayDeal = sumDayDeal.add(order.getDealAmount());
+                bankInfo.setToDayDeal(addToDayDeal);
+                bankInfo.setSumDayDeal(sumDayDeal);
+                flag =   mediumServiceImpl.upBuAmount(bankInfo.getVersion(),bankInfo.getId(),addToDayDeal,addSumDayDeal);
+            } else {//出款更新
+                BigDecimal toDayWit = bankInfo.getToDayWit();
+                BigDecimal sumDayWit = bankInfo.getSumDayWit();
+                BigDecimal addToDayWit = toDayWit.add(order.getDealAmount());
+                BigDecimal addSumDayWit = sumDayWit.add(order.getDealAmount());
+                bankInfo.setToDayWit(addToDayWit);
+                bankInfo.setSumDayDeal(addSumDayWit);
+                flag =   mediumServiceImpl.upBuAmountWit(bankInfo.getVersion(),bankInfo.getId(),addToDayWit,addSumDayWit);
+            }
+            //更新订单业务余额
+            BigDecimal bu = bankInfo.getToDayDeal().subtract(bankInfo.getToDayWit()).add(bankInfo.getYseToday());
+            orderServiceImpl.updateSystemBankAmount(bu,order.getOrderId());
+        }catch (Exception s ){
+            log.info("四方交易订单");
+        }
 
-
-
-
-
-
+        // 这里的银行卡流水 暂未完善
     }
 }
 

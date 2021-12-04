@@ -317,4 +317,90 @@ public class MediumServiceImpl implements MediumService {
         }
     }
 
+    @Override
+    public Medium findMedByBankNo(String bankNo) {
+        return mediumDao.findMedByBankNo(bankNo);
+    }
+
+    @Override
+    public boolean upBuAmount(Integer version, Integer id, BigDecimal addToDayDeal, BigDecimal addSumDayDeal) {
+        synchronized (id) {
+            try {
+                boolean flag = true;
+                int lockMsg = 0;
+                do {
+                    lockMsg += 1;
+                   int i =  mediumDao.upBuAmount(version,addToDayDeal,addSumDayDeal,id);
+                   if(i > 0){
+                       return  Boolean.TRUE;
+                   }
+                    if(lockMsg > 10 ){
+                        flag = false;
+                    }
+                }while (flag);
+            } finally {
+
+            }
+
+        }
+        return Boolean.FALSE;
+    }
+
+    @Override
+    public boolean upBuAmountWit(Integer version, Integer id, BigDecimal addToDayWit, BigDecimal addSumDayWit) {
+        synchronized (id) {
+            try {
+                boolean flag = true;
+                int lockMsg = 0;
+                do {
+                    lockMsg += 1;
+                    int i =  mediumDao.upBuAmountWit(version,addToDayWit,addSumDayWit,id);
+                    if(i > 0){
+                        return  Boolean.TRUE;
+                    }
+                    if(lockMsg > 10 ){
+                        flag = false;
+                    }
+                }while (flag);
+            } finally {
+
+            }
+
+        }
+        return Boolean.FALSE;
+    }
+
+
+    /**
+     * 代付订单回滚，扣减银行卡余额
+     * @param bankno
+     * @param amount
+     */
+    @Override
+    public void updateMountWit(String bankno, String amount) {
+        synchronized (bankno) {
+            try {
+
+                boolean flag = true;
+                int lockMsg = 0;
+                do {
+                    Medium bank = mediumDao.findBank(bankno);
+                    BigDecimal sumDayWit = bank.getSumDayWit();
+                    BigDecimal toDayWit = bank.getToDayWit();
+                    sumDayWit = sumDayWit.subtract(new BigDecimal(amount));
+                    toDayWit = toDayWit.subtract(new BigDecimal(amount));
+                    lockMsg += 1;
+                    int i =  mediumDao.upBuAmountWit(bank.getVersion(),toDayWit,sumDayWit,bank.getId());
+                    if(i > 0){
+                        return  ;
+                    }
+                    if(lockMsg > 10 ){
+                        flag = false;
+                    }
+                }while (flag);
+            } finally {
+            }
+        }
+    }
+
 }

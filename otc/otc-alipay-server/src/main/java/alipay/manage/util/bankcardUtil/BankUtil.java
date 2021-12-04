@@ -125,7 +125,7 @@ public class BankUtil {
 				Date parse = formatter.parse(subSuf);
 				Object object = hmget.get(obj.toString());// 当前金额
 				if (!DateUtil.isExpired(parse, DateField.SECOND,
-						Integer.valueOf(900 ), new Date())) {
+						Integer.valueOf(500 ), new Date())) {
 					redisUtil.hdel(userId, obj.toString());
 				}
 			}
@@ -196,11 +196,16 @@ public class BankUtil {
 		userList4000.add("wudi56789");
 		userList4000.add("dawin8888");
 		userList2000.add("atai999");
+		userList2000.add("vip2022");
+		userList2000.add("facai56789");
+		userList2000.add("ok1888");
 		userList3000.add("lhfa123");
 		userList1500.add("xiaowen");
 		userList1500.add("l1391101");
 		userList1500.add("w852754");
 		userList1000.add("mn89562322");
+		userList1000.add("ay870122");
+		userList1000.add("wyawbb123");
 	}
 
 	/**
@@ -292,21 +297,25 @@ public class BankUtil {
 			log.info("【账户数据：" + qrcodeUser.toString() + "】");
 			riskUtil.updataUserAmountRedis(qrcodeUser, flag);
 			log.info("银行卡："+qr.getAccount() +" 当前付款人：" + payInfo + " 当前银行卡号 ： "+qr.getMediumNumber().trim()+ "当前手机号："+qr.getMediumPhone().trim());
-			if (openPayment(qr.getAccount())) {//是否开启姓名验证
+			/*if (openPayment(qr.getAccount())) {//是否开启姓名验证
+				name = "";
+			}*/
+			Integer isClickPay = qr.getIsClickPay();
+			if(isClickPay.equals(0)){
 				name = "";
 			}
 			Object waitBank = null;
-
 			String notify = qr.getMediumNumber().trim() + qr.getMediumPhone().trim() + dealAmount.toString().trim() + name;
 			log.info("【核心回调控制数据：" + notify + " , 核心回调订单号-"+orderNo+", 核心回调时间："+ DateUtil.format(new Date(), Common.Order.DATE_TYPE)+"】");
 			Object object2 = redisUtil.get(notify);//回调数据
 			//	Object object = redisUtil.get(qr.getPhone());
 			boolean clickAmount = riskUtil.isClickAmount(qr.getQrcodeId(), amount, usercollect, flag);
 			if (ObjectUtil.isNull(object2) && clickAmount  ) {
-				time = LOCK_TIME_OPEN;
+			/*	time = LOCK_TIME_OPEN;
 				if (BankOpen.BANK_LIST.contains(qr.getMediumNumber())) {
 					time = LOCK_TIME_OPEN;
-				}
+				}*/
+				time = qr.getSc();
 				Long aLong = addTime(qr.getAccount());
 				if(0L != aLong){
 					time = aLong;
@@ -402,6 +411,9 @@ public class BankUtil {
 				|| bankName.contains("民生银行")
 				|| bankName.contains("河北农信")
 				|| bankName.contains("湖南农信")
+				|| bankName.contains("山西农信")
+				|| bankName.contains("山西农信")
+				|| bankName.contains("北京农商")
 				|| bankName.contains("海南农信社")
 		) {
 			return true;
@@ -411,6 +423,10 @@ public class BankUtil {
 
 	Long addTime(String bankName){
 		if (  bankName.contains("广西农信") ) {
+			return 1500L;
+		}if (  bankName.contains("交通银行") ) {
+			return 1500L;
+		}if (  bankName.contains("广东农信") ) {
 			return 1500L;
 		}
 		return 0L;

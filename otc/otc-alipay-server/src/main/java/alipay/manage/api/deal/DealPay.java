@@ -146,7 +146,7 @@ public class DealPay {
         dealApp.setOrderType(Common.Order.ORDER_TYPE_DEAL);
         String dealDescribe  = "充值交易";
         if(StrUtil.isNotEmpty(dealBean.getUserId())){
-            dealDescribe =  dealBean.getUserId();
+            dealDescribe = "付款人："+ dealBean.getUserId();
         }
         dealApp.setDealDescribe(dealDescribe);
         dealApp.setRetain1(userRate.getPayTypr());

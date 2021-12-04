@@ -72,4 +72,7 @@ public interface WithdrawService {
     List<Withdraw> findNotPush();
 
     void updateMsg(String orderId, String s);
+
+    boolean updatePushAgent(String orderId);
 }
+

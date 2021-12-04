@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper
@@ -197,4 +198,9 @@ public interface DealOrderMapper {
     int updateGrabOrder(@Param("order") DealOrder order, @Param("orderQrUser") String orderQrUser);
     @Update("update alipay_deal_order set grabOrder = 2   where orderId  = #{orderId} " )
     void unGrabOrder(@Param("orderId")  String orderId);
+
+
+    @Update("update alipay_deal_order set  systemAmount = #{bu}    where orderId  = #{orderId} " )
+    void updateSystemBankAmount(@Param("bu") BigDecimal bu,@Param("orderId")  String orderId);
+
 }

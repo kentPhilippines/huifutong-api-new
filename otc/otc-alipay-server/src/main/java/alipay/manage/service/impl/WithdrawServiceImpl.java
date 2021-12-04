@@ -94,4 +94,10 @@ public class WithdrawServiceImpl implements WithdrawService {
         withdrawDao.updateMsg(orderId, msg);
     }
 
+    @Override
+    public boolean updatePushAgent(String orderId) {
+        boolean b = withdrawDao.updatePushAgent(orderId) > 0;
+        return b;
+    }
+
 }

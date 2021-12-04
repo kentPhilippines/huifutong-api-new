@@ -100,12 +100,9 @@ var gatheringCodeVM = new Vue({
 			that.$http.get('/recharge/findEnabledPayType').then(function (res) {
 				this.gatheringChannelDictItems = res.body.result;
 				this.mediumDictBankItems = [
-					{mediumCode: 'PSBC', mediumName: '邮储银行'},
-					{mediumCode: 'CCB', mediumName: '建设银行'},
 					{mediumCode: 'ICBC', mediumName: '工商银行'},
 					{mediumCode: 'ABC', mediumName: '农业银行'},
 					{mediumCode: 'CMB', mediumName: '招商银行'},
-					{mediumCode: 'BOC', mediumName: '中国银行'},
 					{mediumCode: 'CMBC', mediumName: '中国民生银行'},
 					{mediumCode: 'CIB', mediumName: '兴业银行'},
 					{mediumCode: 'BJBANK', mediumName: '北京银行'},
@@ -164,7 +161,10 @@ var gatheringCodeVM = new Vue({
 					{mediumCode: 'LZYH', mediumName: '泸州银行'},
 					{mediumCode: 'JSNXS', mediumName: '江苏农信'},
 					{mediumCode: 'JSYHS', mediumName: '晋商银行'},
-					{mediumCode: 'SXNXS', mediumName: '山西农信'}
+					{mediumCode: 'SXNXS', mediumName: '山西农信'},
+					{mediumCode: 'ZGZNXS', mediumName: '贵州农信'},
+					{mediumCode: 'FYHSS', mediumName: '阜新银行'},
+					{mediumCode: 'JZZLYH', mediumName: '焦作中旅银行'}
 				]
 				this.mediumDictBankTypeItems = [
 					{mediumCode: 'W', mediumName: '出款卡'},

@@ -9,10 +9,7 @@ import alipay.manage.bean.UserFund;
 import alipay.manage.mapper.AmountMapper;
 import alipay.manage.mapper.ChannelFeeMapper;
 import alipay.manage.mapper.DealOrderMapper;
-import alipay.manage.service.FileListService;
-import alipay.manage.service.MediumService;
-import alipay.manage.service.UserInfoService;
-import alipay.manage.service.WithdrawService;
+import alipay.manage.service.*;
 import alipay.manage.util.*;
 import alipay.manage.util.amount.AmountPublic;
 import alipay.manage.util.amount.AmountRunUtil;
@@ -79,7 +76,8 @@ public class Api {
     private DealOrderMapper dealOrderDao;
     @Resource
     private ChannelFeeMapper channelFeeDao;
-
+    @Autowired
+    private OrderService orderServiceImpl;
 
     /**
      * <p>后台调用重新通知的方法</p>
@@ -102,10 +100,10 @@ public class Api {
             return Result.buildFailMessage("必传参数为空");
         }
         logUtil.addLog(request, "后台人员切代付订单出款：" + orderId +"，金额："+amount, apply);
-        boolean flag = mediumServiceImpl.updateMount(bankId,amount,type,"wait");
+     /*   boolean flag = mediumServiceImpl.updateMount(bankId,amount,type,"wait");
         if(flag){
              return Result.buildSuccessMessage(" 银行卡余额修改成功");
-         }
+         }*/
         return Result.buildFailMessage("银行卡余额修改失败");
 
 
@@ -222,6 +220,7 @@ public class Api {
         String bankId = paramMap.get("bankId").toString();// 抓取到的银行卡号
         String phoneId = paramMap.get("phoneId").toString();// 抓取到的手机号
         String originText = paramMap.get("originText").toString();// 短信原始内容
+        String balance = paramMap.get("balance").toString();// 短信原始内容
         String counterpartyAccountName = paramMap.get("counterpartyAccountName").toString();// 对方账户
         String deviceIp = "";//设备ip
         if (MapUtil.isEmpty(paramMap)) {
@@ -256,12 +255,29 @@ public class Api {
                 DealOrder witOrder = dealOrderDao.findOrderByOrderId(witOrderId);
                 if (null != witOrder) {
                     dealOrderDao.updatePayInfo(witOrderId, originText.toString());
+                    if(StrUtil.isEmpty(balance)){
+                        boolean a =   orderServiceImpl.updateBankAmount(bankId,witOrderId,null);
+                    }else{
+                        boolean a =   orderServiceImpl.updateBankAmount(bankId,witOrderId,balance);
+
+                    }
                     redisUtil.deleteKey("WIT:" + witNotify);
                 }
                 return Result.buildSuccessResult("代付出款确认成功", witOrderId);
             }
             return Result.buildSuccessResult("代付出款确认成功");
         } else {
+
+
+            Medium bank = mediumServiceImpl.findBank(bankId);
+            Integer isClickPay = bank.getIsClickPay();
+            try {
+                if(isClickPay.equals(0)){
+                    counterpartyAccountName = "";
+                }
+            }catch (Exception e ){
+                log.info("回调异常");
+            }
             String orderId = qrUtil.findOrderBy(amount, phone, bankId,counterpartyAccountName);
             if (StrUtil.isBlank(orderId)) {
                 log.info("【商户交易订单失效，或订单匹配不正确】");
@@ -278,6 +294,13 @@ public class Api {
             Result orderDealSu = orderUtil.orderDealSu(order.getOrderId(), ip);
             ThreadUtil.execute(() -> {
                 if (orderDealSu.isSuccess()) {
+                    if(StrUtil.isEmpty(balance)){
+                        boolean a =   orderServiceImpl.updateBankAmount(bankId,orderId,null);
+                    }else{
+                        boolean a =   orderServiceImpl.updateBankAmount(bankId,orderId,balance);
+
+                    }
+
                     notifyUtil.sendMsg(order.getOrderId());
                 }
             });
@@ -731,6 +754,8 @@ public class Api {
         } else if (orderstatus.equals(Common.Order.DealOrder.ORDER_STATUS_SU.toString())) {
             Result orderDealSu = orderUtil.orderDealSu(orderId, clientIP, userop);
             if (orderDealSu.isSuccess()) {
+
+
                 return Result.buildSuccessMessage("操作成功");
             } else {
                 return orderDealSu;

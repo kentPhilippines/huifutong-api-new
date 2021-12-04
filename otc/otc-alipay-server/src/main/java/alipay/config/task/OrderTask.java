@@ -50,6 +50,7 @@ public class OrderTask {
 	private WithdrawService withdrawServiceImpl;
 	@Autowired
 	private WitPay WitPayImpl;
+	@Autowired BankOpen bankOpen;
 
 	/**
 	 * 每十秒结算一次
@@ -84,6 +85,10 @@ public class OrderTask {
 				}
 				Result settlement = orderUtilImpl.settlement(order);
 				if (settlement.isSuccess()) {
+					//更新银行卡余额,并生成银行卡卡流水   暂时先更新银行卡余额  余额生成简单流水
+					ThreadUtil.execute(() -> {
+					bankOpen.updateBnakAmount(order);
+					});
 					ThreadUtil.execute(() -> {
 						dealOrderDao.updateSuccessAndAmount(order.getOrderId());
 					});
@@ -96,6 +101,11 @@ public class OrderTask {
 				RedisLockUtil.unLock(KEY + "lock");
 			}
 		}
+
+
+
+
+
 		RedisLockUtil.redisLock(KEY_WIT + "lock");
 		List<Withdraw> orderWitList = withdrawServiceImpl.findSuccessAndNotAmount();
 		for (Withdraw order : orderWitList) {

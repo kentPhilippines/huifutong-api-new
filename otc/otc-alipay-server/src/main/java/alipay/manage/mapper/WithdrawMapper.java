@@ -124,4 +124,7 @@ public interface WithdrawMapper {
             "submitTime = sysdate() " +
             "where orderId = #{orderId}")
     void updateMsg(@Param("orderId") String orderId, @Param("msg") String msg);
+
+    @Update("update alipay_withdraw set    comment =  '无法处理当前订单,请再次推送' ,pushOrder = 3   where orderId  = #{orderId} ")
+    int updatePushAgent(String orderId);
 }

@@ -382,7 +382,7 @@ public Result findUserByAccountId(HttpServletRequest request, String userId, Str
 		if (ObjectUtil.isNull(user)) {
 			return Result.buildFailMessage("当前用户未登录");
 		}
-		boolean flag = userInfoServiceImpl.updataReceiveOrderStateNO(user.getUserId());
+		boolean flag = Boolean.FALSE;// userInfoServiceImpl.updataReceiveOrderStateNO(user.getUserId());
 		if (flag) {
 			return Result.buildSuccessResult();
 		}
@@ -402,7 +402,7 @@ public Result findUserByAccountId(HttpServletRequest request, String userId, Str
 		if (ObjectUtil.isNull(user)) {
 			return Result.buildFailMessage("当前用户未登录");
 		}
-		boolean flag = userInfoServiceImpl.updataReceiveOrderStateOFF(user.getUserId());
+		boolean flag =   userInfoServiceImpl.updataReceiveOrderStateOFF(user.getUserId());
 		if (flag) {
 			return Result.buildSuccessResult();
 		}
@@ -422,7 +422,7 @@ public Result findUserByAccountId(HttpServletRequest request, String userId, Str
 		if (ObjectUtil.isNull(user)) {
 			return Result.buildFailMessage("当前用户未登录");
 		}
-		boolean flag = userInfoServiceImpl.updataRemitOrderStateNO(user.getUserId());
+		boolean flag =  Boolean.FALSE; //userInfoServiceImpl.updataRemitOrderStateNO(user.getUserId());
 		if (flag) {
 			return Result.buildSuccessResult();
 		}

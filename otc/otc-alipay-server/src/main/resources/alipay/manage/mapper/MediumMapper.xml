@@ -24,6 +24,16 @@
         <result column="mountSystem" property="mountSystem" jdbcType="DECIMAL"/>
         <result column="mountLimit" property="mountLimit" jdbcType="DECIMAL"/>
         <result column="witAmount" property="witAmount" jdbcType="DECIMAL"/>
+        <result column="toDayDeal" property="toDayDeal" jdbcType="DECIMAL"/>
+        <result column="sumDayDeal" property="sumDayDeal" jdbcType="DECIMAL"/>
+        <result column="toDayWit" property="toDayWit" jdbcType="DECIMAL"/>
+        <result column="sumDayWit" property="sumDayWit" jdbcType="DECIMAL"/>
+        <result column="startAmount" property="startAmount" jdbcType="DECIMAL"/>
+        <result column="yseToday" property="yseToday" jdbcType="DECIMAL"/>
+        <result column="startTime" property="startTime"  />
+        <result column="endTime" property="endTime"  />
+        <result column="isClickPay" property="isClickPay"  />
+        <result column="sc" property="sc"  />
 
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="otc.bean.alipay.Medium" extends="BaseResultMap">
@@ -91,7 +101,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-    id, mediumNumber, mediumId, mediumHolder,mediumNote, mediumPhone, qrcodeId, code, createTime,
+    id, mediumNumber, mediumId, mediumHolder,mediumNote, mediumPhone, qrcodeId, code, createTime,toDayDeal,sumDayDeal,toDayWit,sumDayWit,startAmount,sumDayWit,startTime,endTime,isClickPay,sc,
     submitTime, status, isDeal,attr,bankcode,account,mountNow,mountSystem,mountLimit,notfiyMask,witAmount
   </sql>
     <sql id="Blob_Column_List">

@@ -36,6 +36,8 @@ public abstract class PayOrderService implements PayService {
 	public static final Log log = LogFactory.get();
 	private static final String ORDER = "orderid";
 	@Autowired
+	private WithdrawService withdrawServiceImpl;
+	@Autowired
 	private AmountPublic amountPublic;
 	@Autowired
 	private AmountRunUtil amountRunUtil;
@@ -261,4 +263,19 @@ public abstract class PayOrderService implements PayService {
 			return Result.buildFailMessage("修改失败");
 		}
 	}
+	protected static boolean isNumber(String str) {
+		BigDecimal a = new BigDecimal(str);
+		double dInput = a.doubleValue();
+		long longPart = (long) dInput;
+		BigDecimal bigDecimal = new BigDecimal(Double.toString(dInput));
+		BigDecimal bigDecimalLongPart = new BigDecimal(Double.toString(longPart));
+		double dPoint = bigDecimal.subtract(bigDecimalLongPart).doubleValue();
+		System.out.println("整数部分为:" + longPart + "\n" + "小数部分为: " + dPoint);
+		return dPoint > 0;
+	}
+	public Result withdrawErMsg(Withdraw wit, String msg, String ip) {
+		withdrawServiceImpl.updateMsg(wit.getOrderId(),msg);
+		return  Result.buildSuccess();
+	}
+
 }

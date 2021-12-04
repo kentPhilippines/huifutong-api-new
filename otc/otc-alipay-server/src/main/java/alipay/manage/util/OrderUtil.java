@@ -250,9 +250,9 @@ public class OrderUtil {
                                 log.info("【更新银行卡余额  入款增加】");
                                 String orderQr = order.getOrderQr();
                                 log.info("[当前更新银行卡：" + orderQr + "]");
-                                String[] split = orderQr.split(":");
-                                  bankAccount = split[2];
-                                mediumServiceImpl.updateMount(bankAccount, order.getDealAmount().toString(), "add","succ");
+                              //  String[] split = orderQr.split(":");
+                              //    bankAccount = split[2];
+                              //  mediumServiceImpl.updateMount(bankAccount, order.getDealAmount().toString(), "add","succ");
                         }
                     }
                     log.info("若为代付订，则置商户代付订单为成功，当前订单号：" + orderSu.getOrderId() + "，当前订单类型：" + orderSu.getOrderType() + "");
@@ -261,12 +261,12 @@ public class OrderUtil {
                             log.info("【更新银行卡余额  出款减少】");
                             String orderQr = order.getOrderQr();
                             String[] split = orderQr.split(":");
-                              bankAccount = split[2];
-                            mediumServiceImpl.updateMount(bankAccount, order.getDealAmount().toString(), "sub","succ");
+                           //   bankAccount = split[2];
+                           // mediumServiceImpl.updateMount(bankAccount, order.getDealAmount().toString(), "sub","succ");
                         settlementOrderApp(orderSu);//如果是代付订单，商户会瞬间成功
                     }
                     log.info("修改订单银行卡余额表示标识，当前订单号：" + orderSu.getOrderId() + "，当前订单类型：" + orderSu.getOrderType() + "");
-                    boolean a =   orderServiceImpl.updateBankAmount(bankAccount,orderSu.getOrderId());
+
                 });
                 return Result.buildSuccessResult("订单修改成功");
             }
@@ -379,13 +379,13 @@ public class OrderUtil {
         boolean updateOrderStatus = orderServiceImpl.updateOrderStatus(orderId, OrderDealStatus.失败.getIndex().toString(), mag);
         if(Common.Order.ORDER_TYPE_BANKCARD_W.toString().equals(order.getOrderType().toString())){
            ThreadUtil.execute(()->{
-               DealOrder order1 = orderServiceImpl.findOrderByOrderId(order.getOrderId());
+               /*DealOrder order1 = orderServiceImpl.findOrderByOrderId(order.getOrderId());
                          //如果是入款订单,当前银行卡的系统业务余额会增加    手动失败 驳回的时候只对  代付余额进行修改
                             log.info("【 手动失败 更新银行卡余额  出款减少】");
                             String orderQr = order.getOrderQr();
                             String[] split = orderQr.split(":");
                             String bankAccount   = split[2];
-               boolean flag = mediumServiceImpl.updateMount(bankAccount,order1.getDealAmount().toString(), "add","wait");
+             //  boolean flag = mediumServiceImpl.updateMount(bankAccount,order1.getDealAmount().toString(), "add","wait");*/
            });
            };
         if (!updateOrderStatus) {
@@ -1200,12 +1200,12 @@ public class OrderUtil {
                 }
             }
         }
-        ThreadUtil.execute(()->{
+        ThreadUtil.execute(()->{//这里失败之后 直接讲业务余额扣减
             orderServiceImpl.updateOrderStatus(order.getOrderId(), Common.Order.DealOrderApp.ORDER_STATUS_ER,"代付回滚");
             String orderQr = order.getOrderQr();
             String[] split = orderQr.split(":");
             String bankno =   split[2];
-            mediumServiceImpl.updateMount(bankno,order.getDealAmount().toString(),"add","succ");
+            mediumServiceImpl.updateMountWit(bankno,order.getDealAmount().toString());
         });
         return Result.buildSuccessMessage("渠道退款成功");
     }

@@ -35,7 +35,7 @@ public class HuiTongFUDpay extends PayOrderService {
         return DateUtil.format(new Date(), DatePattern.PURE_DATETIME_FORMAT);
     }
 
-    private static boolean isNumber(String str) {
+    public static boolean isNumber(String str) {
         BigDecimal a = new BigDecimal(str);
         double dInput = a.doubleValue();
         long longPart = (long) dInput;

@@ -83,7 +83,6 @@ public class PayApiConstant {
 		public static final String OFF_FILE = "/off-file-file";//关闭一个二维码
 		public static final String OPEN_FILE = "/open-file-file";//当前二维码裁剪完成
 		public static final String FILE_TASK = "/file-task";//图片裁剪定时任务
-
 	}
 
 	public class Queue{

@@ -17,6 +17,7 @@ import otc.bean.dealpay.Recharge;
 import otc.bean.dealpay.Withdraw;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -360,10 +361,8 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     MediumMapper mediumDao;
     @Override
-    public boolean updateBankAmount(String bankAccount, String orderId) {
-        Medium medium =   mediumDao.findBank(bankAccount);
-        String mountSystem = medium.getMountSystem();//当前银行卡系统余额  【系统内部业务余额】
-       int i =  dealOrderMapper.updateBankAmount(orderId,mountSystem);
+    public boolean updateBankAmount(String bankAccount, String orderId, String amount) {
+        int i =  dealOrderMapper.updateBankAmount(orderId,amount);
         return i>0;
     }
     @Override
@@ -402,6 +401,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void unGrabOrder(String orderId) {
           dealOrderMapper.unGrabOrder(orderId);
+
+    }
+
+    @Override
+    public void updateSystemBankAmount(BigDecimal bu, String orderId) {
+
+        dealOrderMapper.updateSystemBankAmount(bu,orderId);
+
 
     }
 }
