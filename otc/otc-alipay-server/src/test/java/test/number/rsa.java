@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import otc.util.MapUtil;
 import otc.util.RSAUtils;
 
+import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.util.*;
 
@@ -19,9 +20,15 @@ public class rsa {
 
 
     public static void main(String[] args) {
-        String s2 = PayUtil.md5("6230810354286164");
+        String s2 = PayUtil.md5("6217281732001139874");
         System.out.println(s2);
 
+        String amount = "2000.000";
+
+
+        if(new BigDecimal(amount).compareTo(new BigDecimal(500))< 0 ){
+            System.out.println("进入 判断");
+        }
 
     }
 }

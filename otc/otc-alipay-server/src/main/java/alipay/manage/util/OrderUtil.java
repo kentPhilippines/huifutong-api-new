@@ -336,7 +336,7 @@ public class OrderUtil {
         } else if (Common.Order.ORDER_TYPE_BANKCARD_W.toString().equals(order.getOrderType().toString())) {
             Withdraw orderWit = withdrawDao.findWitOrder(order.getAssociatedId());
             // 商户代付结算
-            if (orderWit.getOrderStatus().equals(2)) {
+            if (orderWit.getOrderStatus().equals("2")) {
                 log.info("【当前订单已处理,订单号：" + orderWit.getOrderId() + "】");
                 return Result.buildSuccessMessage("当前订单已处理");
             }

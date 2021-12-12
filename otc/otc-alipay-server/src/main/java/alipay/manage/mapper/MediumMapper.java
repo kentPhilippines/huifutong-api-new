@@ -57,7 +57,7 @@ public interface MediumMapper {
      * @return
      */
     @Select(" select * from alipay_medium where status = 1  and  isDeal = '2'   " +
-            " and black = 1  and error  = 0  and         (     #{amount}  > startAmount)  and    ( ( toDayDeal - toDayWit  + yseToday +  #{amount} ) < sumAmounlimit )   " +
+            " and black = 1  and error  = 0  and         (     #{amount}  > startAmount)    and    ( ( toDayDeal  +  #{amount} ) <   sumAmounlimit )  and    ( ( toDayDeal - toDayWit  + yseToday +  #{amount} ) <   mountLimit  )   " +
             "                and ( now() < endTime  and now() >  submitTime  )     "
              )
     List<Medium> findBankByAmount(@Param("amount") BigDecimal amount);

@@ -61,6 +61,7 @@ public class BankUtil {
 	private static final Long LOCK_TIME_OPEN = 300L;
 	private static final String WIT_BANK_COUNT = "WIT:BANK:COUNT:";//代付出款缓存数据统计
 	private static final String WIAT_BANK = "WIAT:BANK:";//代付出款缓存数据统计
+	private static final String LIMIT_BANK = "LIMIT:BANK:";//代付出款缓存数据统计
 
 
 	/**
@@ -190,22 +191,6 @@ public class BankUtil {
 	}
 
 	static {
-		userList5000.add("ww985125");
-		userList5000.add("waa669966");
-		userList4000.add("qiang168");
-		userList4000.add("wudi56789");
-		userList4000.add("dawin8888");
-		userList2000.add("atai999");
-		userList2000.add("vip2022");
-		userList2000.add("facai56789");
-		userList2000.add("ok1888");
-		userList3000.add("lhfa123");
-		userList1500.add("xiaowen");
-		userList1500.add("l1391101");
-		userList1500.add("w852754");
-		userList1000.add("mn89562322");
-		userList1000.add("ay870122");
-		userList1000.add("wyawbb123");
 	}
 
 	/**
@@ -310,7 +295,8 @@ public class BankUtil {
 			Object object2 = redisUtil.get(notify);//回调数据
 			//	Object object = redisUtil.get(qr.getPhone());
 			boolean clickAmount = riskUtil.isClickAmount(qr.getQrcodeId(), amount, usercollect, flag);
-			if (ObjectUtil.isNull(object2) && clickAmount  ) {
+			Object o = redisUtil.get(LIMIT_BANK + qr.getMediumNumber().trim());//回调数据
+			if (ObjectUtil.isNull(object2) && clickAmount && ObjectUtil.isNull(o)) {
 			/*	time = LOCK_TIME_OPEN;
 				if (BankOpen.BANK_LIST.contains(qr.getMediumNumber())) {
 					time = LOCK_TIME_OPEN;
@@ -320,6 +306,7 @@ public class BankUtil {
 				if(0L != aLong){
 					time = aLong;
 				}
+				redisUtil.set(LIMIT_BANK + qr.getMediumNumber().trim(), LIMIT_BANK + qr.getMediumNumber().trim(), 30);//金额锁定时间标记     , 如果在20分钟内回调就会删除锁定金额
 				redisUtil.set(notify, orderNo, time);    //核心回调数据
 				//redisUtil.set(qr.getPhone(), qr.getPhone() + amount.toString(), Integer.valueOf( configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.QR_OUT_TIME).getResult().toString() ));
 				String hashkey = qr.getQrcodeId() + DateUtil.format(new Date(), Common.Order.DATE_TYPE);    //锁定金额数据

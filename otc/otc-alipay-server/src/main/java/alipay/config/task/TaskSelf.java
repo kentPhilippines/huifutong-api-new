@@ -23,7 +23,7 @@ public class TaskSelf {
     @Autowired
     private ServerConfig serverConfig;
 
-    @Scheduled(cron = "0/20 * * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     public void orderTask() {
         if (serverConfig.getServerPort() != 9010) {
             log.info("当前任务端口号不正确");

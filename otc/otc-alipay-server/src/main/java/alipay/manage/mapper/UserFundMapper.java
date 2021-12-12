@@ -32,9 +32,15 @@ public interface UserFundMapper {
 
     @Select("select * from alipay_user_fund auf " +
             " left join alipay_user_info aui on auf.userId = aui.userId " +
+            " ( " +
+            "             select SUM(mountNow) as mountNow , qrcodeId from " +
+            "             alipay_medium WHERE  isDeal = '2' " +
+            "             group by qrcodeId " +
+            "             ) as am  on auf.userId =  am.qrcodeId  " +
             " where aui.userType = 2 and  ( ( auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance - ((100 - aui.credit   ) / 100 *  (auf.deposit)) ) > #{amount}  ) and" +
-            " ( auf.accountBalance  - auf.sumProfit  <=  auf.deposit ) " +
-            " and aui.switchs = 1 and aui.receiveOrderState = 1 ")
+            " ( auf.accountBalance  - auf.sumProfit  - 3000  <=  auf.deposit ) " +
+            " and aui.switchs = 1 and aui.receiveOrderState = 1 " +
+            " and am.mountNow < auf .deposit ")
     List<UserFund> findUserByAmount(@Param("amount") BigDecimal amount);
 
     @Select(" select  id, userId, userName, cashBalance, rechargeNumber, freezeBalance, accountBalance, " +

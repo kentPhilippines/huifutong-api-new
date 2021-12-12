@@ -152,7 +152,6 @@ public class QrcodeContorller {
                 if(StrUtil.isEmpty(bankCard)){
                     bankCard =order.getOrderQr().split(MARK)[2];
                 }
-
                 Result result = enterWit(order, bankCard, orderId);
                 if(!result.isSuccess()){
                     return  result;
@@ -227,9 +226,7 @@ public class QrcodeContorller {
         account = mediumId.getAccount();//开户行
         mediumPhone = mediumId.getMediumPhone();
         String bankInfo = "";
-
         String isWit = mediumNumber + mediumPhone + getAmount(order.getDealAmount());
-
         boolean b1 = redisUtil.hasKey(isWit);
         if (b1) {
             return Result.buildFailMessage("当前银行卡限制出款，请等待");
@@ -254,12 +251,8 @@ public class QrcodeContorller {
             log.info("当前订单号为："+witNotify+"");
             redisUtil.set("WIT:" + witNotify, order.getOrderId(), 600);
         }
-
         return Result.buildSuccess();
     }
-
-
-
 
 
     @GetMapping("/grabOrder")
@@ -275,14 +268,18 @@ public class QrcodeContorller {
             if(2 == receiveOrderState){
                 return;
             }
+
             /**
              * 抢单要求
              * 1，当前订单抢到后总出款单 不超过4单
              * 2, 当前订单金额不超过总押金额度-处理中的出款订单
              */
-
             String publicAccount = "zhongbang-bank";
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
+            if(new BigDecimal(12000).compareTo(orderWit.getDealAmount()) < 0 ){
+                log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"订单金额不合符抢单要求");
+                return ;
+            }
             if(null == orderWit ){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前订单已被抢");
                 return ;
@@ -325,12 +322,7 @@ public class QrcodeContorller {
              * 2, 当前订单金额不超过总押金额度-处理中的出款订单
              */
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,user.getUserId());
-
             orderServiceImpl.unGrabOrder(orderWit.getOrderId());//放弃出款按钮
-
-
-
-
         });
         return Result.buildSuccessMessage("已经放弃出款,等待客服切款");
     }

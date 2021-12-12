@@ -51,12 +51,13 @@
 						accountChangeLog.runOrderType  == 6 ? '代付手续费' :
 						accountChangeLog.runOrderType  == 7 ? '冻结' :
 						accountChangeLog.runOrderType  == 8 ? '解冻' :
-						accountChangeLog.runOrderType  == 9 ? '代付手手续费冻结' :
+						accountChangeLog.runOrderType  == 9 ? '代付手续费冻结' :
 						accountChangeLog.runOrderType  == 10 ? '代付冻结' :
 						accountChangeLog.runOrderType  == 11 ? '增加交易点数' :
 						accountChangeLog.runOrderType  == 12 ? '点数扣除' :
 						accountChangeLog.runOrderType  == 13 ? '代理商分润' :
-						accountChangeLog.runOrderType  == 14 ? '码商分润' :''
+						accountChangeLog.runOrderType  == 14 ? '码商分润' :'':
+						accountChangeLog.runOrderType  == 40 ? '冲正交易' :''
 						}}
 						</span><label class="form-details-item-highlight">{{accountChangeLog.orderAccount}}</label>
 					</div>

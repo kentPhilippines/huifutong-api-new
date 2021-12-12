@@ -137,6 +137,7 @@ public class CreateOrder {
      * @param dealApp
      * @return
      */
+    private String name = "付款人：";
     public Result dealAddOrder(DealOrderApp dealApp) {
         String channnelId = "";
         String channelFeeId = null;
@@ -155,11 +156,11 @@ public class CreateOrder {
         String bc = GenerateOrderNo.Generate("BA");
 
         String payInfo = dealApp.getDealDescribe();
-
-
-
-
-
+        if(StrUtil.isNotEmpty(payInfo)) {
+            String[] split = payInfo.split(name);
+            String payName = split[1];
+            payInfo = payName;
+        }
         Medium qr = queue.findQr(bc, dealApp.getOrderAmount(), Arrays.asList(queueCode), false,payInfo);//当前接口限制 收款回调，接单限制，接单评率等数据
         if (null == qr) {
             return Result.buildFailMessage("暂无对应银行卡");
