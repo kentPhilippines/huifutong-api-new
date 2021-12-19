@@ -20,15 +20,11 @@ public class rsa {
 
 
     public static void main(String[] args) {
-        String s2 = PayUtil.md5("6217281732001139874");
-        System.out.println(s2);
-
-        String amount = "2000.000";
+        String s = PayUtil.md5("6230901818126454596");
 
 
-        if(new BigDecimal(amount).compareTo(new BigDecimal(500))< 0 ){
-            System.out.println("进入 判断");
-        }
+        System.out.println(s);
+
 
     }
 }

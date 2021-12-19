@@ -302,10 +302,6 @@ public class BankUtil {
 					time = LOCK_TIME_OPEN;
 				}*/
 				time = qr.getSc();
-				Long aLong = addTime(qr.getAccount());
-				if(0L != aLong){
-					time = aLong;
-				}
 				redisUtil.set(LIMIT_BANK + qr.getMediumNumber().trim(), LIMIT_BANK + qr.getMediumNumber().trim(), 30);//金额锁定时间标记     , 如果在20分钟内回调就会删除锁定金额
 				redisUtil.set(notify, orderNo, time);    //核心回调数据
 				//redisUtil.set(qr.getPhone(), qr.getPhone() + amount.toString(), Integer.valueOf( configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.QR_OUT_TIME).getResult().toString() ));

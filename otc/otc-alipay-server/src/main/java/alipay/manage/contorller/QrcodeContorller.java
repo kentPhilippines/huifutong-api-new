@@ -13,6 +13,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -53,6 +54,8 @@ public class QrcodeContorller {
     private UserInfoService userInfoServer;
     @Autowired
     private ReWit reWit;
+    @Autowired
+    private ExceptionOrderService exceptionOrderServiceImpl;
 
     @GetMapping("/findIsMyQrcodePage")
     @ResponseBody
@@ -141,8 +144,8 @@ public class QrcodeContorller {
             return Result.buildFailResult("用户未登录");
         }
         log.info("银行卡号："+bankCard);
+        DealOrder order = orderServiceImpl.findOrderByOrderId(orderId);
         try {
-            DealOrder order = orderServiceImpl.findOrderByOrderId(orderId);
             String mediumNumber = "";
             String mediumHolder = "";
             String account = "";
@@ -152,7 +155,7 @@ public class QrcodeContorller {
                 if(StrUtil.isEmpty(bankCard)){
                     bankCard =order.getOrderQr().split(MARK)[2];
                 }
-                Result result = enterWit(order, bankCard, orderId);
+                Result result = enterWit(order, bankCard, orderId,request);
                 if(!result.isSuccess()){
                     return  result;
                 }
@@ -162,7 +165,7 @@ public class QrcodeContorller {
                 mediumHolder = split[1];//开户人
                 account = split[0];//开户行
                 Medium mediumByMediumNumber = mediumServiceImpl.findMediumByMediumNumber(mediumNumber);
-                Result result = enterWit(order, mediumByMediumNumber.getId().toString(), orderId);
+                Result result = enterWit(order, mediumByMediumNumber.getId().toString(), orderId,request);
                 if(!result.isSuccess()){
                     return  result;
                 }
@@ -178,6 +181,7 @@ public class QrcodeContorller {
         }catch (Throwable t ){
             log.error("选卡异常",t);
             log.info("出款信息异常，当前订单号："+orderId);
+            exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),user.getUserId()," 当前报错：选卡异常",Boolean.FALSE, HttpUtil.getClientIP(request),order.getDealAmount());
         }
         try {
             ThreadUtil.execute(()->{
@@ -187,10 +191,9 @@ public class QrcodeContorller {
         }catch (Throwable e ){
             log.info("出款卡锁定异常");
         }
+        exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),user.getUserId(),"当前用户成功选卡出款，请关注",Boolean.TRUE, HttpUtil.getClientIP(request),order.getDealAmount());
         return Result.buildSuccessResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + orderId + "&type=203");
     }
-
-
     String getAmount(BigDecimal dealAmount) {
         String amount = "";
         String[] split = dealAmount.toString().split("\\.");
@@ -215,7 +218,7 @@ public class QrcodeContorller {
 
 
 
-    Result  enterWit( DealOrder order ,String bankCard,String orderId){
+    Result  enterWit( DealOrder order ,String bankCard,String orderId,HttpServletRequest request){
         String mediumNumber = "";
         String mediumHolder = "";
         String account = "";
@@ -229,6 +232,7 @@ public class QrcodeContorller {
         String isWit = mediumNumber + mediumPhone + getAmount(order.getDealAmount());
         boolean b1 = redisUtil.hasKey(isWit);
         if (b1) {
+            exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),order.getOrderQrUser()," 当前报错：当前银行卡限制出款，请用户稍等几分钟后重新拉单",Boolean.FALSE, HttpUtil.getClientIP(request),order.getDealAmount());
             return Result.buildFailMessage("当前银行卡限制出款，请等待");
         }
         String bankCheck = RSAUtils.md5(RedisConstant.Queue.HEARTBEAT + mediumNumber);// 验证银行 卡在线标记
@@ -240,6 +244,7 @@ public class QrcodeContorller {
         String witNotify1 = mediumNumber + mediumPhone + amount1 ; //验证当前 银行卡是否处于出款状态
         Object o = redisUtil.get("WIT:" + witNotify1);
         if (null != o) {
+            exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),order.getOrderQrUser()," 当前报错：当前银行卡 正在出款， 请更换银行卡出款",Boolean.FALSE, HttpUtil.getClientIP(request),order.getDealAmount());
             return Result.buildFailMessage("当前银行卡 正在出款， 请更换银行卡出款");
         }
         bankInfo = account + MARK + mediumHolder + MARK + mediumNumber + MARK + "电话" + MARK + mediumPhone;
@@ -249,7 +254,7 @@ public class QrcodeContorller {
             String amount = getAmount(order.getDealAmount());
             String witNotify = mediumNumber + mediumPhone + amount; //代付回调成功 标记
             log.info("当前订单号为："+witNotify+"");
-            redisUtil.set("WIT:" + witNotify, order.getOrderId(), 600);
+            redisUtil.set("WIT:" + witNotify, order.getOrderId(), 500);
         }
         return Result.buildSuccess();
     }
@@ -263,9 +268,12 @@ public class QrcodeContorller {
             return Result.buildFailResult("用户未登录");
         }
         ThreadUtil.execute(()->{
+            String publicAccount = "zhongbang-bank";
+            DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
             UserInfo user1 = userInfoServer.findUserInfoByUserId(user.getUserId());
             Integer receiveOrderState = user1.getReceiveOrderState();
             if(2 == receiveOrderState){
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：当前用户代付状态未开启",Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return;
             }
 
@@ -274,20 +282,22 @@ public class QrcodeContorller {
              * 1，当前订单抢到后总出款单 不超过4单
              * 2, 当前订单金额不超过总押金额度-处理中的出款订单
              */
-            String publicAccount = "zhongbang-bank";
-            DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
+
             if(new BigDecimal(12000).compareTo(orderWit.getDealAmount()) < 0 ){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"订单金额不合符抢单要求");
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：订单金额不合符抢单要求",Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;
             }
             if(null == orderWit ){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前订单已被抢");
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：当前订单已经被抢",Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;
             }
             log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+""+"");
             List<DealOrder> witOrderByUserId = orderServiceImpl.findWitOrderByUserId(user.getUserId());
             if( witOrderByUserId.size()>=5){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前账户抢单过多，请先出款");
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：当前账户抢单过多，需要先处理其他订单",Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;
             }
             BigDecimal amount = BigDecimal.ZERO;
@@ -302,9 +312,17 @@ public class QrcodeContorller {
             BigDecimal deposit = userFund.getDeposit();
             if(deposit.compareTo(amount) < 0 ){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"抢单失败，可用额度不足");
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：抢单失败，可用额度不足" ,Boolean.TRUE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;
             }
-            reWit.grabOrder(user.getUserId(),orderWit);
+            Result result = reWit.grabOrder(user.getUserId(), orderWit);
+            if(result.isSuccess()){
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId(),"抢单成功" ,Boolean.TRUE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
+            }else {
+                exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId(),result.getMessage() ,Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
+            }
+
+
         });
         return Result.buildSuccessMessage("抢单已处理，请到出款页面查看结果");
     }
@@ -316,6 +334,7 @@ public class QrcodeContorller {
             return Result.buildFailResult("用户未登录");
         }
         ThreadUtil.execute(()->{
+            log.info("放弃出款当前订单号："+orderId);
             /**
              * 抢单要求
              * 1，当前订单抢到后总出款单 不超过4单
@@ -323,6 +342,7 @@ public class QrcodeContorller {
              */
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,user.getUserId());
             orderServiceImpl.unGrabOrder(orderWit.getOrderId());//放弃出款按钮
+            exceptionOrderServiceImpl.unGrabOrder(orderWit.getOrderId(),user.getUserId(),"卡商放弃出款" ,Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
         });
         return Result.buildSuccessMessage("已经放弃出款,等待客服切款");
     }

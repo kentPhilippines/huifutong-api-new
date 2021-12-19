@@ -48,7 +48,7 @@ public class IsDealIpUtil {
 		 * <li>3,随机匹配</li>
 		 */
 		AreaIp ip  = new AreaIp();
-		ip.setIp(StrUtil.isBlank(addresses.getIp())?"":addresses.getIp());
+		ip.setIp(ipAddr);
 		ip.setArea(StrUtil.isBlank(addresses.getArea())?"":addresses.getArea());
 		ip.setAreaId(StrUtil.isBlank(addresses.getArea_id())?"":addresses.getArea_id());
 		ip.setCity(StrUtil.isBlank(addresses.getCity())?"":addresses.getCity());

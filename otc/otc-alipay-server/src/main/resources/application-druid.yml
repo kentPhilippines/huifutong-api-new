@@ -1,4 +1,6 @@
 server:
+    # 服务器的HTTP端口，默认为80
+  port: 801
   session:
     store-type: redis
     #  timeout: 3600s

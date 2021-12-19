@@ -4,6 +4,8 @@ import alipay.manage.bean.ExceptionOrder;
 import alipay.manage.bean.util.DealBean;
 import alipay.manage.bean.util.WithdrawalBean;
 
+import java.math.BigDecimal;
+
 public interface ExceptionOrderService {
 
 
@@ -37,4 +39,15 @@ public interface ExceptionOrderService {
 
     void addWitEx(String user,String amount,String msg,String ip ,String orderId  );
     void addDealEx(String user,String amount,String msg,String ip ,String orderId  );
+
+    void addBankInfo(String orderId, String userId, String msg, Boolean status, String ip, BigDecimal dealAmount);
+    void addFindBankInfo(String orderId, String userId, String msg, Boolean status, String ip, BigDecimal dealAmount);
+
+    void unGrabOrder(String orderId, String userId, String 卡商放弃出款, Boolean aFalse, String clientIP, BigDecimal dealAmount);
+
+
+    void enterBankOrder(String orderId, String userId, String s, Boolean aTrue, String clientIP, BigDecimal dealAmount);
+
+
+    
 }

@@ -5,6 +5,7 @@ import alipay.manage.bean.DealOrder;
 import alipay.manage.bean.RunOrder;
 import alipay.manage.bean.UserInfo;
 import alipay.manage.bean.util.PageResult;
+import alipay.manage.service.ExceptionOrderService;
 import alipay.manage.service.OrderService;
 import alipay.manage.service.UserInfoService;
 import alipay.manage.service.UserRateService;
@@ -108,7 +109,8 @@ public class OrderContorller {
 		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType );
 		return Result.buildSuccessResult(listOrder);
 	}
-
+	@Autowired
+	private ExceptionOrderService exceptionOrderServiceImpl;
 	@Autowired
 	private ReWit reWit;
 	@GetMapping("/userConfirmToPaid")
@@ -129,6 +131,7 @@ public class OrderContorller {
 				//	reWit.rewit(user.getUserId());
 				});
 			}
+			exceptionOrderServiceImpl.enterBankOrder(orderByOrderId.getOrderId(),user.getUserId()," 卡商确认出款成功",Boolean.TRUE, HttpUtil.getClientIP(request),orderByOrderId.getDealAmount());
 			return orderDealSu;
 		} else {
 			return Result.buildFailMessage("请绑定出款卡");

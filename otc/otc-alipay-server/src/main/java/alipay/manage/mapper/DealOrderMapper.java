@@ -131,10 +131,10 @@ public interface DealOrderMapper {
      */
     @Select("" + " " +
             " ( select * from alipay_deal_order where orderStatus = 2  and  retain4 = 1   and (orderType = 1 or orderType = 3 )      and    submitTime  between    CURRENT_TIMESTAMP - INTERVAL 50 MINUTE   " +
-            "     and  now() order by id limit 25) " +
+            "     and  now() order by submitTime limit 25 )   " +
             " union all " +
             " ( select * from alipay_deal_order  where orderStatus = 2  and  retain4 = 1   and  orderType = 4  and enterPay = 1  and    submitTime  between    CURRENT_TIMESTAMP - INTERVAL 20000 MINUTE  " +
-            "        and  CURRENT_TIMESTAMP - INTERVAL 2 MINUTE )  ")
+            "        and  CURRENT_TIMESTAMP - INTERVAL 2 MINUTE order by submitTime )   ")
     List<DealOrder> findSuccessAndNotAmount();
 
 

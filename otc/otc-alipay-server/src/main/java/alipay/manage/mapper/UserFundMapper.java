@@ -32,7 +32,7 @@ public interface UserFundMapper {
 
     @Select("select * from alipay_user_fund auf " +
             " left join alipay_user_info aui on auf.userId = aui.userId " +
-            " ( " +
+            "   left join  ( " +
             "             select SUM(mountNow) as mountNow , qrcodeId from " +
             "             alipay_medium WHERE  isDeal = '2' " +
             "             group by qrcodeId " +

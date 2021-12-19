@@ -285,10 +285,6 @@ public class WitPay extends PayOrderService {
                 }
             } else {
                 deal = super.withdraw(order);
-                if (deal.isSuccess()) {
-                    withdrawServiceImpl.updateMsg(order.getOrderId(), "当前代付为手动推送，请手动推送出款");
-                }
-
             }
         } catch (Exception e) {
             push("当前推送发生异常，修改订单为已推送状态， 请及时检查异常情况，当前订单号：" + order.getOrderId() + "，当前程序堆栈数据：" + printStackTrace(e.getStackTrace()));
