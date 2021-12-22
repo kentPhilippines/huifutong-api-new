@@ -168,11 +168,6 @@ public class OrderTask {
                     withdrawServiceImpl.updatePush(order.getOrderId());//修改为已推送
                     continue;
 				}
-
-				if(!order.getRetain1().equals("1")){
-					log.info("当前订单为后台手动提款请手动推送，当前订单号："+order.getOrderId());
-					continue;
-				};
 				Result settlement = WitPayImpl.witAutoPush(order);
 			} catch (Exception e) {
 				log.info("【推送代付订单异常：" + order.getOrderId() + "】");

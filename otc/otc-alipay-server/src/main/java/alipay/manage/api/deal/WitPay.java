@@ -80,6 +80,7 @@ public class WitPay extends PayOrderService {
         String manage = request.getParameter("manage");
         boolean flag = false;
         if (StrUtil.isNotBlank(manage)) {
+            log.info("后台提现");
             flag = true;
         }
         Result withdrawal = vendorRequestApi.withdrawal(request, flag);
