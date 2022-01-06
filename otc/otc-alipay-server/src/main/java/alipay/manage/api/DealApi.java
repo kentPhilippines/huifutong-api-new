@@ -2,6 +2,7 @@ package alipay.manage.api;
 
 import alipay.manage.api.config.NotfiyChannel;
 import alipay.manage.bean.*;
+import alipay.manage.mapper.DealOrderAppMapper;
 import alipay.manage.service.*;
 import alipay.manage.util.LogUtil;
 import alipay.manage.util.NotifyUtil;
@@ -28,10 +29,12 @@ import otc.result.Result;
 import otc.util.RSAUtils;
 import otc.util.number.Number;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -166,14 +169,23 @@ public class DealApi extends NotfiyChannel {
 		DealOrder order2 = orderServiceImpl.findAssOrder(stringObjectMap.get(ORDER).toString());
 		return Result.buildSuccessResult(order2);
 	}
-	
+	@Resource
+	DealOrderAppMapper dealOrderAppDao;
 	
 	@GetMapping("/getOrderGatheringCode1")
 	@ResponseBody
 	public Result findOrder1(String orderNo) {
 		log.info("【查询订单号为："+orderNo+"】");
-		DealOrder order2 = orderServiceImpl.findOrderByOrderId(orderNo);
-		return Result.buildSuccessResult(order2);
+		if(StrUtil.isEmpty(orderNo)){
+			 return Result.buildFailMessage("必传订单号为空");
+		}
+		DealOrder orderByAssociatedId = orderServiceImpl.findOrderByAssociatedId(orderNo);
+		String orderQr = orderByAssociatedId.getOrderQr();//支付宝数据
+		Medium mediumById = mediumServiceImpl.findMediumById(orderQr);
+		Map  map = new HashMap();
+		map.put("order",orderByAssociatedId);
+		map.put("medium",mediumById);
+		return Result.buildSuccessResult(map);
 	}
 	
 	@GetMapping("/testWit")
