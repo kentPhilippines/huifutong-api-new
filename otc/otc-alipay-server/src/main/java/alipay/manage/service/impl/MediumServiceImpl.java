@@ -52,7 +52,7 @@ public class MediumServiceImpl implements MediumService {
              * 这里验证唯一需要加上  银行卡类型
              */
         }
-        criteria.andIsDealEqualTo(Common.Medium.QR_IS_DEAL_ON);
+       // criteria.andIsDealEqualTo(Common.Medium.QR_IS_DEAL_ON);
         if (CollUtil.isNotEmpty(mediumDao.selectByExample(example))) {//验证银行卡号唯一
             return false;
         }
@@ -60,12 +60,13 @@ public class MediumServiceImpl implements MediumService {
         medium.setMediumId(medium2);
         medium.setIsDeal(Common.Medium.QR_IS_DEAL_ON);
         medium.setStatus(Integer.valueOf(Common.STATUS_IS_NOT_OK));
+        medium.setPayInfo(medium.getPayInfo());
         String agentId = correlationService.findAgent(medium.getQrcodeId());
         medium.setAttr(agentId);//顶代标识
         /**
          * 还需要   添加当前 银行卡当日最高接单金额， 以及当前银行卡当前回调标识，，， 各个银行都是不一样的   回调标识  在这里单独写方法以做区分
          */
-        medium.setNotfiyMask(BankTypeUtil.replaceBank(medium.getAccount(), medium.getMediumNumber()));
+       // medium.setNotfiyMask(BankTypeUtil.replaceBank(medium.getAccount(), medium.getMediumNumber()));
         int insertSelective = mediumDao.insertSelective(medium);
         Medium medium1 = mediumDao.findMediumBy(medium2);
         UserInfo user = userInfoMapper.findUserByUserId(medium1.getQrcodeId());

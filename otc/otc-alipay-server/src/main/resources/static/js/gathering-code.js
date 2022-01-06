@@ -20,6 +20,7 @@ var gatheringCodeVM = new Vue({
 		mediumId: '',
 		editShow: false,
 		mediumShow: true,
+		isAlipay: false,
 		qrcodeShow: false,
 		addQrShow: false,
 		showGatheringCodeFlag: true,
@@ -37,7 +38,8 @@ var gatheringCodeVM = new Vue({
 			bankcode: '',
 			account: '',
 			code: '',
-			status: ''
+			status: '',
+			payInfo :''
 		},
 		showEditGatheringCodeFlag : false,
 	},
@@ -83,6 +85,13 @@ var gatheringCodeVM = new Vue({
 
 	},
 	methods : {
+		getValue: function (){
+			if(this.medium.code == 'alipay'){
+				this.isAlipay = true;
+			}else{
+				this.isAlipay = false;
+			}
+		},
 		/**
 		 * 获取收款渠道1
 		 */
@@ -91,7 +100,8 @@ var gatheringCodeVM = new Vue({
 			that.$http.get('/recharge/findEnabledPayType').then(function (res) {
 				this.gatheringChannelDictItems = res.body.result;
 				this.mediumDictItems = [
-					{mediumCode: 'card', mediumName: '银行卡'}
+					{mediumCode: 'card', mediumName: '银行卡'},
+					{mediumCode: 'alipay', mediumName: '支付宝'}
 				]
 			});
 		},
@@ -441,8 +451,14 @@ var gatheringCodeVM = new Vue({
 				this.editShow = false;	
 				headerVM.title = '添加收款媒介';
 			}
+			if(this.medium.code == 'alipay'){
+				this.isAlipay = true;
+			}else{
+				this.isAlipay = false;
+			}
 			this.mediumShow = false;//关闭主页面
 			this.mediumEdit = true;//打开编辑媒介页面
+
 		},
 		hideEditGatheringCodePage : function() {
 			headerVM.showBackFlag = true;
@@ -455,6 +471,12 @@ var gatheringCodeVM = new Vue({
 		addMedium : function (){
 			var that = this;
 			var medium = that.medium;
+
+
+
+			if(medium.code == 'alipay'){
+				medium.account = '蚂蚁金服科技';
+			}
 			if (medium.code == null || medium.code == '') {
 				layer.alert('请选择收款媒介', {
 					title : '提示',

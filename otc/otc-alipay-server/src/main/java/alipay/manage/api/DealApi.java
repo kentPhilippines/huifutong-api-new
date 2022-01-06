@@ -6,6 +6,7 @@ import alipay.manage.service.*;
 import alipay.manage.util.LogUtil;
 import alipay.manage.util.NotifyUtil;
 import alipay.manage.util.QrUtil;
+import alipay.manage.util.bankcardUtil.BankUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -42,7 +43,8 @@ public class DealApi extends NotfiyChannel {
 	@Autowired OrderAppService orderAppServiceImpl;
 	@Autowired OrderService orderServiceImpl;
 	@Autowired UserInfoService userInfoServiceImpl;
-	@Autowired QrUtil  qrUtil;
+	@Autowired
+	private BankUtil qrUtil;
 	@Autowired LogUtil logUtil;
 	@Autowired NotifyUtil notifyUtil;
 	@Autowired FileListService fileListServiceImpl;
@@ -51,14 +53,24 @@ public class DealApi extends NotfiyChannel {
 	static Lock lock = new ReentrantLock();
 	private static final String tinyurl =  "http://tinyurl.com/api-create.php";
 	private static final Log log = LogFactory.get();
-	@RequestMapping("/alipayScan/{param:.+}")
-	public String alipayScan(@PathVariable String param,HttpServletRequest request) {
+	@RequestMapping("/alipayScan")
+	public String alipayScan(HttpServletRequest request) {
+		String orderId = request.getParameter("order_id");
+		if(StrUtil.isEmpty(orderId)){
+			log.info("【关联订单号为空】");
+		}
+		log.info("【请求交易的终端用户交易请求参数为：order_id=" + orderId + "】");
+
+
+/*
 		log.info("【请求交易的终端用户交易请求参数为：" + param + "】");
 		Map<String, Object> stringObjectMap = RSAUtils.retMapDecode(param, SystemConstants.INNER_PLATFORM_PRIVATE_KEY);
 		if (CollUtil.isEmpty(stringObjectMap)) {
 			log.info("【参数解密为空】");
-		}
-		String orderId = stringObjectMap.get(ORDER).toString();
+		}*/
+
+
+
 		log.info("【当前请求交易订单号为：" + orderId + "】");
 		DealOrder order = orderServiceImpl.findAssOrder(orderId);
 		if (ObjectUtil.isNotNull(order)) {
@@ -95,21 +107,18 @@ public class DealApi extends NotfiyChannel {
 		order.setGenerationIp(HttpUtil.getClientIP(request));
 		order.setOrderAccount(orderApp.getOrderAccount());
 		order.setNotify(orderApp.getNotify());
-		FileList findQr = null;
+		Medium qr = null;
 
-		try {
-			findQr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), true);
-		} catch (ParseException e) {
-			log.info("【选码出现异常】");
-		}
-		if (ObjectUtil.isNull(findQr)) {
+			 qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), true, "");
+
+		if (ObjectUtil.isNull(qr)) {
 			return false;
 		}
-		order.setOrderQrUser(findQr.getFileholder());
-		order.setOrderQr(findQr.getFileId());
+		order.setOrderQrUser(qr.getMediumHolder());
+		order.setOrderQr(qr.getMediumId());
 		order.setOrderStatus(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString());
 		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
-		UserRate rate = userInfoServiceImpl.findUserRate(findQr.getFileholder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
+		UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
 		order.setOrderId(Number.getOrderQr());
 		order.setFeeId(rate.getId());
 		order.setRetain1(rate.getPayTypr());

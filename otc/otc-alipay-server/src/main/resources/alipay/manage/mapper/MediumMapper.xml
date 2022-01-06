@@ -34,6 +34,7 @@
         <result column="endTime" property="endTime"  />
         <result column="isClickPay" property="isClickPay"  />
         <result column="sc" property="sc"  />
+        <result column="payInfo" property="payInfo"  />
 
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="otc.bean.alipay.Medium" extends="BaseResultMap">
@@ -101,7 +102,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-    id, mediumNumber, mediumId, mediumHolder,mediumNote, mediumPhone, qrcodeId, code, createTime,toDayDeal,sumDayDeal,toDayWit,sumDayWit,startAmount,sumDayWit,startTime,endTime,isClickPay,sc,
+    id, mediumNumber, mediumId, mediumHolder,mediumNote, mediumPhone, qrcodeId, code,payInfo , createTime,toDayDeal,sumDayDeal,toDayWit,sumDayWit,startAmount,sumDayWit,startTime,endTime,isClickPay,sc,
     submitTime, status, isDeal,attr,bankcode,account,mountNow,mountSystem,mountLimit,notfiyMask,witAmount
   </sql>
     <sql id="Blob_Column_List">
@@ -228,6 +229,9 @@
             <if test="mountLimit != null">
                 mountLimit,
             </if>
+            <if test="payInfo != null">
+                payInfo,
+            </if>
         </trim>
 
 
@@ -286,6 +290,9 @@
             <if test="mountLimit != null">
                 #{mountLimit,jdbcType=DECIMAL},
             </if>
+            <if test="payInfo != null">
+                #{payInfo},
+            </if>
 
 
         </trim>
@@ -337,6 +344,9 @@
             </if>
             <if test="record.attr != null">
                 mediumNote = #{record.attr},
+            </if>
+            <if test="record.payInfo != null">
+                payInfo = #{record.payInfo},
             </if>
         </set>
         <if test="_parameter != null">
@@ -431,6 +441,9 @@
             </if>
             <if test="mountLimit != null">
                 mountLimit = #{mountLimit,jdbcType=DECIMAL},
+            </if>
+            <if test="payInfo != null">
+                payInfo = #{payInfo},
             </if>
 
 

@@ -94,7 +94,7 @@
                     <img src="https://i.alipayobjects.com/common/favicon/favicon.ico" style="float: right;">
                 </div>
                 <div class="account-change-body-item">
-                    <label>媒介:</label> <span>{{medium.code == 'card' ? '银行卡' : '其他'}}</span>
+                    <label>媒介:</label> <span>{{medium.code == 'card' ? '银行卡' : '支付宝'}}</span>
                     <label>状态:</label> <span>{{medium.status == 1 ? '开启' : '关闭'}}</span>
                 </div>
                 <div class="account-change-body-item">
@@ -177,7 +177,7 @@
         <div class="container" style="margin-top: 1.3rem;">
             <div class="form-group">
                 <label>收款媒介:</label>
-                <select class="form-control" v-model="medium.code">
+                <select class="form-control" v-model="medium.code" @change='getValue' >
                     <option value="">请选择</option>
                     <option :value="dictItem.mediumCode" v-for="dictItem in mediumDictItems">{{dictItem.mediumName}}
                     </option>
@@ -191,8 +191,14 @@
                     <option :value="0">关闭</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>银行卡账号:</label> <input class="form-control" placeholder="银行卡号" type="text"
+            <div class="form-group" v-show="!isAlipay"   >
+                <label>银行卡账号:</label>
+                <input class="form-control" placeholder="银行卡号" type="text"
+                                             v-model="medium.mediumNumber">
+            </div>
+            <div class="form-group" v-show="isAlipay"  >
+                <label>支付宝账号:</label>
+                <input class="form-control" placeholder="支付宝账号" type="text"
                                              v-model="medium.mediumNumber">
             </div>
             <div class="form-group">
@@ -211,13 +217,27 @@
                         {{dictItem.mediumName}}
                 </select>
             </div>-->
-            <div class="form-group">
+            <div class="form-group"  v-show="!isAlipay"  >
                 <label>银行卡开户行:</label>
                 <select class="form-control" v-model="medium.account">
                     <option value="">请选择</option>
                     <option :value="dictItem.mediumName" v-for="dictItem in mediumDictBankItems">{{dictItem.mediumName}}
                 </select>
             </div>
+
+            <div class="form-group" v-show="isAlipay"  >
+                <label>收款解析码:</label>
+                <input class="form-control" placeholder="请填写解析码" type="text"
+                       v-model="medium.payInfo">
+
+            </div>
+            <div class="form-group" v-show="!isAlipay"  >
+                <label>详细支行地址:</label>
+                <input class="form-control" placeholder="请填写支行地址" type="text"
+                       v-model="medium.payInfo">
+            </div>
+
+
             <form>
                 <button class="btn bg-primary btn-lg btn-block" style="background-color:#00a0e9" type="button"
                         v-on:click="addMedium">保存

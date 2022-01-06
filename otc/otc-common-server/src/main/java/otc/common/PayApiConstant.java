@@ -1,5 +1,7 @@
 package otc.common;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class PayApiConstant {
 	public class Server{
 		public static final String PAY_SERVER = "otc-pay-server";//四方支付服务
@@ -94,11 +96,15 @@ public class PayApiConstant {
         public static final String TASK_MEDIUM = "/task-medium";
 		public static final String UPDATA_BANK = "/updata-queue-bank";
     }
+	@Value("${otc:payInfo.url}")
+	public String url;
+
 
     public class Notfiy {
+
         public static final String NOTFIY_API = "/notfiy-api";
         public static final String NOTFIY_API_WAI = "/notfiy-api-pay";
         public static final String NOTFIY_AGENT = "/notfiy-agent";
-		public static final String OTHER_URL = "http://34.67.54.176";
+		public static  final String OTHER_URL =  "http://47.243.6.52";
     }
 }

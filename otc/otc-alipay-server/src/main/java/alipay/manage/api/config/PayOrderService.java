@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 import otc.api.alipay.Common;
 import otc.bean.dealpay.Withdraw;
+import otc.common.PayApiConstant;
 import otc.common.SystemConstants;
 import otc.result.Result;
 import otc.util.RSAUtils;
@@ -138,11 +139,9 @@ public abstract class PayOrderService implements PayService {
 		 * #############################
 		 * 生成预订单病返回支付连接
 		 */
-		Map<String, Object> param = MapUtil.newHashMap();
-		param.put(ORDER, dealOrderApp.getOrderId());
-		String encryptPublicKey = RSAUtils.getEncryptPublicKey(param, SystemConstants.INNER_PLATFORM_PUBLIC_KEY);
-		String URL = "";//configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.SERVER_IP).getResult().toString();补充链接即可成为三方支付服务
-		return Result.buildSuccessResult(URL + "/pay/alipayScan/" + encryptPublicKey);
+		//String encryptPublicKey = RSAUtils.getEncryptPublicKey(param, SystemConstants.INNER_PLATFORM_PUBLIC_KEY);
+		String URL = PayApiConstant.Notfiy.OTHER_URL;//configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.SERVER_IP).getResult().toString();补充链接即可成为三方支付服务
+		return Result.buildSuccessResult(URL + "/pay/alipayScan?order_id="+dealOrderApp.getOrderId());
 	}
 	/**
 	 * <p>支付宝H5</p>

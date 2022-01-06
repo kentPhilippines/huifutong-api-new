@@ -55,6 +55,16 @@ public class Medium implements Serializable {
     private String endTime;//接单结束 时间
     private Integer isClickPay;// 收款户名验证是否验证户名   1 验证    0 不验证
     private Long sc;//接单间隔秒数
+    private String payInfo;//支付宝扫码绑定的时候 上传二维码
+
+
+    public String getPayInfo() {
+        return payInfo;
+    }
+
+    public void setPayInfo(String payInfo) {
+        this.payInfo = payInfo;
+    }
 
     public BigDecimal getYseToday() {
         return yseToday;

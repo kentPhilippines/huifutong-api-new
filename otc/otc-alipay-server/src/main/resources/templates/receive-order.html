@@ -320,15 +320,15 @@
                     </div>
                 </div> -->
             <div class="platform-order" v-for="gatheringCode in gatheringCodes">
-                <div class="platform-order-body">
+                <div class="platform-order-body" >
                     <div class="account-change-body-item">
-                        <label>银行卡:</label> <span>{{gatheringCode.mediumNumber }}</span>
+                        <label>{{ gatheringCode.code == 'alipay' ? '银行卡' : '支付宝'}} :</label> <span>{{gatheringCode.mediumNumber }}</span>
                         <img height="40px"
                              src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1437076556,2698044114&fm=26&gp=0.jpg"
                              style="float: right;" width="40px">
                     </div>
-                    <div class="account-change-body-item">
-                        <label>开户行:</label> <span>{{gatheringCode.account }}</span>
+                    <div class="account-change-body-item"   >
+                        <label>   开户行:</label> <span>{{gatheringCode.account }}</span>
                     </div>
                     <div class="account-change-body-item">
                         <label>账户名:</label> <span>{{gatheringCode.mediumHolder }}</span>
