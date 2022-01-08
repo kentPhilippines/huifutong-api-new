@@ -53,13 +53,17 @@ public class DealApi extends NotfiyChannel {
 	@Autowired FileListService fileListServiceImpl;
 	@Autowired MediumService mediumServiceImpl;
 	@Autowired CorrelationService correlationServiceImpl;
+	@Autowired  private UserRateService userRateServiceImpl;
+
 	static Lock lock = new ReentrantLock();
 	private static final String tinyurl =  "http://tinyurl.com/api-create.php";
 	private static final Log log = LogFactory.get();
 	@RequestMapping("/alipayScan")
-	public String alipayScan(HttpServletRequest request) {
+	@ResponseBody
+	public Result alipayScan(HttpServletRequest request) {
 		String orderId = request.getParameter("order_id");
-		if(StrUtil.isEmpty(orderId)){
+		String ip = request.getParameter("ip");
+		if(StrUtil.isEmpty(orderId) ||StrUtil.isEmpty(ip)   ){
 			log.info("【关联订单号为空】");
 		}
 		log.info("【请求交易的终端用户交易请求参数为：order_id=" + orderId + "】");
@@ -77,20 +81,23 @@ public class DealApi extends NotfiyChannel {
 		log.info("【当前请求交易订单号为：" + orderId + "】");
 		DealOrder order = orderServiceImpl.findAssOrder(orderId);
 		if (ObjectUtil.isNotNull(order)) {
-			return "toFixationPay";
+			//return "toFixationPay";
+			return Result.buildFailMessage("当前订单不存在");
 		}
 		DealOrderApp orderApp = orderAppServiceImpl.findOrderByOrderId(orderId);
-		boolean flag = addOrder(orderApp, request);
+		boolean flag = addOrder(orderApp, request,ip);
 		if (!flag) {
 			log.info("【订单生成有误，或者当前武可用渠道】");
 			ThreadUtil.execute(() -> {
 				orderAppServiceImpl.updateOrderEr(orderId, "当前无可用渠道");
 			});
-			return "payEr";
+			return Result.buildFailMessage("当前暂无二维码");
+		//	return "payEr";
 		}
-		return "toFixationPay";
+	//	return "toFixationPay";
+		return Result.buildSuccessMessage("订单成功,请拉起扫码页面获取详细扫码信息");
 	}
-	private boolean addOrder(DealOrderApp orderApp, HttpServletRequest request) {
+	private boolean addOrder(DealOrderApp orderApp, HttpServletRequest request,String ip ) {
 		if (!orderApp.getOrderStatus().toString().equals(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString())) {
 			return false;
 		}
@@ -99,21 +106,22 @@ public class DealApi extends NotfiyChannel {
 		UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
 		String[] split = {};
 		if (StrUtil.isNotBlank(accountInfo.getQueueList())) {
-			split = accountInfo.getQueueList().split(",");//队列供应标识数组
+			//[0]split = "huifutong2";//队列供应标识数组
+			split[0] = "huifutong2";
 		}
+		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
+		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
 		order.setAssociatedId(orderApp.getOrderId());
 		order.setDealDescribe("正常交易订单");
-		order.setActualAmount(orderApp.getOrderAmount());
+		order.setActualAmount(orderApp.getOrderAmount().subtract(fee1));
 		order.setDealAmount(orderApp.getOrderAmount());
-		order.setDealFee(new BigDecimal("0"));
+		order.setDealFee(fee1);
 		order.setExternalOrderId(orderApp.getAppOrderId());
-		order.setGenerationIp(HttpUtil.getClientIP(request));
+		order.setGenerationIp(ip);//终端玩家拉起ip
 		order.setOrderAccount(orderApp.getOrderAccount());
 		order.setNotify(orderApp.getNotify());
 		Medium qr = null;
-
-			 qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), true, "");
-
+			 qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), false, "");
 		if (ObjectUtil.isNull(qr)) {
 			return false;
 		}
@@ -121,10 +129,23 @@ public class DealApi extends NotfiyChannel {
 		order.setOrderQr(qr.getMediumId());
 		order.setOrderStatus(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString());
 		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
-		UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
+		UserRate userRateR = userRateServiceImpl.findUserRateR(qr.getQrcodeId());
+	//	UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
 		order.setOrderId(Number.getOrderQr());
-		order.setFeeId(rate.getId());
-		order.setRetain1(rate.getPayTypr());
+		order.setFeeId(userRateR.getId());
+		order.setRetain1(userRateR.getPayTypr());
+
+		BigDecimal fee = userRateR.getFee();//卡商入款订单手续费率
+		BigDecimal multiply = fee.multiply(orderApp.getOrderAmount());//码商接单成本
+		log.info("码商接单成本："+multiply);
+		order.setRetain2(multiply.toString());//渠道成本
+		BigDecimal multiply1 = fee1.multiply(orderApp.getOrderAmount());
+		log.info("商户此单交易手续费："+multiply);
+		BigDecimal subtract = multiply1.subtract(multiply);//商户交易手续费 - 渠道成本 =  渠道利润
+		log.info("渠道此单利润："+subtract);
+		order.setRetain3(subtract.toString());// 渠道利润
+
+
 		boolean addOrder = orderServiceImpl.addOrder(order);
 		if (addOrder) {
 			corr(order.getOrderId());

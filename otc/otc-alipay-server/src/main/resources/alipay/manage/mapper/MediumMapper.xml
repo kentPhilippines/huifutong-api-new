@@ -35,6 +35,7 @@
         <result column="isClickPay" property="isClickPay"  />
         <result column="sc" property="sc"  />
         <result column="payInfo" property="payInfo"  />
+        <result column="isRed" property="isRed"  />
 
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="otc.bean.alipay.Medium" extends="BaseResultMap">
@@ -102,7 +103,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-    id, mediumNumber, mediumId, mediumHolder,mediumNote, mediumPhone, qrcodeId, code,payInfo , createTime,toDayDeal,sumDayDeal,toDayWit,sumDayWit,startAmount,sumDayWit,startTime,endTime,isClickPay,sc,
+    id, mediumNumber, mediumId, mediumHolder,mediumNote,isRed, mediumPhone, qrcodeId, code,payInfo , createTime,toDayDeal,sumDayDeal,toDayWit,sumDayWit,startAmount,sumDayWit,startTime,endTime,isClickPay,sc,
     submitTime, status, isDeal,attr,bankcode,account,mountNow,mountSystem,mountLimit,notfiyMask,witAmount
   </sql>
     <sql id="Blob_Column_List">
