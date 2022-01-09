@@ -58,6 +58,16 @@ public class Medium implements Serializable {
     private String payInfo;//支付宝扫码绑定的时候 上传二维码
 
 
+
+    private Integer isRed;//是否支付宝红包
+
+    public Integer getIsRed() {
+        return isRed;
+    }
+
+    public void setIsRed(Integer isRed) {
+        this.isRed = isRed;
+    }
     public String getPayInfo() {
         return payInfo;
     }
