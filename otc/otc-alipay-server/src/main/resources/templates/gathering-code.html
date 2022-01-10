@@ -91,7 +91,9 @@
             <div class="account-change-body">
                 <div class="account-change-body-item">
                     <label>创建时间:</label> <span>{{medium.createTime | dateFilter("yyyy-mm-dd hh:mm:ss")}}</span>
-                    <img src="https://i.alipayobjects.com/common/favicon/favicon.ico" style="float: right;">
+                    <img v-show="medium.code == 'alipay'"  src="https://i.alipayobjects.com/common/favicon/favicon.ico" style="float: right;">
+                    <img height="40px"  width="40px"  v-show="medium.code != 'alipay' "
+                         src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1437076556,2698044114&fm=26&gp=0.jpg" style="float: right;">
                 </div>
                 <div class="account-change-body-item">
                     <label>媒介:</label> <span>{{medium.code == 'card' ? '银行卡' : '支付宝'}}</span>

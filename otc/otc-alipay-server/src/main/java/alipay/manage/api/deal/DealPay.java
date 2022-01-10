@@ -11,6 +11,7 @@ import alipay.manage.service.ExceptionOrderService;
 import alipay.manage.service.OrderAppService;
 import alipay.manage.service.UserInfoService;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import org.slf4j.Logger;
@@ -130,11 +131,18 @@ public class DealPay {
     }
 
     DealOrderApp createDealAppOrder(DealBean dealBean, UserRate userRate) {
+        String payTypr = userRate.getPayTypr();
+        boolean alipay = payTypr.contains("ALIPAY");//如果是支付宝类型的产品金额 会有变动后面加几毛钱以作为 回调辨识
+        BigDecimal amount  = new BigDecimal(dealBean.getAmount());
+        if(alipay){
+            int i = RandomUtil.randomInt(1, 50);
+            amount = amount.add( new BigDecimal(i).divide(new BigDecimal(100))) ;
+        }
         DealOrderApp dealApp = new DealOrderApp();
         dealApp.setAppOrderId(dealBean.getOrderId());
         dealApp.setOrderId(Number.getAppOreder());
         dealApp.setNotify(dealBean.getNotifyUrl());
-        dealApp.setOrderAmount(new BigDecimal(dealBean.getAmount()));
+        dealApp.setOrderAmount(amount);
         String userId = dealBean.getAppId();
         dealApp.setFeeId(userRate.getId());
         dealApp.setOrderAccount(userId);

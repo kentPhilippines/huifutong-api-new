@@ -44,7 +44,7 @@ public class RiskUtil {
     @Autowired
     CorrelationService correlationServiceImpl;
     DateFormat formatter = new SimpleDateFormat(Common.Order.DATE_TYPE);
-    private static final Integer LOCK_TIME = 500;
+    private static final Integer LOCK_TIME = 1000;
     @Autowired
     private BankUtil bankUtil;
 

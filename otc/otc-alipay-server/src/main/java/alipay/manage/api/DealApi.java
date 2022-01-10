@@ -67,22 +67,17 @@ public class DealApi extends NotfiyChannel {
 			log.info("【关联订单号为空】");
 		}
 		log.info("【请求交易的终端用户交易请求参数为：order_id=" + orderId + "】");
-
-
 /*
 		log.info("【请求交易的终端用户交易请求参数为：" + param + "】");
 		Map<String, Object> stringObjectMap = RSAUtils.retMapDecode(param, SystemConstants.INNER_PLATFORM_PRIVATE_KEY);
 		if (CollUtil.isEmpty(stringObjectMap)) {
 			log.info("【参数解密为空】");
 		}*/
-
-
-
 		log.info("【当前请求交易订单号为：" + orderId + "】");
 		DealOrder order = orderServiceImpl.findAssOrder(orderId);
 		if (ObjectUtil.isNotNull(order)) {
 			//return "toFixationPay";
-			return Result.buildFailMessage("当前订单不存在");
+			return  Result.buildSuccessMessage("订单成功,请拉起扫码页面获取详细扫码信息");
 		}
 		DealOrderApp orderApp = orderAppServiceImpl.findOrderByOrderId(orderId);
 		boolean flag = addOrder(orderApp, request,ip);
@@ -104,18 +99,18 @@ public class DealApi extends NotfiyChannel {
 		DealOrder order = new DealOrder();
 		String orderAccount = orderApp.getOrderAccount();//交易商户号
 		UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
-		String[] split = {};
-		if (StrUtil.isNotBlank(accountInfo.getQueueList())) {
+		String[] split = {"huifutong2"};
+		if (StrUtil.isBlank(accountInfo.getQueueList())) {
 			//[0]split = "huifutong2";//队列供应标识数组
-			split[0] = "huifutong2";
+			return  false;
 		}
 		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
 		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
 		order.setAssociatedId(orderApp.getOrderId());
 		order.setDealDescribe("正常交易订单");
-		order.setActualAmount(orderApp.getOrderAmount().subtract(fee1));
+		order.setActualAmount(orderApp.getOrderAmount().subtract(fee1.multiply(orderApp.getOrderAmount())));
 		order.setDealAmount(orderApp.getOrderAmount());
-		order.setDealFee(fee1);
+		order.setDealFee(fee1.multiply(orderApp.getOrderAmount()));
 		order.setExternalOrderId(orderApp.getAppOrderId());
 		order.setGenerationIp(ip);//终端玩家拉起ip
 		order.setOrderAccount(orderApp.getOrderAccount());

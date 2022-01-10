@@ -199,7 +199,7 @@ public class witTest {
         deal.setNotifyUrl("http://starpay168.com:5055");
         deal.setPageUrl("http://starpay168.com:5055");
         deal.setOrderId(IdUtil.objectId());
-        deal.setPassCode("BANK_R");
+        deal.setPassCode("ALIPAY_BIG_QR");
         deal.setSubject("订单交易");
         deal.setUserId("张三");  //to userid
         Map<String, Object> objectToMap = MapUtil.objectToMap(deal);
@@ -218,7 +218,7 @@ public class witTest {
         postMap.put("cipherText", publicEncrypt);
         postMap.put("userId", userid);
         System.out.println("请求参数：" + postMap.toString());
-        String post = HttpUtil.post("http://34.150.96.248:5055/api-alipay/deal/pay", postMap);
+        String post = HttpUtil.post("http://127.0.0.1:801/deal/pay", postMap);
         System.out.println("相应结果集：" + post);
 
     }
