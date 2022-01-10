@@ -9,7 +9,6 @@ import alipay.manage.mapper.MediumMapper;
 import alipay.manage.mapper.UserInfoMapper;
 import alipay.manage.service.CorrelationService;
 import alipay.manage.service.MediumService;
-import alipay.manage.util.bankcardUtil.BankTypeUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import org.slf4j.Logger;
@@ -232,8 +231,8 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public List<Medium> findBankByAmount(BigDecimal amount, List<String> code) {
-      return mediumDao.findBankByAmount(amount);
+    public List<Medium> findBankByAmount(BigDecimal amount, List<String> code, String codeMed) {
+      return mediumDao.findBankByAmount(amount,codeMed);
     }
 
     @Override

@@ -98,10 +98,16 @@ public class BankOpen {
         // 也就是   昨日余额不用更新 有每日定时清算直接算出   今日余额也直接算出
         try {
             String orderQr = order.getOrderQr();
-            String[] split = orderQr.split(":");//
-            String bankNo  = split[2];
-            log.info("银行卡号："+bankNo);
-            Medium bankInfo =  mediumServiceImpl.findMedByBankNo(bankNo);
+            Medium bankInfo = null;
+            String payType = order.getRetain1();
+            if(!payType.contains("ALIPAY")){
+                String[] split = orderQr.split(":");//
+                String bankNo  = split[2];
+                log.info("银行卡号："+bankNo);
+                 bankInfo =  mediumServiceImpl.findMedByBankNo(bankNo);
+            }else{
+                bankInfo = mediumServiceImpl.findMediumById(orderQr);
+            }
             String orderType = order.getOrderType();
             boolean flag = Boolean.FALSE;
             if( "1".equals(orderType) ) {//入款更新

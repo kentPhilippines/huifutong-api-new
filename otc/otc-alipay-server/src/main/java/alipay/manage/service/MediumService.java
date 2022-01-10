@@ -116,9 +116,10 @@ public interface MediumService {
      *
      * @param amount
      * @param code
+     * @param codeMed
      * @return
      */
-    List<Medium> findBankByAmount(BigDecimal amount, List<String> code);
+    List<Medium> findBankByAmount(BigDecimal amount, List<String> code, String codeMed);
 
     void updateMountNow(String bankAccount, BigDecimal dealAmount, String add);
 

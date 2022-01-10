@@ -1,7 +1,6 @@
 package alipay.manage.util.bankcardUtil;
 
 import alipay.config.redis.RedisUtil;
-import alipay.config.task.BankOpen;
 import alipay.manage.api.feign.ConfigServiceClient;
 import alipay.manage.api.feign.QueueServiceClien;
 import alipay.manage.bean.UserFund;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import otc.api.alipay.Common;
 import otc.bean.alipay.Medium;
-import otc.bean.config.ConfigFile;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -200,11 +198,12 @@ public class BankUtil {
 	 * @param amount  金额
 	 * @param code    选吗CODE值
 	 * @param flag    是否为顶代结算模式  true  是     false   否
+	 * @param info
 	 * @param payInfo
      * @return
 	 * @throws ParseException
      */
-    public Medium findQr(String orderNo, BigDecimal amount, List<String> code, boolean flag, String payInfo) {
+    public Medium findQr(String orderNo, BigDecimal amount, List<String> code, boolean flag, String codeMed, String payInfo) {
 		Collection<String> strings = CollUtil.removeBlank(code);
 		code = new ArrayList<>();
 		for (String aa : strings) {
@@ -247,7 +246,7 @@ public class BankUtil {
 			}
 		});
 		List<UserFund> userList = userInfoServiceImpl.findUserByAmount(amount, flag);
-		List<Medium> qcList = mediumService.findBankByAmount(amount, code);
+		List<Medium> qcList = mediumService.findBankByAmount(amount, code,codeMed);
 		log.info("【银行卡个数：" + qcList.size() + "】");
 
 

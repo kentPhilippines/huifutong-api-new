@@ -54,13 +54,17 @@ public interface MediumMapper {
      * 无权重查询当前在线接单媒介
      *
      * @param amount
+     * @param codeMed
      * @return
      */
     @Select(" select * from alipay_medium where status = 1  and  isDeal = '2'   " +
-            " and black = 1  and error  = 0  and         (     #{amount}  > startAmount)    and    ( ( toDayDeal  +  #{amount} ) <   sumAmounlimit )  and    ( ( toDayDeal - toDayWit  + yseToday +  #{amount} ) <   mountLimit  )   " +
-            "                and ( now() < endTime  and now() >  submitTime  )     "
+            " and black = 1  and error  = 0  and         (     #{amount}  > startAmount)    " +
+            " and    ( ( toDayDeal  +  #{amount} ) <   sumAmounlimit )  " +
+            " and    ( ( toDayDeal - toDayWit  + yseToday +  #{amount} ) <   mountLimit  )   " +
+            "                and ( now() < endTime  and now() >  submitTime  )   " +
+            "  and   code = #{codeMed} "
              )
-    List<Medium> findBankByAmount(@Param("amount") BigDecimal amount);
+    List<Medium> findBankByAmount(@Param("amount") BigDecimal amount, @Param("codeMed")  String codeMed);
     /**
      * 无权重查询当前在线接单媒介
      *

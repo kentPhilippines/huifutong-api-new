@@ -116,11 +116,11 @@ public class DealApi extends NotfiyChannel {
 		order.setOrderAccount(orderApp.getOrderAccount());
 		order.setNotify(orderApp.getNotify());
 		Medium qr = null;
-			 qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), false, "");
+			 qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), false, "alipay","");
 		if (ObjectUtil.isNull(qr)) {
 			return false;
 		}
-		order.setOrderQrUser(qr.getMediumHolder());
+		order.setOrderQrUser(qr.getQrcodeId());
 		order.setOrderQr(qr.getMediumId());
 		order.setOrderStatus(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString());
 		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
