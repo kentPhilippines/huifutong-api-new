@@ -80,6 +80,7 @@ public class DealApi extends NotfiyChannel {
 			return  Result.buildSuccessMessage("订单成功,请拉起扫码页面获取详细扫码信息");
 		}
 		DealOrderApp orderApp = orderAppServiceImpl.findOrderByOrderId(orderId);
+		log.info(orderApp.toString());
 		boolean flag = addOrder(orderApp, request,ip);
 		if (!flag) {
 			log.info("【订单生成有误，或者当前武可用渠道】");
@@ -93,17 +94,15 @@ public class DealApi extends NotfiyChannel {
 		return Result.buildSuccessMessage("订单成功,请拉起扫码页面获取详细扫码信息");
 	}
 	private boolean addOrder(DealOrderApp orderApp, HttpServletRequest request,String ip ) {
-		if (!orderApp.getOrderStatus().toString().equals(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString())) {
+		if (!orderApp.getOrderStatus().toString().equals(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString())
+		) {
+			log.info("【订单状态有误】");
 			return false;
 		}
 		DealOrder order = new DealOrder();
 		String orderAccount = orderApp.getOrderAccount();//交易商户号
-		UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
+	//	UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
 		String[] split = {"huifutong2"};
-		if (StrUtil.isBlank(accountInfo.getQueueList())) {
-			//[0]split = "huifutong2";//队列供应标识数组
-			return  false;
-		}
 		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
 		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
 		order.setAssociatedId(orderApp.getOrderId());
@@ -126,7 +125,7 @@ public class DealApi extends NotfiyChannel {
 		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
 		UserRate userRateR = userRateServiceImpl.findUserRateR(qr.getQrcodeId());
 	//	UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
-		order.setOrderId(Number.getOrderQr());
+		order.setOrderId(Number.alipayDeal());
 		order.setFeeId(userRateR.getId());
 		order.setRetain1(userRateR.getPayTypr());
 
@@ -139,8 +138,6 @@ public class DealApi extends NotfiyChannel {
 		BigDecimal subtract = multiply1.subtract(multiply);//商户交易手续费 - 渠道成本 =  渠道利润
 		log.info("渠道此单利润："+subtract);
 		order.setRetain3(subtract.toString());// 渠道利润
-
-
 		boolean addOrder = orderServiceImpl.addOrder(order);
 		if (addOrder) {
 			corr(order.getOrderId());

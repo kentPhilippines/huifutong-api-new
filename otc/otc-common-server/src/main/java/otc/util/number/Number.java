@@ -177,6 +177,9 @@ public class Number {
     public static String getWitOrderQr() {
             return GetRandom(Common.Deals.ORDERWIT_QR);
     }
+    public static String alipayDeal() {
+            return GetRandom("ALD");
+    }
 
 
     public static String getWitOrderCa() {

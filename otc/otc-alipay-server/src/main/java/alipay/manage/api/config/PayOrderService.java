@@ -2,6 +2,7 @@ package alipay.manage.api.config;
 
 import alipay.manage.api.channel.util.ChannelInfo;
 import alipay.manage.bean.*;
+import alipay.manage.bean.util.ResultDeal;
 import alipay.manage.mapper.ChannelFeeMapper;
 import alipay.manage.mapper.WithdrawMapper;
 import alipay.manage.service.*;
@@ -9,6 +10,7 @@ import alipay.manage.util.NotifyUtil;
 import alipay.manage.util.OrderUtil;
 import alipay.manage.util.amount.AmountPublic;
 import alipay.manage.util.amount.AmountRunUtil;
+import alipay.manage.util.bankcardUtil.BankUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -17,15 +19,19 @@ import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 import otc.api.alipay.Common;
+import otc.bean.alipay.Medium;
 import otc.bean.dealpay.Withdraw;
 import otc.common.PayApiConstant;
 import otc.common.SystemConstants;
 import otc.result.Result;
 import otc.util.RSAUtils;
 import otc.util.number.GenerateOrderNo;
+import otc.util.number.Number;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -36,6 +42,8 @@ import java.util.Map;
 public abstract class PayOrderService implements PayService {
 	public static final Log log = LogFactory.get();
 	private static final String ORDER = "orderid";
+	@Autowired
+	private BankUtil qrUtil;
 	@Autowired
 	private WithdrawService withdrawServiceImpl;
 	@Autowired
@@ -141,7 +149,12 @@ public abstract class PayOrderService implements PayService {
 		 */
 		//String encryptPublicKey = RSAUtils.getEncryptPublicKey(param, SystemConstants.INNER_PLATFORM_PUBLIC_KEY);
 		String URL = PayApiConstant.Notfiy.OTHER_URL;//configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.SERVER_IP).getResult().toString();补充链接即可成为三方支付服务
-		return Result.buildSuccessResult(URL + "/pay/alipayScan?order_id="+dealOrderApp.getOrderId());
+
+
+
+
+
+		return Result.buildSuccessResult("支付处理中",ResultDeal.sendUrl(URL + "/pay/alipayScan?order_id="+dealOrderApp.getOrderId()));
 	}
 	/**
 	 * <p>支付宝H5</p>
@@ -276,5 +289,59 @@ public abstract class PayOrderService implements PayService {
 		withdrawServiceImpl.updateMsg(wit.getOrderId(),msg);
 		return  Result.buildSuccess();
 	}
+
+
+	public boolean addOrder(DealOrderApp orderApp , String ip ) {
+		if (!orderApp.getOrderStatus().toString().equals(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString())) {
+			log.info("【订单状态有误】");
+			return false;
+		}
+		DealOrder order = new DealOrder();
+		String orderAccount = orderApp.getOrderAccount();//交易商户号
+		//	UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
+		String[] split = {"huifutong2"};
+		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
+		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
+		order.setAssociatedId(orderApp.getOrderId());
+		order.setDealDescribe("正常交易订单");
+		order.setActualAmount(orderApp.getOrderAmount().subtract(fee1.multiply(orderApp.getOrderAmount())));
+		order.setDealAmount(orderApp.getOrderAmount());
+		order.setDealFee(fee1.multiply(orderApp.getOrderAmount()));
+		order.setExternalOrderId(orderApp.getAppOrderId());
+		order.setGenerationIp(ip);//终端玩家拉起ip
+		order.setOrderAccount(orderApp.getOrderAccount());
+		order.setNotify(orderApp.getNotify());
+		Medium qr = null;
+		qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), false, "alipay","");
+		if (ObjectUtil.isNull(qr)) {
+			return false;
+		}
+		order.setOrderQrUser(qr.getQrcodeId());
+		order.setOrderQr(qr.getMediumId());
+		order.setOrderStatus(Common.Order.DealOrder.ORDER_STATUS_DISPOSE.toString());
+		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
+		UserRate userRateR = userRateServiceImpl.findUserRateR(qr.getQrcodeId());
+		//	UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
+		order.setOrderId(Number.alipayDeal());
+		order.setFeeId(userRateR.getId());
+		order.setRetain1(userRateR.getPayTypr());
+		BigDecimal fee = userRateR.getFee();//卡商入款订单手续费率
+		BigDecimal multiply = fee.multiply(orderApp.getOrderAmount());//码商接单成本
+		log.info("码商接单成本："+multiply);
+		order.setRetain2(multiply.toString());//渠道成本
+		BigDecimal multiply1 = fee1.multiply(orderApp.getOrderAmount());
+		log.info("商户此单交易手续费："+multiply);
+		BigDecimal subtract = multiply1.subtract(multiply);//商户交易手续费 - 渠道成本 =  渠道利润
+		log.info("渠道此单利润："+subtract);
+		order.setRetain3(subtract.toString());// 渠道利润
+		boolean addOrder = orderServiceImpl.addOrder(order);
+		return addOrder;
+	}
+
+
+
+
+
+
 
 }
