@@ -149,11 +149,6 @@ public abstract class PayOrderService implements PayService {
 		 */
 		//String encryptPublicKey = RSAUtils.getEncryptPublicKey(param, SystemConstants.INNER_PLATFORM_PUBLIC_KEY);
 		String URL = PayApiConstant.Notfiy.OTHER_URL;//configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.SERVER_IP).getResult().toString();补充链接即可成为三方支付服务
-
-
-
-
-
 		return Result.buildSuccessResult("支付处理中",ResultDeal.sendUrl(URL + "/pay/alipayScan?order_id="+dealOrderApp.getOrderId()));
 	}
 	/**
@@ -296,9 +291,12 @@ public abstract class PayOrderService implements PayService {
 			log.info("【订单状态有误】");
 			return false;
 		}
+		String orderId = Number.alipayDeal();
+
 		DealOrder order = new DealOrder();
 		String orderAccount = orderApp.getOrderAccount();//交易商户号
 		//	UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
+	//	String[] split = {"zbzfb999"};
 		String[] split = {"huifutong2"};
 		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
 		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
@@ -312,7 +310,7 @@ public abstract class PayOrderService implements PayService {
 		order.setOrderAccount(orderApp.getOrderAccount());
 		order.setNotify(orderApp.getNotify());
 		Medium qr = null;
-		qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), false, "alipay","");
+		qr = qrUtil.findQr(orderId, orderApp.getOrderAmount(), Arrays.asList(split), false, "alipay","");
 		if (ObjectUtil.isNull(qr)) {
 			return false;
 		}
@@ -322,7 +320,7 @@ public abstract class PayOrderService implements PayService {
 		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
 		UserRate userRateR = userRateServiceImpl.findUserRateR(qr.getQrcodeId());
 		//	UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
-		order.setOrderId(Number.alipayDeal());
+		order.setOrderId(orderId);
 		order.setFeeId(userRateR.getId());
 		order.setRetain1(userRateR.getPayTypr());
 		BigDecimal fee = userRateR.getFee();//卡商入款订单手续费率

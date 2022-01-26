@@ -21,11 +21,11 @@ public class AlipayQr extends PayOrderService {
                 Result result = dealAlipayScan(dealOrderApp);
                 return result;
             }else{
-                orderEr(dealOrderApp, "错误消息：暂无对应资源"  );
+                orderAppEr(dealOrderApp, "错误消息：暂无对应资源"  );
                 return  Result.buildFailMessage("暂无对应资源");
             }
         }catch (Throwable t){
-            orderEr(dealOrderApp, "错误消息：暂无对应资源" );
+            orderAppEr(dealOrderApp, "错误消息：暂无对应资源" );
             return  Result.buildFailMessage("暂无对应资源");
         }
     }

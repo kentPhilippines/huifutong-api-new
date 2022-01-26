@@ -110,7 +110,6 @@ var gatheringCodeVM = new Vue({
 			that.$http.get('/recharge/findEnabledPayType').then(function (res) {
 				this.gatheringChannelDictItems = res.body.result;
 				this.mediumDictBankItems = [
-					{mediumCode: 'ICBC', mediumName: '工商银行'},
 					{mediumCode: 'ABC', mediumName: '农业银行'},
 					{mediumCode: 'CMB', mediumName: '招商银行'},
 					{mediumCode: 'CMBC', mediumName: '中国民生银行'},

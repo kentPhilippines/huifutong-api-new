@@ -99,10 +99,13 @@ public class DealApi extends NotfiyChannel {
 			log.info("【订单状态有误】");
 			return false;
 		}
+		String orderId = Number.alipayDeal();
+
 		DealOrder order = new DealOrder();
 		String orderAccount = orderApp.getOrderAccount();//交易商户号
 	//	UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
-		String[] split = {"huifutong2"};
+		 String[] split = {"huifutong2"};
+		//String[] split = {"zbzfb999"};
 		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
 		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
 		order.setAssociatedId(orderApp.getOrderId());
@@ -115,7 +118,7 @@ public class DealApi extends NotfiyChannel {
 		order.setOrderAccount(orderApp.getOrderAccount());
 		order.setNotify(orderApp.getNotify());
 		Medium qr = null;
-			 qr = qrUtil.findQr(orderApp.getOrderId(), orderApp.getOrderAmount(), Arrays.asList(split), false, "alipay","");
+			 qr = qrUtil.findQr(orderId, orderApp.getOrderAmount(), Arrays.asList(split), false, "alipay","");
 		if (ObjectUtil.isNull(qr)) {
 			return false;
 		}
@@ -125,7 +128,7 @@ public class DealApi extends NotfiyChannel {
 		order.setOrderType(Common.Order.ORDER_TYPE_DEAL.toString());
 		UserRate userRateR = userRateServiceImpl.findUserRateR(qr.getQrcodeId());
 	//	UserRate rate = userInfoServiceImpl.findUserRate(qr.getMediumHolder(), Common.Deal.PRODUCT_ALIPAY_SCAN);
-		order.setOrderId(Number.alipayDeal());
+		order.setOrderId(orderId);
 		order.setFeeId(userRateR.getId());
 		order.setRetain1(userRateR.getPayTypr());
 

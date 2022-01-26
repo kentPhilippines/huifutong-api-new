@@ -99,7 +99,7 @@ public class NotifyUtil {
         } else {
             result = HttpUtil.post(url, msg, 2000);
         }
-        log.info("服务器返回结果为: " + result.toString());
+        log.info("服务器返回结果为: " + result.toString()+":"+msg.toString());
         log.info("【下游商户返回信息为成功,成功收到回调信息】");
         //更新订单是否通知成功状态
     }

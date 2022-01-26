@@ -64,7 +64,6 @@ public class CreateOrder {
     private UserFundService userFundService;
     @Autowired
     private CorrelationService correlationServiceImpl;
-
     /**
      * 卡商充值 卡商入款订单生成
      *
@@ -161,7 +160,7 @@ public class CreateOrder {
             String payName = split[1];
             payInfo = payName;
         }
-        Medium qr = queue.findQr(bc, dealApp.getOrderAmount(), Arrays.asList(queueCode), false,payInfo);//当前接口限制 收款回调，接单限制，接单评率等数据
+        Medium qr = queue.findQr(bc, dealApp.getOrderAmount(), Arrays.asList(queueCode), false, "card", payInfo);//当前接口限制 收款回调，接单限制，接单评率等数据
         if (null == qr) {
             return Result.buildFailMessage("暂无对应银行卡");
         }
@@ -228,7 +227,7 @@ public class CreateOrder {
         }
         String bc = GenerateOrderNo.Generate("RE");
         String payInfo = recharge.getChargeReason();
-        Medium qr = queue.findQr(bc, recharge.getAmount(), Arrays.asList(queueCode), false, payInfo);//当前接口限制 收款回调，接单限制，接单评率等数据
+        Medium qr = queue.findQr(bc, recharge.getAmount(), Arrays.asList(queueCode), false, "card", payInfo);//当前接口限制 收款回调，接单限制，接单评率等数据
         if (null == qr) {
             return Result.buildFailMessage("暂无收款渠道");
         }

@@ -135,10 +135,10 @@ public class DealPay {
         String payTypr = userRate.getPayTypr();
         boolean alipay = payTypr.contains("ALIPAY");//如果是支付宝类型的产品金额 会有变动后面加几毛钱以作为 回调辨识
         BigDecimal amount  = new BigDecimal(dealBean.getAmount());
-        if(alipay){
+     /*   if(alipay){
             int i = RandomUtil.randomInt(1, 50);
             amount = amount.add( new BigDecimal(i).divide(new BigDecimal(100))) ;
-        }
+        }*/
         DealOrderApp dealApp = new DealOrderApp();
         dealApp.setAppOrderId(dealBean.getOrderId());
         dealApp.setOrderId(Number.getAppOreder());

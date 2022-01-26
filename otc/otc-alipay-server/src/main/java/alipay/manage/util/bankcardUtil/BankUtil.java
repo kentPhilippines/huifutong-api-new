@@ -124,7 +124,7 @@ public class BankUtil {
 				Date parse = formatter.parse(subSuf);
 				Object object = hmget.get(obj.toString());// 当前金额
 				if (!DateUtil.isExpired(parse, DateField.SECOND,
-						Integer.valueOf(1000 ), new Date())) {
+						Integer.valueOf(600 ), new Date())) {
 					redisUtil.hdel(userId, obj.toString());
 				}
 			}

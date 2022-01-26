@@ -23,6 +23,7 @@ public class BankTypeUtil {
 
 		BANK_MAP.put("Bankcard", "Bankcard");
 		BANK_MAP.put("Alipay", "Alipay");
+		BANK_MAP.put("ALIPAY", "ALIPAY");
 		BANK_MAP.put("Wechar", "Wechar");
 		BANK_MAP.put("ABC", BankEnum.ABC.getBankId());
 		BANK_MAP.put("USDT", BankEnum.USDT.getBankId());
@@ -311,6 +312,8 @@ public class BankTypeUtil {
         BANK_MAP_NAME.put("ZZBANK", BankEnum.ZZBANK.getBankNameCn());
         BANK_MAP_NAME.put("HXBANK", BankEnum.HXBANK.getBankNameCn());
         BANK_MAP_NAME.put("SZSNZ", BankEnum.SZSNZ.getBankNameCn());
+        BANK_MAP_NAME.put("ALIPAY", BankEnum.ALIPAY.getBankNameCn());
+        BANK_MAP_NAME.put("Alipay", BankEnum.ALIPAY.getBankNameCn());
     }
 
 
