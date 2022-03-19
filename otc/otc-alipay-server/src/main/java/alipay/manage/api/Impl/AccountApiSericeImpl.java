@@ -102,6 +102,7 @@ public class AccountApiSericeImpl implements AccountApiService {
         if (StrUtil.isNotBlank(user.getUserId())) {
             criteria.andUserIdEqualTo(user.getUserId());
         }
+        criteria.andUserTypeEqualTo(2);
         List<UserInfo> userList = userInfoDao.selectByExample(info);
         if (userList.size() > 1) {
             return Result.buildFailMessage("当前用户错误，联系技术人员处理");

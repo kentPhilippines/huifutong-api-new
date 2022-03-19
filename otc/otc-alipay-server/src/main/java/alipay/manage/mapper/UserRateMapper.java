@@ -110,7 +110,7 @@ public interface UserRateMapper {
     UserRate findAgentChannelFee(@Param("userId") String userId, @Param("userType") Integer userType, @Param("payTypr") String payTypr, @Param("feeType") Integer feeType);
 
     @Cacheable(cacheNames = {RATE}, unless = "#result == null")
-    @Select("select * from alipay_user_rate where feeType = 2 and `switchs` = 1 and userId = #{userId} limit 1 ")
+    @Select("select * from alipay_user_rate where feeType = 2 and `switchs` = 1 and userId = #{userId}  limit 1 ")
     UserRate findUserRateWitByUserIdApp(String userId);
 
     @Cacheable(cacheNames = {RATE}, unless = "#result == null")

@@ -13,8 +13,8 @@ import otc.result.Result;
  *
  * @author hx08
  */
-@Component("MyChannelWithdraw")
-public class MyChannel extends PayOrderService {
+@Component("MyChannelWithdraws")
+public class MyChannelS extends PayOrderService {
 	@Autowired
 	OrderUtil orderUtil;
 	@Autowired
@@ -25,7 +25,7 @@ public class MyChannel extends PayOrderService {
 		//Result withrawOrder = orderUtil.withrawOrder(wit.getOrderId(), wit.getRetain2(), false);
 
 
-		Result result = createOrder.witAddOrder(wit, null,false);
+		Result result = createOrder.witAddOrder(wit, null,true);
 		if (!result.isSuccess()) {
 			withdrawEr(wit, result.getMessage(), wit.getRetain2());
 		}

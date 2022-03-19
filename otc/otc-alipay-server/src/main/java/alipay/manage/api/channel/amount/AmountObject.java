@@ -50,7 +50,7 @@ public abstract class AmountObject implements AmountChannel {
 
 		//	Result result = dealpayServiceClienImpl.wit(wit);
 
-		Result result = createOrder.witAddOrder(wit, null);
+		Result result = createOrder.witAddOrder(wit, null,false);
 
 
 		return result;

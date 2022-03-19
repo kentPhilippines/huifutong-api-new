@@ -4,6 +4,7 @@ import alipay.config.redis.RedisUtil;
 import alipay.manage.bean.DealOrder;
 import alipay.manage.bean.RunOrder;
 import alipay.manage.bean.UserInfo;
+import alipay.manage.bean.UserRate;
 import alipay.manage.bean.util.PageResult;
 import alipay.manage.service.ExceptionOrderService;
 import alipay.manage.service.OrderService;
@@ -106,8 +107,18 @@ public class OrderContorller {
 		}
 		//按时间段查询
 		log.info("当前用户进入抢单查询："+user.getUserId());
-		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType );
+		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType ,islittle(user.getUserId()));
 		return Result.buildSuccessResult(listOrder);
+	}
+	boolean islittle (String userId){
+		UserInfo userInfoByUserId = accountServiceImpl.findUserInfoByUserId(userId);
+		if(ObjectUtil.isNotNull(userInfoByUserId)){
+			String agent = userInfoByUserId.getAgent();
+			UserRate userRateW = userRateService.findUserRateW(agent);
+			return userRateW.getPayTypr().equals("BANK_WIT_S");
+		}
+		return false;
+
 	}
 	@Autowired
 	private ExceptionOrderService exceptionOrderServiceImpl;

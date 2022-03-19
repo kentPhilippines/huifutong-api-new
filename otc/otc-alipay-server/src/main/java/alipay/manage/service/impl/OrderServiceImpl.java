@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import otc.bean.alipay.Medium;
 import otc.bean.dealpay.Recharge;
 import otc.bean.dealpay.Withdraw;
 
@@ -382,8 +381,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<DealOrder> grabAnOrderListFind(String orderType) {
-        String publicAccount = "zhongbang-bank";
+    public List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle) {
+        String publicAccount = "";
+        if(islittle){
+            publicAccount = "zhongbang-bank-s";
+        }else {
+            publicAccount = "zhongbang-bank";
+        }
         return dealOrderMapper.grabAnOrderListFind(orderType,publicAccount);
     }
 
@@ -393,8 +397,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean updateGrabOrder(DealOrder order) {
-        String publicAccount = "zhongbang-bank";
+    public boolean updateGrabOrder(DealOrder order, boolean islittle) {
+        String publicAccount = "";
+        if(islittle){
+            publicAccount = "zhongbang-bank-s";
+        }else {
+            publicAccount = "zhongbang-bank";
+        }
         return dealOrderMapper.updateGrabOrder(order,publicAccount)>1;
     }
 

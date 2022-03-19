@@ -50,7 +50,8 @@ public class UserRateServiceImpl implements UserRateService {
 
     @Override
     public UserRate findUserRateWitByUserIdApp(String userId) {
-        return userRateMapper.findUserRateWitByUserIdApp(userId);
+			return userRateMapper.findUserRateWitByUserIdApp(userId);
+
     }
 
     @Override

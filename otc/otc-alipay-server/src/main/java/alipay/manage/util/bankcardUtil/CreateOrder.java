@@ -79,9 +79,10 @@ public class CreateOrder {
      *
      * @param wit    提现订单
      * @param userId 是否指定出款人，当前参数为出款人
+     * @param flag1  true 为小额出款  false 为其他出款
      * @return
      */
-    public Result witAddOrder(Withdraw wit, String userId) {
+    public Result witAddOrder(Withdraw wit, String userId,boolean flag1 ) {
         String channnelId = "";
         String channelFeeId = null;
         Boolean flag = false;
@@ -95,7 +96,12 @@ public class CreateOrder {
         //出款选卡算法
         Medium bankinfo =  null; // getBankInfo(userId, accountInfo.getQueueList(), bc,wit.getAmount());//出款人   采取手动配单
         if (null == bankinfo) {
-            witprople =   "zhongbang-bank";
+            if(flag1){
+                witprople =   "zhongbang-bank-s";
+            }else{
+                witprople =   "zhongbang-bank";
+            }
+
             bankInfo =  "";
         }else{
             witprople = bankinfo.getQrcodeId();

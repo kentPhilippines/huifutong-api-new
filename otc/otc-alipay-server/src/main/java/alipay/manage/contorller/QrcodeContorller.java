@@ -4,6 +4,7 @@ import alipay.config.redis.RedisUtil;
 import alipay.manage.bean.DealOrder;
 import alipay.manage.bean.UserFund;
 import alipay.manage.bean.UserInfo;
+import alipay.manage.bean.UserRate;
 import alipay.manage.bean.util.PageResult;
 import alipay.manage.service.*;
 import alipay.manage.util.QueueUtil;
@@ -56,7 +57,8 @@ public class QrcodeContorller {
     private ReWit reWit;
     @Autowired
     private ExceptionOrderService exceptionOrderServiceImpl;
-
+    @Autowired UserInfoService accountServiceImpl;
+    @Autowired UserRateService userRateService;
     @GetMapping("/findIsMyQrcodePage")
     @ResponseBody
     public Result findIsMyQrcodePage(HttpServletRequest request, String pageNum, String pageSize) {
@@ -214,7 +216,16 @@ public class QrcodeContorller {
         return amount;
     }
 
+    boolean islittle (String userId){
+        UserInfo userInfoByUserId = accountServiceImpl.findUserInfoByUserId(userId);
+        if(ObjectUtil.isNotNull(userInfoByUserId)){
+            String agent = userInfoByUserId.getAgent();
+            UserRate userRateW = userRateService.findUserRateW(agent);
+            return userRateW.getPayTypr().equals("BANK_WIT_S");
+        }
+        return false;
 
+    }
 
 
 
@@ -315,7 +326,7 @@ public class QrcodeContorller {
                 exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：抢单失败，可用额度不足" ,Boolean.TRUE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;
             }
-            Result result = reWit.grabOrder(user.getUserId(), orderWit);
+            Result result = reWit.grabOrder(user.getUserId(), orderWit,islittle(user.getUserId()));
             if(result.isSuccess()){
                 exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId(),"抢单成功" ,Boolean.TRUE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
             }else {
