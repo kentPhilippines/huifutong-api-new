@@ -279,7 +279,12 @@ public class QrcodeContorller {
             return Result.buildFailResult("用户未登录");
         }
         ThreadUtil.execute(()->{
-            String publicAccount = "zhongbang-bank";
+            String publicAccount = "";
+            if(islittle(user.getUserId())){
+                publicAccount = "zhongbang-bank-s";
+            }else {
+                publicAccount = "zhongbang-bank";
+            }
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
             UserInfo user1 = userInfoServer.findUserInfoByUserId(user.getUserId());
             Integer receiveOrderState = user1.getReceiveOrderState();
