@@ -90,6 +90,7 @@ public class BankUtil {
 		 * 当前数据是否删除有待商榷
 		 * 如果放开这个数据可能会造成保存支付的问题， 当前数据标记最大话的减少 不按照规定 支付出错的问题
 		 */
+		redisUtil.set(LIMIT_BANK + bankNo, LIMIT_BANK + bankNo, 10);//订单成功后这个卡无法被再次拉起
 		redisUtil.deleteKey(notify);
 
 		/**
