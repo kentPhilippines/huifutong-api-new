@@ -393,7 +393,7 @@ public class Api {
                         userFund.setUserId(amount.getUserId());
                         Result addAmountAdd = amountPublic.addBankprofitAmount(userFund, amount.getAmount(), amount.getOrderId());
                         if (addAmountAdd.isSuccess()) {
-                            Result deleteAmount = amountRunUtil.addBankprofitAmount(amount, clientIP, "扣减卡商佣金订单驳回，还原扣减资金");
+                            Result deleteAmount = amountRunUtil.addBankprofitAmountB(amount, clientIP, "扣减卡商佣金订单驳回，还原扣减资金");
                             if (deleteAmount.isSuccess()) {
                                 logUtil.addLog(request, "当前扣款订单置为失败，资金原路退回，扣款订单号：" + amount.getOrderId() + "，扣款用户：" + amount.getUserId() + "，操作人：" + amount.getAccname() + "", amount.getAccname());
                                 return Result.buildSuccessMessage("操作成功");
@@ -822,6 +822,7 @@ public class Api {
         if (StrUtil.isBlank(clientIP)) {
             return Result.buildFailMessage("当前使用代理服务器 或是操作ip识别出错，不允许操作");
         }
+        alipayAmount.setApproval(accname.toString());
         UserFund userFund = userInfoServiceImpl.fundUserFundAccounrBalace(userId.toString());
         if (userFund == null) {
             throw new BusinessException("此用户不存在");
@@ -853,6 +854,7 @@ public class Api {
                 if (result.isSuccess()) {
                     Result result1 = amountRunUtil.deleteBankprofit(alipayAmount, clientIP);
                     if (result1.isSuccess()) {
+                        alipayAmount.setAmountType(Common.Deal.AMOUNT_ORDER_DELETE_PROFIT);
                         int i = userInfoServiceImpl.insertAmountEntitys(alipayAmount);
                         if (i == 1) {
                             return Result.buildSuccessMessage("创建订单成功");

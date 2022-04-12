@@ -119,11 +119,13 @@ public class AmountRunUtil {
 
 
     private static final Integer PROFIT_AMOUNT_BANK_W_NUMBER = 38;//卡商佣金扣减
-    private static final Integer PROFIT_AMOUNT_BANK_R_NUMBER = 39;//卡商佣金增加
+    private static final Integer PROFIT_AMOUNT_BANK_R_NUMBER = 39;//卡商佣金扣除
+    private static final Integer PROFIT_AMOUNT_BANK_B_NUMBER = 41;//卡商佣金退回
     public static final Integer BANK_CARD_BACK_NUMBER = 40;//卡商流水退回
     private static final String PROFIT_AMOUNT_BANK_W = "PROFIT_AMOUNT_BANK_W";
     private static final String BANK_CARD_BACK = "BANK_CARD_BACK";
     private static final String PROFIT_AMOUNT_BANK_R = "PROFIT_AMOUNT_BANK_R";
+    private static final String PROFIT_AMOUNT_BANK_B = "PROFIT_AMOUNT_BANK_B";
 
 
 
@@ -626,6 +628,9 @@ public class AmountRunUtil {
             case PROFIT_AMOUNT_BANK_R:
                 runOrderType = PROFIT_AMOUNT_BANK_R_NUMBER;
                 break;
+            case PROFIT_AMOUNT_BANK_B:
+                runOrderType = PROFIT_AMOUNT_BANK_B_NUMBER;
+                break;
             case PROFIT_AMOUNT_BANK_W:
                 runOrderType = PROFIT_AMOUNT_BANK_W_NUMBER;
                 break;
@@ -749,6 +754,10 @@ public class AmountRunUtil {
         Result add = add(PROFIT_AMOUNT_BANK_R, alipayAmount.getUserId(), alipayAmount.getOrderId(), alipayAmount.getAmount(), clientIP, "当前卡商佣金退回，当前退回佣金为：" + alipayAmount.getAmount(), RUNTYPE_ARTIFICIAL);
         return add;
     }
+ public Result addBankprofitAmountB(Amount alipayAmount, String clientIP, String descr) {
+        Result add = add(PROFIT_AMOUNT_BANK_B, alipayAmount.getUserId(), alipayAmount.getOrderId(), alipayAmount.getAmount(), clientIP, descr + alipayAmount.getAmount(), RUNTYPE_ARTIFICIAL);
+        return add;
+    }
 
     public Result addBankprofitAmount(Amount alipayAmount, String clientIP) {
         return addBankprofitAmount(alipayAmount, clientIP, "当前卡商佣金退回，当前退回佣金为：" + alipayAmount.getAmount());
@@ -756,12 +765,12 @@ public class AmountRunUtil {
 
 
     public Result deleteBankprofit(Amount alipayAmount, String clientIP, String descr) {
-        Result add = add(PROFIT_AMOUNT_BANK_R, alipayAmount.getUserId(), alipayAmount.getOrderId(), alipayAmount.getAmount(), clientIP, descr, RUNTYPE_ARTIFICIAL);
+        Result add = delete(PROFIT_AMOUNT_BANK_R, alipayAmount.getUserId(), alipayAmount.getOrderId(), alipayAmount.getAmount(), clientIP, descr, RUNTYPE_ARTIFICIAL);
         return add;
     }
 
     public Result deleteBankprofit(Amount alipayAmount, String clientIP) {
-        return deleteBankprofit(alipayAmount, clientIP, "手动增加卡商佣金：" + alipayAmount.getAmount() + "，当前处理人：" + alipayAmount.getApproval());
+        return deleteBankprofit(alipayAmount, clientIP, "手动扣除卡商佣金：" + alipayAmount.getAmount() + "，当前处理人：" + alipayAmount.getApproval());
     }
 
 

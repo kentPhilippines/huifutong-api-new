@@ -202,7 +202,7 @@ public class AmountConfig extends Util {
                         log.info("子线程访问-delete");
                         return userInfoServiceImpl.findUserFundByAccount(finalUserFund1.getUserId());
                     });
-                    userFund = future.get(2, TimeUnit.SECONDS);
+                    userFund = future.get();
                     if (!amountPrivate.clickUserFund(userFund).isSuccess()) {
                         return Result.buildFailMessage("【资金账户存在问题】");
                     }
@@ -278,9 +278,7 @@ public class AmountConfig extends Util {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            } finally {
+            }   finally {
             }
         }
         return Result.buildFailMessage("传参异常");
