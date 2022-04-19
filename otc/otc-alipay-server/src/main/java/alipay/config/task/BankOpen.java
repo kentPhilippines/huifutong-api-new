@@ -113,19 +113,31 @@ public class BankOpen {
             if( "1".equals(orderType) ) {//入款更新
                 BigDecimal toDayDeal = bankInfo.getToDayDeal();
                 BigDecimal sumDayDeal = bankInfo.getSumDayDeal();
+                Integer sumCount = bankInfo.getSumCount();
+                Integer todayCount = bankInfo.getTodayCount();
+                sumCount+=1;
+                todayCount+=1;
                 BigDecimal addToDayDeal = toDayDeal.add(order.getDealAmount());
                 BigDecimal addSumDayDeal = sumDayDeal.add(order.getDealAmount());
+                bankInfo.setTodayCount(todayCount);
+                bankInfo.setSumCount(sumCount);
                 bankInfo.setToDayDeal(addToDayDeal);
                 bankInfo.setSumDayDeal(sumDayDeal);
-                flag =   mediumServiceImpl.upBuAmount(bankInfo.getVersion(),bankInfo.getId(),addToDayDeal,addSumDayDeal);
+                flag =   mediumServiceImpl.upBuAmount(bankInfo.getVersion(),bankInfo.getId(),addToDayDeal,addSumDayDeal,bankInfo.getSumCount(),bankInfo.getTodayCount());
             } else {//出款更新
                 BigDecimal toDayWit = bankInfo.getToDayWit();
                 BigDecimal sumDayWit = bankInfo.getSumDayWit();
+                Integer todayCountWit = bankInfo.getTodayCountWit();
+                Integer sumCountWit = bankInfo.getSumCountWit();
+                todayCountWit+=1;
+                sumCountWit+=1;
+                bankInfo.setTodayCountWit(todayCountWit);
+                bankInfo.setSumCountWit(sumCountWit);
                 BigDecimal addToDayWit = toDayWit.add(order.getDealAmount());
                 BigDecimal addSumDayWit = sumDayWit.add(order.getDealAmount());
                 bankInfo.setToDayWit(addToDayWit);
                 bankInfo.setSumDayDeal(addSumDayWit);
-                flag =   mediumServiceImpl.upBuAmountWit(bankInfo.getVersion(),bankInfo.getId(),addToDayWit,addSumDayWit);
+                flag =   mediumServiceImpl.upBuAmountWit(bankInfo.getVersion(),bankInfo.getId(),addToDayWit,addSumDayWit,bankInfo.getSumCountWit(),bankInfo.getTodayCountWit());
             }
             //更新订单业务余额
             BigDecimal bu = bankInfo.getToDayDeal().subtract(bankInfo.getToDayWit()).add(bankInfo.getYseToday());

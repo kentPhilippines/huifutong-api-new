@@ -25,7 +25,7 @@ public class Task {
     @Scheduled(cron = "0/10 * * * * ?")
     public void task() {
         log.info("【执行更新队列操作】");
-        heartUtil.clickHeart();
+       // heartUtil.clickHeart();
     }
 
 

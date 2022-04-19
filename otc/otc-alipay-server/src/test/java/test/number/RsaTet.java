@@ -14,10 +14,7 @@ public class RsaTet {
     private static final String ENCODE_TYPE = "md5";
 
     public static void main(String[] args) {
-        String pri = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCe4GbVQGVnAcphcRgMwnGE0XJTsqNULUDsIYrsc9gLovA9I7NORNV9/M2hYUqj2QEUPEeU3g4C6SEw/koyqS9kURloGWWy+H8FVk4TJx+ow+RvdQPWzDfLubcKkAiKU56PjtUJmkK+OIGHFarH3v/QB6yitw3ucdOFmEcVI3qp2wIDAQAB";
-        String s = RSAUtils.publicEncrypt("amount=100&appId=Well001&orderId=GMW2phcRgMwnGE0XJTsqNULUDsIYrsphcRgMwnGE0XJTsqNULUDsIYrsphcRgMwnGE0XJTsqNULUDsIYrsphcRgMwnGE0XJTsqNULUDsIYrs1030916310159139&success=true7378A36802E35F1EF0D387EA445A8429", pri);
-
-        System.out.println(s);
+        System.out.println(md5("6216698400004335670"));;
 
 
     }

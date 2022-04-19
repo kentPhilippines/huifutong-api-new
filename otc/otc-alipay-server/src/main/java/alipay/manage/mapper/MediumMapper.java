@@ -62,7 +62,8 @@ public interface MediumMapper {
             " and    ( ( toDayDeal  +  #{amount} ) <   sumAmounlimit )  " +
             " and    ( ( toDayDeal - toDayWit  + yseToday +  #{amount} ) <   mountLimit  )   " +
             "                and ( now() < endTime  and now() >  submitTime  )   " +
-            "  and   code = #{codeMed} "
+            "  and   code = #{codeMed} " +
+            " and  ( todayCount < countLimit  ) "
              )
     List<Medium> findBankByAmount(@Param("amount") BigDecimal amount, @Param("codeMed")  String codeMed);
     /**
@@ -125,11 +126,13 @@ public interface MediumMapper {
 
 
 
-    @Update("update alipay_medium set `version` =  `version` + 1 , toDayWit = #{toDayWit} ,sumDayWit  = #{sumDayWit}  where id = #{id} and `version`  = #{version} ")
-    int upBuAmountWit(@Param("version") Integer version, @Param("toDayWit") BigDecimal toDayWit, @Param("sumDayWit") BigDecimal sumDayWit, @Param("id") Integer id);
+    @Update("update alipay_medium set `version` =  `version` + 1 , toDayWit = #{toDayWit} ,sumDayWit  = #{sumDayWit} , sumCountWit = #{sumCountWit} ,  todayCountWit  = #{todayCountWit}  where id = #{id} and `version`  = #{version} ")
+    int upBuAmountWit(@Param("version") Integer version, @Param("toDayWit") BigDecimal toDayWit, @Param("sumDayWit") BigDecimal sumDayWit,
+                      @Param("id") Integer id,@Param("sumCountWit") Integer sumCountWit, @Param("todayCountWit") Integer todayCountWit);
 
-    @Update("update alipay_medium set `version` =  `version` + 1 , toDayDeal = #{toDayDeal} , sumDayDeal = #{sumDayDeal}  where id = #{id} and `version`  = #{version} ")
-    int upBuAmount(@Param("version") Integer version, @Param("toDayDeal") BigDecimal toDayDeal, @Param("sumDayDeal") BigDecimal sumDayDeal, @Param("id") Integer id);
+    @Update("update alipay_medium set `version` =  `version` + 1 , toDayDeal = #{toDayDeal} , sumDayDeal = #{sumDayDeal} , sumCount = #{sumCount} ,todayCount = #{todayCount}   where id = #{id} and `version`  = #{version} ")
+    int upBuAmount(@Param("version") Integer version, @Param("toDayDeal") BigDecimal toDayDeal, @Param("sumDayDeal") BigDecimal sumDayDeal,
+                   @Param("id") Integer id, @Param("sumCount") Integer sumCount,  @Param("todayCount") Integer todayCount);
 
 
 
@@ -138,17 +141,17 @@ public interface MediumMapper {
     @Insert("insert into  alipay_medium_bak (mediumNumber, mediumId, mediumHolder, mediumPhone, bankcode, account,  " +
             "    mountNow, mountSystem, mountLimit, qrcodeId, code,   " +
             "    submitTime, status, isDeal, mediumNote, attr  ,notfiyMask ,toDayDeal ,sumDayDeal  ,startAmount  ," +
-            " toDayWit , sumDayWit  , sumAmounlimit , yseToday)  " +
+            " toDayWit , sumDayWit  , sumAmounlimit , yseToday , todayCount , todayCountWit )  " +
             "" +
             "select mediumNumber, mediumId, " +
             "mediumHolder, mediumPhone, bankcode, account,  " +
             "    mountNow, mountSystem, mountLimit, qrcodeId, code ,  " +
             "    submitTime, status, isDeal, mediumNote, attr ,notfiyMask ,toDayDeal ,sumDayDeal   ,startAmount , " +
-            " toDayWit  , sumDayWit ,sumAmounlimit  , yseToday  FROM alipay_medium")
+            " toDayWit  , sumDayWit ,sumAmounlimit  , yseToday , todayCount , todayCountWit   FROM alipay_medium")
     void bak();
 
 
 
-    @Update("  update alipay_medium set  yseToday = ( toDayDeal -  toDayWit  + yseToday ) ,toDayDeal = 0 ,toDayWit = 0  ")
+    @Update("  update alipay_medium set  yseToday = ( toDayDeal -  toDayWit  + yseToday ) ,toDayDeal = 0 ,toDayWit = 0 ,todayCount = 0 , todayCountWit = 0  ")
     void updateUserTime();
 }

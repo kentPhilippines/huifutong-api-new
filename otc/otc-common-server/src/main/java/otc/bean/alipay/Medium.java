@@ -59,6 +59,57 @@ public class Medium implements Serializable {
 
 
 
+    private Integer todayCount;//当日交易笔数
+    private Integer sumCount;//累计交易笔数
+    private Integer countLimit;//日交易限制笔数  默认  50
+
+
+    private Integer todayCountWit;//当日出款笔数
+    private Integer sumCountWit;//累计出款笔数
+
+
+
+
+    public Integer getSumCountWit() {
+        return sumCountWit;
+    }
+
+    public void setSumCountWit(Integer sumCountWit) {
+        this.sumCountWit = sumCountWit;
+    }
+
+    public Integer getTodayCountWit() {
+        return todayCountWit;
+    }
+
+    public void setTodayCountWit(Integer todayCountWit) {
+        this.todayCountWit = todayCountWit;
+    }
+
+    public Integer getCountLimit() {
+        return countLimit;
+    }
+
+    public void setCountLimit(Integer countLimit) {
+        this.countLimit = countLimit;
+    }
+
+    public Integer getSumCount() {
+        return sumCount;
+    }
+
+    public void setSumCount(Integer sumCount) {
+        this.sumCount = sumCount;
+    }
+
+    public Integer getTodayCount() {
+        return todayCount;
+    }
+
+    public void setTodayCount(Integer todayCount) {
+        this.todayCount = todayCount;
+    }
+
     private Integer isRed;//是否支付宝红包
 
     public Integer getIsRed() {

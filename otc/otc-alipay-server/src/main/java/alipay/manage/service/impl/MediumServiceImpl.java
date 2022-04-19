@@ -323,14 +323,14 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public boolean upBuAmount(Integer version, Integer id, BigDecimal addToDayDeal, BigDecimal addSumDayDeal) {
+    public boolean upBuAmount(Integer version, Integer id, BigDecimal addToDayDeal, BigDecimal addSumDayDeal, Integer sumCount, Integer todayCount) {
         synchronized (id) {
             try {
                 boolean flag = true;
                 int lockMsg = 0;
                 do {
                     lockMsg += 1;
-                   int i =  mediumDao.upBuAmount(version,addToDayDeal,addSumDayDeal,id);
+                   int i =  mediumDao.upBuAmount(version,addToDayDeal,addSumDayDeal,id,sumCount,todayCount);
                    if(i > 0){
                        return  Boolean.TRUE;
                    }
@@ -347,14 +347,14 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public boolean upBuAmountWit(Integer version, Integer id, BigDecimal addToDayWit, BigDecimal addSumDayWit) {
+    public boolean upBuAmountWit(Integer version, Integer id, BigDecimal addToDayWit, BigDecimal addSumDayWit, Integer sumCountWit, Integer todayCountWit) {
         synchronized (id) {
             try {
                 boolean flag = true;
                 int lockMsg = 0;
                 do {
                     lockMsg += 1;
-                    int i =  mediumDao.upBuAmountWit(version,addToDayWit,addSumDayWit,id);
+                    int i =  mediumDao.upBuAmountWit(version,addToDayWit,addSumDayWit,id,sumCountWit,todayCountWit);
                     if(i > 0){
                         return  Boolean.TRUE;
                     }
@@ -390,7 +390,7 @@ public class MediumServiceImpl implements MediumService {
                     sumDayWit = sumDayWit.subtract(new BigDecimal(amount));
                     toDayWit = toDayWit.subtract(new BigDecimal(amount));
                     lockMsg += 1;
-                    int i =  mediumDao.upBuAmountWit(bank.getVersion(),toDayWit,sumDayWit,bank.getId());
+                    int i =  mediumDao.upBuAmountWit(bank.getVersion(),toDayWit,sumDayWit,bank.getId(), bank.getSumCountWit(), bank.getTodayCountWit());
                     if(i > 0){
                         return  ;
                     }

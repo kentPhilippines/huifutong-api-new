@@ -147,9 +147,9 @@ public interface MediumService {
 
     Medium findMedByBankNo(String bankNo);
 
-    boolean upBuAmount(Integer version, Integer id, BigDecimal addToDayDeal, BigDecimal addSumDayDeal);
+    boolean upBuAmount(Integer version, Integer id, BigDecimal addToDayDeal, BigDecimal addSumDayDeal, Integer sumCount, Integer todayCount);
 
-    boolean upBuAmountWit(Integer version, Integer id, BigDecimal addToDayWit, BigDecimal addSumDayWit);
+    boolean upBuAmountWit(Integer version, Integer id, BigDecimal addToDayWit, BigDecimal addSumDayWit, Integer sumCountWit, Integer todayCountWit);
 
 
     void updateMountWit(String bankno, String amount);

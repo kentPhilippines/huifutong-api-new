@@ -20,10 +20,12 @@ public class rsa {
 
 
     public static void main(String[] args) {
-        String s = PayUtil.md5("6230901818126454596");
 
 
-        System.out.println(s);
+    //    String s = HttpUtil.get("alipays://platformapi/startapp?appId=60000154&url=%2Fwww%2Findex%2Fdetail.htm%3FbatchNo%3D20220330000750021000350038484020%26token%3Denp1oAXS%26source%3DqrCode");
+
+     //   System.out.println(s);
+//https://openapi.alipay.com/gateway.do?timestamp=2013-01-01 08:08:08&method=alipay.fund.trans.aacollect.batch.query&app_id=13603&sign_type=RSA2&sign=ERITJKEIJKJHKKKKKKKHJEREEEEEEEEEEE&version=1.0&charset=GBK&biz_content=
 
 
     }
