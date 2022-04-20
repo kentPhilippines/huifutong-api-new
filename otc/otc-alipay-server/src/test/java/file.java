@@ -3,52 +3,59 @@ import cn.hutool.http.HttpUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import com.aliyun.oss.ClientException;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.PutObjectRequest;
+import java.io.File;
 public class file {
+        public static void main(String[] args) throws Exception {
+            // Endpoint以华东1（杭州）为例，其它Region请按实际情况填写。
+            String endpoint = "imgslocation.oss-cn-hongkong-internal.aliyuncs.com";
+            // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
+            String accessKeyId = "LTAI5t7kBpUP8rLGpi1Kwy1m";
+            String accessKeySecret = "rmUd0OT3qBgZQ5IGf5n2JFzhWEmAoU\n";
+            // 填写Bucket名称，例如examplebucket。
+            String bucketName = "imgslocation";
+            // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
+            String objectName = "imgslocation/alipay.log.2022-04-12.log";
+            // 填写本地文件的完整路径，例如D:\\localpath\\examplefile.txt。
+            // 如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
+            String filePath= "/Users/kent/IdeaProjects/huifutong-api-new/alipay.log.2022-04-12.log";
 
+            // 创建OSSClient实例。
+            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
-    public static void main(String[] args) {
-        String url = "http://127.0.0.1:9010/notfiy-api-pay/test-notify";
+            try {
+                // 创建PutObjectRequest对象。
+                PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, new File(filePath));
+                // 如果需要上传时设置存储类型和访问权限，请参考以下示例代码。
+                // ObjectMetadata metadata = new ObjectMetadata();
+                // metadata.setHeader(OSSHeaders.OSS_STORAGE_CLASS, StorageClass.Standard.toString());
+                // metadata.setObjectAcl(CannedAccessControlList.Private);
+                // putObjectRequest.setMetadata(metadata);
 
-
-        ThreadUtil.execute(() -> {
-            Map map = new HashMap();
-            map.put("orderId", "C1598973014033222573");
-            HttpUtil.post(url, map);
-        });
-        ThreadUtil.execute(() -> {
-            Map map1 = new HashMap();
-            map1.put("orderId", "C1598976699433211041");
-            // HttpUtil.post(url,map1);
-        });
-        ThreadUtil.execute(() -> {
-            Map map1 = new HashMap();
-            map1.put("orderId", "C1598972774098722533");
-            //  HttpUtil.post(url,map1);
-        });
-
-
-      /*
-        ThreadUtil.execute(()->{
-        Map map2 = new HashMap();
-        map2.put("orderId","C1598976492366920157");
-        HttpUtil.post(url,map2);
-        Map map3 = new HashMap();
-        map3.put("orderId", "C1598976382556933055");
-            HttpUtil.post(url,map3);
-        });
-        ThreadUtil.execute(()->{
-        Map map4 = new HashMap();
-        map4.put("orderId", "C1598976122196246776");
-            HttpUtil.post(url, map4);
-        });
-          ThreadUtil.execute(()->{
-              Map map5 = new HashMap();
-              map5.put("orderId", "C1598976107432998589");
-              HttpUtil.post(url, map5);
-          });
-*/
+                // 上传文件。
+                ossClient.putObject(putObjectRequest);
+            } catch (OSSException oe) {
+                System.out.println("Caught an OSSException, which means your request made it to OSS, "
+                        + "but was rejected with an error response for some reason.");
+                System.out.println("Error Message:" + oe.getErrorMessage());
+                System.out.println("Error Code:" + oe.getErrorCode());
+                System.out.println("Request ID:" + oe.getRequestId());
+                System.out.println("Host ID:" + oe.getHostId());
+            } catch (ClientException ce) {
+                System.out.println("Caught an ClientException, which means the client encountered "
+                        + "a serious internal problem while trying to communicate with OSS, "
+                        + "such as not being able to access the network.");
+                System.out.println("Error Message:" + ce.getMessage());
+            } finally {
+                if (ossClient != null) {
+                    ossClient.shutdown();
+                }
+            }
+        }
     }
 
-}
 
