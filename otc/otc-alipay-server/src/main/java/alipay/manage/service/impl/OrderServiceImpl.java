@@ -18,10 +18,7 @@ import otc.bean.dealpay.Withdraw;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -382,13 +379,24 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle) {
+        List<DealOrder> dealOrders1 = new ArrayList<>();
         String publicAccount = "";
-        if(islittle){
-            publicAccount = "zhongbang-bank-s";
-        }else {
-            publicAccount = "zhongbang-bank";
+        String publicAccounts = "";
+        try {
+           publicAccounts = "zhongbang-bank-s";
+           publicAccount = "zhongbang-bank";
+           List<DealOrder> dealOrders = dealOrderMapper.grabAnOrderListFind(orderType, publicAccount);
+           List<DealOrder> dealOrderss = dealOrderMapper.grabAnOrderListFind(orderType, publicAccounts);
+            dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);
+       }catch (Throwable e ){
+            if(islittle){
+                publicAccount = "zhongbang-bank-s";
+            }else {
+                publicAccount = "zhongbang-bank";
+            }
+            dealOrders1 = dealOrderMapper.grabAnOrderListFind(orderType, publicAccount);
         }
-        return dealOrderMapper.grabAnOrderListFind(orderType,publicAccount);
+        return dealOrders1;
     }
 
     @Override
@@ -397,13 +405,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean updateGrabOrder(DealOrder order, boolean islittle) {
+    public boolean updateGrabOrder(DealOrder order, boolean islittle, boolean aiAuto) {
         String publicAccount = "";
         if(islittle){
             publicAccount = "zhongbang-bank-s";
         }else {
             publicAccount = "zhongbang-bank";
         }
+        publicAccount = order.getOrderQrUser();
+
         return dealOrderMapper.updateGrabOrder(order,publicAccount)>1;
     }
 
@@ -419,5 +429,16 @@ public class OrderServiceImpl implements OrderService {
         dealOrderMapper.updateSystemBankAmount(bu,orderId);
 
 
+    }
+
+    @Override
+    public List<DealOrder> findWitOrder(String userId) {
+        return dealOrderMapper.findWitOrder(userId);
+    }
+
+    @Override
+    public boolean updateBankInfoByOrderIdAUTO(String bankInfo, String orderId) {
+        int a = dealOrderMapper.updateBankInfoByOrderIdAUTO(bankInfo, orderId);
+        return a == 1;
     }
 }

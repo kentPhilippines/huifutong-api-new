@@ -1,6 +1,7 @@
 package alipay.manage.api;
 
 import alipay.config.redis.RedisUtil;
+import alipay.manage.api.Impl.AutoWit;
 import alipay.manage.api.config.FactoryForStrategy;
 import alipay.manage.bean.Amount;
 import alipay.manage.bean.ChannelFee;
@@ -78,6 +79,32 @@ public class Api {
     private ChannelFeeMapper channelFeeDao;
     @Autowired
     private OrderService orderServiceImpl;
+   @Autowired
+    private AutoWit auto;
+
+
+    /**
+     * 自动出款抢单
+     * @param request
+     * @return
+     */
+    @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/getBankInfo" )
+    public Result getwit(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
+        log.info("【当前收到自动回调消息为：" + paramMap.toString() + "】");
+        if (null == paramMap) {
+            return Result.buildFail();
+        }
+        String bankNo = paramMap.get("bankNo").toString();//转账金额
+        String userId = paramMap.get("userId").toString();//  income  转入      expenditure 转出
+        String amount = paramMap.get("amount").toString();// 抓取到的银行卡号
+        String ip = paramMap.get("ip").toString();// 抓取到的手机号
+        Result result = auto.autoWit(bankNo, userId, amount, ip);
+        log.info("自动抢单结果：result："+result.toString());
+        return   result;
+    }
+
+
+
 
     /**
      * <p>后台调用重新通知的方法</p>

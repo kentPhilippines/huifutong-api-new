@@ -331,7 +331,7 @@ public class QrcodeContorller {
                 exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：抢单失败，可用额度不足" ,Boolean.TRUE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;
             }
-            Result result = reWit.grabOrder(user.getUserId(), orderWit,islittle(user.getUserId()));
+            Result result = reWit.grabOrder(user.getUserId(), orderWit,islittle(user.getUserId()), false);
             if(result.isSuccess()){
                 exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId(),"抢单成功" ,Boolean.TRUE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
             }else {

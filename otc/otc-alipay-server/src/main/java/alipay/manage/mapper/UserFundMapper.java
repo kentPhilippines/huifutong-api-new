@@ -40,7 +40,8 @@ public interface UserFundMapper {
             " where aui.userType = 2 and  ( ( auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance - ((100 - aui.credit   ) / 100 *  (auf.deposit)) ) > #{amount}  ) and" +
             " ( auf.accountBalance  - auf.sumProfit  - 3000  <=  auf.deposit ) " +
             " and aui.switchs = 1 and aui.receiveOrderState = 1 " +
-            " and am.mountNow < auf .deposit ")
+            " and am.mountNow < auf .deposit " +
+            "")
     List<UserFund> findUserByAmount(@Param("amount") BigDecimal amount);
 
     @Select(" select  id, userId, userName, cashBalance, rechargeNumber, freezeBalance, accountBalance, " +

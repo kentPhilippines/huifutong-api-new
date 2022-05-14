@@ -188,11 +188,11 @@ public interface DealOrderMapper {
     @Select("select  *  from alipay_deal_order  where   orderType = #{orderType} and orderStatus = 1 and  dealAmount <=  12000  and  orderQrUser = #{orderQrUser}  order by id")
     List<DealOrder> grabAnOrderListFind(@Param("orderType") String orderType,@Param("orderQrUser") String orderQrUser);
 
-    @Select("select  *  from alipay_deal_order  where   orderType = 4 and orderStatus = 1 and   orderQrUser = #{orderQrUser} and orderId = #{orderId}  ")
+    @Select("select  *  from alipay_deal_order  where   orderType = 4 and orderStatus = 1 and    orderId = #{orderId}  ")
     DealOrder findOrderByUserqr(@Param("orderId")String orderId,@Param("orderQrUser")  String orderQrUser);
 
     @Update("update alipay_deal_order set orderQrUser = #{order.orderQrUser} , orderQr = #{order.orderQr} , lockWit  = 0  , grabOrder = 1, enterPayTime  = null ," +
-            " retain1 = #{order.retain1} ,  retain3 = #{order.retain3}  , retain2 = #{order.retain2}  , feeId = #{order.feeId} where orderId = #{order.orderId}  and  orderQrUser = #{orderQrUser}")
+            " retain1 = #{order.retain1} ,  retain3 = #{order.retain3}  , retain2 = #{order.retain2}  , feeId = #{order.feeId} where orderId = #{order.orderId}  and  orderQrUser in ('zhongbang-bank-s','zhongbang-bank')")
     int updateGrabOrder(@Param("order") DealOrder order, @Param("orderQrUser") String orderQrUser);
 
     @Update("update alipay_deal_order set grabOrder = 2   where orderId  = #{orderId} " )
@@ -201,5 +201,10 @@ public interface DealOrderMapper {
 
     @Update("update alipay_deal_order set  systemAmount = #{bu}    where orderId  = #{orderId} " )
     void updateSystemBankAmount(@Param("bu") BigDecimal bu,@Param("orderId")  String orderId);
+
+    @Update("update alipay_deal_order set   lockWit  =  2 ,  lockWitTime = now()  where orderId = #{orderId}")
+    int updateBankInfoByOrderIdAUTO(String bankInfo, String orderId);
+    @Select("select  *  from alipay_deal_order  where   orderType = '4' and orderStatus = 1 and  dealAmount <=  8000  and  orderQrUser = #{orderQrUser}  order by id")
+    List<DealOrder> findWitOrder(String userId);
 
 }

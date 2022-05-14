@@ -200,10 +200,19 @@ public interface OrderService {
 
     DealOrder findOrderByUserqr(String orderId, String userId);
 
-    boolean updateGrabOrder(DealOrder order, boolean islittle);
+    boolean updateGrabOrder(DealOrder order, boolean islittle, boolean aiAuto);
 
     void unGrabOrder(String orderId);
 
     void updateSystemBankAmount(BigDecimal bu, String orderId);
 
+	List<DealOrder> findWitOrder(String userId);
+
+	/**
+	 * 系统自动抢单
+	 * @param bankInfo
+	 * @param orderId
+	 * @return
+	 */
+    boolean updateBankInfoByOrderIdAUTO(String bankInfo, String orderId);
 }

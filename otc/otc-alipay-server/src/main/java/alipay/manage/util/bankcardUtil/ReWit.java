@@ -86,7 +86,7 @@ public class ReWit {
   }
 
 
-   public Result grabOrder(String userId, DealOrder order, boolean islittle){
+   public Result grabOrder(String userId, DealOrder order, boolean islittle, boolean aiAuto){
        BigDecimal dealAmount = order.getDealAmount();
        order.setOrderQrUser(userId);
        order.setOrderQr("");
@@ -109,11 +109,7 @@ public class ReWit {
        String orderMark = "ORDER:" + order.getOrderQrUser() + ":AUTO";
        redisUtil.set(orderMark, orderMark, 10);//金额锁定时间标记     , 如果在20分钟内回调就会删除锁定金额
        order.setGrabOrder(1);//抢单
-
-
-
-
-       boolean flag =   orderServiceImpl.updateGrabOrder(order,islittle);
+       boolean flag =   orderServiceImpl.updateGrabOrder(order,islittle,aiAuto);
        if(flag){
            return Result.buildSuccess();
        }

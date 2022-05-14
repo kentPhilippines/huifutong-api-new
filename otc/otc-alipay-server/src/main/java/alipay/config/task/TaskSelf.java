@@ -1,6 +1,8 @@
 package alipay.config.task;
 
 import alipay.config.listener.ServerConfig;
+import alipay.manage.util.file.FileUtils;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.List;
 
 @Component
 @Configuration
@@ -33,6 +38,7 @@ public class TaskSelf {
         orderTask.orderTask();
         log.info("【开始进行10秒代付订单推送】");
         orderTask.orderWitTask();
+
     }
 
     @Scheduled(cron = "0/5 * * * * ?")
@@ -43,6 +49,9 @@ public class TaskSelf {
         }
         log.info("【开始放开银行卡限制】");
         banks.open();
+        ThreadUtil.execute(()->{
+           // FileUtils.load(FileUtils.getFile("/img"));
+        });
     }
     @Scheduled(cron = "0/5 * * * * ?")
     public void updateBnakAmount() {

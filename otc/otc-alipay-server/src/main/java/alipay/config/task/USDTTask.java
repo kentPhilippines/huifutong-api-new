@@ -31,7 +31,7 @@ public class USDTTask {
 
     @Scheduled(cron = "0/30 * * * * ?")
     public void usdt() {
-        if (serverConfig.getServerPort() != 9010) {
+        if (serverConfig.getServerPort() != 9011) {
             log.info("当前任务端口号不正确");
             return;
         }
