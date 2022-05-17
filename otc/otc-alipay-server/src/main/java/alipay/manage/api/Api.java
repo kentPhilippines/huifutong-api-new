@@ -90,7 +90,7 @@ public class Api {
      */
     @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/getBankInfo" )
     public Result getwit(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
-        log.info("【当前收到自动回调消息为：" + paramMap.toString() + "】");
+        log.info("【收到自动出款信息为：" + paramMap.toString() + "】");
         if (null == paramMap) {
             return Result.buildFail();
         }
@@ -102,7 +102,39 @@ public class Api {
         log.info("自动抢单结果：result："+result.toString());
         return   result;
     }
-
+    @Autowired AccountApiService accountApiServiceImpl;
+    @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/offR" )
+    public Result offR(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
+        log.info("【关闭收款：" + paramMap.toString() + "】");
+        if (null == paramMap) {
+            return Result.buildFail();
+        }
+        String userId = paramMap.get("userId").toString();//  income  转入      expenditure 转出
+        Result result = accountApiServiceImpl.auditMerchantStatusByUserId(userId,"receiveOrderState","2");
+        return   result;
+    }
+    @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/witSuccess" )
+    public Result witSuccess(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
+        log.info("【自动出款成功：" + paramMap.toString() + "】");
+        if (null == paramMap) {
+            return Result.buildFail();
+        }
+        String orderId = paramMap.get("orderId").toString();//  income  转入      expenditure 转出
+        String orderStatus = paramMap.get("orderStatus").toString();//  income  转入      expenditure 转出
+        String msg = paramMap.get("msg").toString();//  income  转入      expenditure 转出
+        if(StrUtil.isEmpty(orderId)){
+            return   Result.buildFailMessage("订单号为空");
+        }
+        if(StrUtil.isEmpty(orderStatus)){
+            return   Result.buildFailMessage("状态为空");
+        }
+        int i   =  dealOrderDao.updateAutoSu(orderId,orderStatus,msg);
+        if(i>0){
+            return Result.buildSuccess();
+        }else {
+          return   Result.buildFail();
+        }
+    }
 
 
 

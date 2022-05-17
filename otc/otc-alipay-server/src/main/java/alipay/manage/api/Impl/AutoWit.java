@@ -66,6 +66,9 @@ public class AutoWit {
        */
 
       UserInfo userInfo = userInfoDao.findUserByUserId(userId);
+      if(ObjectUtil.isNull(userInfo)){
+          return Result.buildFailMessageCode("用户不存在",FALSE);
+      }
       Integer autoWitstatusOfAccount = userInfo.getAutowitstatus();//1为开启
       if(0 == autoWitstatusOfAccount){
          return Result.buildFailMessageCode("账户自动出款关闭",FALSE);
@@ -74,9 +77,10 @@ public class AutoWit {
       if(1 != remitOrderState){
           return Result.buildFailMessageCode("账户代付状态已关闭",ERROR);
       }
+      Medium bankm = new Medium();
       try {
-          Medium bank = mediumService.findBank(bankNo);
-          Integer autoWitstatusOfBank = bank.getAutowitstatus();
+          bankm = mediumService.findBank(bankNo);
+          Integer autoWitstatusOfBank = bankm.getAutowitstatus();
           if(0 == autoWitstatusOfBank){
             return   Result.buildFailMessageCode("银行卡自动出款关闭",FALSE);
           }
@@ -84,7 +88,7 @@ public class AutoWit {
           log.info("存在多张银行卡，当前卡号："+bankNo);
           return   Result.buildFailMessageCode("存在多张银行卡,银行卡自动出款关闭",FALSE);
       }
-      Medium medium = mediumServiceImpl.findMediumId(bankNo);
+      Medium medium = mediumServiceImpl.findMediumId(bankm.getId()+"");
 
       if(ObjectUtil.isNull(medium)){
           log.info("当前银行卡不存在，当前卡号："+bankNo);
@@ -159,6 +163,9 @@ public class AutoWit {
             if(witAmount.compareTo(dealAmount) > -1 ){//符合出款要求
                 String associatedId = wit.getAssociatedId();//出款订单
                 Withdraw order = withdrawService.findOrderId(associatedId);
+                if(ObjectUtil.isNull(order)){
+                    continue;
+                }
                 String bankNo1 = order.getBankNo();//卡号
                 String accname = order.getAccname();//入款人
                 String bankName = order.getBankName();//银行

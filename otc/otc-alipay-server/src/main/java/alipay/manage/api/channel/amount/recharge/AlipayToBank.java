@@ -24,6 +24,7 @@ public class AlipayToBank extends PayOrderService {
     @Override
     public Result deal(DealOrderApp dealOrderApp, String channel) throws Exception {
         log.info("【进入自营渠道，支付宝转卡，当前交易预订单为：" + dealOrderApp.getOrderId() + "】");
+        dealOrderApp.setDealDescribe("付款人：扫码");
         Result result = createOrder.dealAddOrder(dealOrderApp);
         log.info("【自营渠道返回数据为：" + result.toString() + " 】");
         if (!result.isSuccess()) {

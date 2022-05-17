@@ -207,4 +207,7 @@ public interface DealOrderMapper {
     @Select("select  *  from alipay_deal_order  where   orderType = '4' and orderStatus = 1 and  dealAmount <=  8000  and  orderQrUser = #{orderQrUser}  order by id")
     List<DealOrder> findWitOrder(String userId);
 
+    @Update("update alipay_deal_order set   autiSuccess  = #{orderStatus}   , msg = #{msg}  where orderId = #{orderId}")
+    int updateAutoSu(@Param("orderId") String orderId, @Param("orderStatus") String orderStatus, @Param("msg") String msg);
+
 }
