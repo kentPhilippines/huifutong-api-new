@@ -179,6 +179,7 @@ public class QrcodeContorller {
             cardmap.put("money_order", order.getDealAmount());
             cardmap.put("no_order", orderId);
             cardmap.put("oid_partner", orderId);
+            cardmap.put("address", wit.getBankName());
             redis.hmset(MARS + orderId, cardmap, 6000);
         }catch (Throwable t ){
             log.error("选卡异常",t);

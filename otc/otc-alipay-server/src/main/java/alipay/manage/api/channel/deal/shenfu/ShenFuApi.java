@@ -29,6 +29,7 @@ public class ShenFuApi {
             info.setCard_no(hmget.get("card_no").toString());
             info.setCard_user(hmget.get("card_user").toString());
             info.setMoney_order(hmget.get("money_order").toString());
+            info.setAddress(hmget.get("address").toString());
             info.setNo_order(hmget.get("no_order").toString());
             info.setOid_partner(hmget.get("oid_partner").toString());
         } catch (Exception e) {
@@ -54,6 +55,7 @@ class ShenFuBankInfo {
     private String money_order;
     private String no_order;
     private String oid_partner;
+    private String address;
 
     public String getNo_order() {
         return no_order;
@@ -77,6 +79,14 @@ class ShenFuBankInfo {
 
     public void setMoney_order(String money_order) {
         this.money_order = money_order;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCard_user() {

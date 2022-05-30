@@ -33,7 +33,7 @@ public class AlipayToBank extends PayOrderService {
         }
         DealOrder assOrder = orderServiceImpl.findAssOrder(dealOrderApp.getOrderId());
         String orderId = assOrder.getOrderId();
-        return Result.buildSuccessResult("支付处理中", ResultDeal.sendUrlAndPayInfo(PayApiConstant.Notfiy.OTHER_URL + "/pay/alipayToCard?order_id="+orderId, result.getMessage()));
+        return Result.buildSuccessResult("支付处理中", ResultDeal.sendUrl(PayApiConstant.Notfiy.OTHER_URL + "/pay/alipayToCard?order_id="+orderId ));
     }
 
 
