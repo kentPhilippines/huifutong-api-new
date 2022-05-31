@@ -112,6 +112,9 @@ public class Result {
 	public static Result buildSuccessMessageCode(String msg, Object o, int i) {
 			return new Result(true, msg, o,i);
 	}
+	public static Result buildFailMessageCode(String msg, int i) {
+			return new Result(false, msg, null,i);
+	}
 
 	public boolean isSuccess() {
 		return success;

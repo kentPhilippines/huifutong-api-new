@@ -12,17 +12,17 @@ import java.io.File;
 public class file {
         public static void main(String[] args) throws Exception {
             // Endpoint以华东1（杭州）为例，其它Region请按实际情况填写。
-            String endpoint = "imgslocation.oss-cn-hongkong-internal.aliyuncs.com";
+            String endpoint = "oss-cn-hongkong.aliyuncs.com";
             // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
             String accessKeyId = "LTAI5t7kBpUP8rLGpi1Kwy1m";
-            String accessKeySecret = "rmUd0OT3qBgZQ5IGf5n2JFzhWEmAoU\n";
+            String accessKeySecret = "rmUd0OT3qBgZQ5IGf5n2JFzhWEmAoU";
             // 填写Bucket名称，例如examplebucket。
             String bucketName = "imgslocation";
             // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
-            String objectName = "imgslocation/alipay.log.2022-04-12.log";
+            String objectName = "alipayImg/image_2021-12-28_13-46-56.png";
             // 填写本地文件的完整路径，例如D:\\localpath\\examplefile.txt。
             // 如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
-            String filePath= "/Users/kent/IdeaProjects/huifutong-api-new/alipay.log.2022-04-12.log";
+            String filePath= "/Users/kent/Downloads/image_2021-12-24_13-22-15.png";
 
             // 创建OSSClient实例。
             OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);

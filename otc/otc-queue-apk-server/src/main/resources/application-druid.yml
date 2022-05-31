@@ -37,8 +37,10 @@ spring:
           enabled: true
   redis:
     port: 6379
-    host: 127.0.0.1
+    host: 34.150.94.93
     timeout: 5000
+    database : 1
+    password: redis123456
     pool:
       max-idle: 200
       min-idle: 10

@@ -101,7 +101,6 @@ public class PayApiConstant {
 
 
     public class Notfiy {
-
         public static final String NOTFIY_API = "/notfiy-api";
         public static final String NOTFIY_API_WAI = "/notfiy-api-pay";
         public static final String NOTFIY_AGENT = "/notfiy-agent";

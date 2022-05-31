@@ -72,7 +72,7 @@ public interface UserInfoMapper {
             "    agent, isAgent, credit, receiveOrderState, remitOrderState," +
             "    createTime, submitTime, status, privateKey, publicKey, minAmount, maxAmount," +
             "    qrRechargeList,dealUrl,queueList,witip,startTime,endTime,timesTotal,totalAmount," +
-            "autoWit , enterWitOpen , interFace  from alipay_user_info where userId = #{userId}")
+            "autoWit , enterWitOpen ,autowitstatus, interFace  from alipay_user_info where userId = #{userId}")
     UserInfo findUserByUserId(@Param("userId") String userId);
 
     @Select("select * from alipay_user_rate where userId = #{userId} and payTypr = #{passCode} and switchs = 1")

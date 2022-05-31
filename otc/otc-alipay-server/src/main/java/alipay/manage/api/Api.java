@@ -1,6 +1,7 @@
 package alipay.manage.api;
 
 import alipay.config.redis.RedisUtil;
+import alipay.manage.api.Impl.AutoWit;
 import alipay.manage.api.config.FactoryForStrategy;
 import alipay.manage.bean.Amount;
 import alipay.manage.bean.ChannelFee;
@@ -78,6 +79,64 @@ public class Api {
     private ChannelFeeMapper channelFeeDao;
     @Autowired
     private OrderService orderServiceImpl;
+   @Autowired
+    private AutoWit auto;
+
+
+    /**
+     * 自动出款抢单
+     * @param request
+     * @return
+     */
+    @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/getBankInfo" )
+    public Result getwit(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
+        log.info("【收到自动出款信息为：" + paramMap.toString() + "】");
+        if (null == paramMap) {
+            return Result.buildFail();
+        }
+        String bankNo = paramMap.get("bankNo").toString();//转账金额
+        String userId = paramMap.get("userId").toString();//  income  转入      expenditure 转出
+        String amount = paramMap.get("amount").toString();// 抓取到的银行卡号
+        String ip = paramMap.get("ip").toString();// 抓取到的手机号
+        Result result = auto.autoWit(bankNo, userId, amount, ip);
+        log.info("自动抢单结果：result："+result.toString());
+        return   result;
+    }
+    @Autowired AccountApiService accountApiServiceImpl;
+    @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/offR" )
+    public Result offR(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
+        log.info("【关闭收款：" + paramMap.toString() + "】");
+        if (null == paramMap) {
+            return Result.buildFail();
+        }
+        String userId = paramMap.get("userId").toString();//  income  转入      expenditure 转出
+        Result result = accountApiServiceImpl.auditMerchantStatusByUserId(userId,"receiveOrderState","2");
+        return   result;
+    }
+    @PostMapping(PayApiConstant.Alipay.ORDER_API +  "/witSuccess" )
+    public Result witSuccess(@RequestBody Map<String, Object> paramMap, HttpServletRequest request) {
+        log.info("【自动出款成功：" + paramMap.toString() + "】");
+        if (null == paramMap) {
+            return Result.buildFail();
+        }
+        String orderId = paramMap.get("orderId").toString();//  income  转入      expenditure 转出
+        String orderStatus = paramMap.get("orderStatus").toString();//  income  转入      expenditure 转出
+        String msg = paramMap.get("msg").toString();//  income  转入      expenditure 转出
+        if(StrUtil.isEmpty(orderId)){
+            return   Result.buildFailMessage("订单号为空");
+        }
+        if(StrUtil.isEmpty(orderStatus)){
+            return   Result.buildFailMessage("状态为空");
+        }
+        int i   =  dealOrderDao.updateAutoSu(orderId,orderStatus,msg);
+        if(i>0){
+            return Result.buildSuccess();
+        }else {
+          return   Result.buildFail();
+        }
+    }
+
+
 
     /**
      * <p>后台调用重新通知的方法</p>

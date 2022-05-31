@@ -21,9 +21,9 @@ import java.util.Map;
 
 public class witTest {
 	public static void main(String[] args) {
-        /*for (int a = 0; a <= 0; a++) {
+        for (int a = 0; a <= 0; a++) {
             new witTest().deal();
-        }*/
+        }
         //find();
 /*
         String userid2 = "2u7rMduh";
@@ -66,7 +66,7 @@ public class witTest {
 
         for (int a = 0; a <= 0; a++) {
             ThreadUtil.execute(() -> {
-             new witTest().wit(userid, key, publicKey);
+           //  new witTest().wit(userid, key, publicKey);
             });
 		/*	ThreadUtil.execute(() -> {
 				new witTest().wit(userid2, key2, publickey2);
@@ -163,7 +163,7 @@ public class witTest {
         postMap.put("userId", userid);
         System.out.println("请求参数：" + postMap.toString());
         long l1 = System.currentTimeMillis();
-        String post = HttpUtil.post("http://47.242.42.81:44216/deal/wit", postMap);
+        String post = HttpUtil.post("http://47.242.42.81:24122/deal/wit", postMap);
         long l = System.currentTimeMillis();
         long a = l - l1;
         System.out.println("相应结果集：" + post + " 处理时间：" + a);
@@ -191,10 +191,10 @@ public class witTest {
 */
 
 
-        String userid = "yajin";
-        String key = "DC64F340640A4BBF927B2F8F3C741C56";
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCDoWgQptipqxZK8XXJFiYwDP6uypcK+qGDtPUuGpvWRUleSbY5s7OV/+f4ggENgei41XFAoY9Z1wZZeZg0TH5kFwNKCJGZ9cQ2qhjeZxNswUp0rvTTMbB+f4lc5FQp3PAxf2ljnXOr6RBT9lV0wHQasuLvQw0Fp8Rhff6dlVPpgQIDAQAB";
-        long amount = RandomUtil.randomLong(3000, 5000);
+        String userid = "jinxing3";
+        String key = "51C2A8E4BBDB488C9E901F163A195BBC";
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJA3kkGVMP3lTsWR6PtBSWFOtP+RmEEv4yWS3E4rIKG07rzX2f7sgQnm2CGld25s4lL9bWT8Hw9ulTpi1vNACHLXko0O/YyNuIfeUvfaXirBgWlErDlQ+hOFdhLle+vdITu+5JW08i+G9Z1gZkcdtk/UeomBuY0FNaLxx/dRCNyQIDAQAB";
+        long amount = RandomUtil.randomLong(200, 300);
         Deal deal = new Deal();
         deal.setAmount(amount + "");//金额
         deal.setAppId(userid);//商户号
@@ -202,7 +202,7 @@ public class witTest {
         deal.setNotifyUrl("http://starpay168.com:5055");
         deal.setPageUrl("http://starpay168.com:5055");
         deal.setOrderId(IdUtil.objectId());
-        deal.setPassCode("ALIPAY_BIG_QR");
+        deal.setPassCode("ALIPAT_TO_BANK");
         deal.setSubject("订单交易");
         deal.setUserId("张三");  //to userid
         Map<String, Object> objectToMap = MapUtil.objectToMap(deal);
@@ -221,7 +221,7 @@ public class witTest {
         postMap.put("cipherText", publicEncrypt);
         postMap.put("userId", userid);
         System.out.println("请求参数：" + postMap.toString());
-        String post = HttpUtil.post("http://127.0.0.1:9010/deal/pay", postMap);
+        String post = HttpUtil.post("http://47.242.42.81:24122/deal/pay", postMap);
         System.out.println("相应结果集：" + post);
 
     }

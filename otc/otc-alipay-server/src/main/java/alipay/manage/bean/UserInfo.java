@@ -29,6 +29,7 @@ public class UserInfo implements Serializable{
     private BigDecimal credit;			//信用等级为默认为100,掉单一次,或者出现故障一次减分0.001分,可人为加分
     private Integer receiveOrderState;	//是否处于入款接单状态 1 接单 2 暂停接单【下游商户则为是否可以交易】
     private Integer remitOrderState;	//是否处于出款接单状态 1 接单 2 暂停接单【下游商户则为是否可以代付】
+    private Integer autowitstatus;	//是否处于自动出款的状态 1 自动出款开启 2 自动出款关闭
     private String QQ;					//联系方式
     private String telegram;			//联系方式
     private String skype;				//联系方式
@@ -55,6 +56,15 @@ public class UserInfo implements Serializable{
 
 
     private String todayProfit;
+
+
+    public Integer getAutowitstatus() {
+        return autowitstatus;
+    }
+
+    public void setAutowitstatus(Integer autowitstatus) {
+        this.autowitstatus = autowitstatus;
+    }
 
     public String getTodayProfit() {
         return todayProfit;

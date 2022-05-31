@@ -296,8 +296,8 @@ public abstract class PayOrderService implements PayService {
 		DealOrder order = new DealOrder();
 		String orderAccount = orderApp.getOrderAccount();//交易商户号
 		//	UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(orderAccount);//这里有为商户配置的 供应队列属性
-		String[] split = {"zbzfb999"};
-	//	String[] split = {"huifutong2"};
+	//	String[] split = {"zbzfb999"};
+		String[] split = {"huifutong2"};
 		UserRate rateFeeType = userRateServiceImpl.findRateFeeType(orderApp.getFeeId());//商户入款费率
 		BigDecimal fee1 = rateFeeType.getFee();//商户交易订单费率
 		order.setAssociatedId(orderApp.getOrderId());

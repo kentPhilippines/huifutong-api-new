@@ -12,6 +12,7 @@ import java.util.Date;
 public class Medium implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer id;                            //数据id
+    private Integer autowitstatus;         ////是否处于自动出款的状态 1 自动出款开启 2 自动出款关闭
     private String mediumNumber;                //媒介账号       银行卡号
     private String mediumId;                    //系统媒介编号    系统编号
     private String mediumHolder;                //媒介所属人      开户人
@@ -67,8 +68,13 @@ public class Medium implements Serializable {
     private Integer todayCountWit;//当日出款笔数
     private Integer sumCountWit;//累计出款笔数
 
+    public Integer getAutowitstatus() {
+        return autowitstatus;
+    }
 
-
+    public void setAutowitstatus(Integer autowitstatus) {
+        this.autowitstatus = autowitstatus;
+    }
 
     public Integer getSumCountWit() {
         return sumCountWit;

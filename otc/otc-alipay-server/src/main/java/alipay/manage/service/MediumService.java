@@ -133,7 +133,7 @@ public interface MediumService {
      */
     Medium findMediumByBankAndId(String cardInfo, String userId);
 
-    Medium findBank(String toString);
+    Medium findBank(String bankNo);
 
 
     /**
