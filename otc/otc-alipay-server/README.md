@@ -50,5 +50,17 @@ super.withdraw //扣款
 zhongbang-bank --大额出款通道
 zhongbang-bank-s --小额出款通道
 
+addOrder //创建订单
+"ORDER:" + order.getOrderQrUser() + ":AUTO" //redis创建缓存，10MINS  接收短信供回调用
+
 TASK:ORDER:PUSH: + "lock"  //代码块解锁
 --------------代付结算逻辑结束
+
+
+
+****
+总体流程：
+下单->异步结算(扣钱)创建订单
+异步场景： 用户持订单号->收银台->查询卡队列->支付-->接收短信
+异步场景： 小助手抓取短信->回调api 流程结束
+****
