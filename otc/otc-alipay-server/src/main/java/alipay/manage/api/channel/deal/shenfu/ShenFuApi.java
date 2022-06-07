@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import otc.common.PayApiConstant;
 
 import java.util.Map;
 
-@RequestMapping(PayApiConstant.Alipay.ORDER_API + "/ShenFuBankCardInfo")
+@RequestMapping("/order-api/ShenFuBankCardInfo")
 @RestController
 public class ShenFuApi {
     public static final Log log = LogFactory.get();
@@ -32,6 +31,7 @@ public class ShenFuApi {
             info.setAddress(hmget.get("address").toString());
             info.setNo_order(hmget.get("no_order").toString());
             info.setOid_partner(hmget.get("oid_partner").toString());
+            info.setLockWit(redis.get("ALIPAY_WITHDRAWAL_LOCKWIT:"+orderId)+"");
         } catch (Exception e) {
             log.info("【请求缓存银行卡数据失败，当前请求订单号：" + orderId + "】");
         }
@@ -56,6 +56,16 @@ class ShenFuBankInfo {
     private String no_order;
     private String oid_partner;
     private String address;
+
+    public String getLockWit() {
+        return lockWit;
+    }
+
+    public void setLockWit(String lockWit) {
+        this.lockWit = lockWit;
+    }
+
+    private String lockWit;
 
     public String getNo_order() {
         return no_order;
