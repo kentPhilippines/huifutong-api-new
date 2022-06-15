@@ -297,6 +297,32 @@ public class AmountRunUtil {
         return Result.buildFailMessage("流水生成失败");
     }
 
+    /**
+     * 晚间上浮费率结算
+     * @param order
+     * @param generationIp
+     * @param flag
+     * @return
+     */
+    public Result addDealAmountNightBankFee(DealOrder order, String generationIp, Boolean flag) {
+        UserRate rate = userInfoServiceImpl.findUserRateById(order.getFeeId());
+        log.info("【三方卡商结算手续费流水】当前加入流水账号：" + order.getOrderQrUser() + "，当前流水金额：" + order.getDealAmount() + "，当前流水费率：" + rate.getRetain3() + "，");
+        BigDecimal dealAmount = order.getDealAmount();
+        BigDecimal nigthFee = BigDecimal.ZERO;
+        String retain4 = rate.getRetain4();
+        try {
+            nigthFee = new BigDecimal(retain4);
+        }catch (Exception e ){
+            log.info("夜间费率费率配置错误或未配置");
+        }
+        BigDecimal amount = dealAmount.multiply(nigthFee);
+        Result add = add(PROFIT_AMOUNT_DEAL, order.getOrderQrUser(), order.getOrderId(), amount, generationIp, "夜间接单额外分润", flag ? RUNTYPE_ARTIFICIAL : RUNTYPE_NATURAL);
+        if (add.isSuccess()) {
+            return add;
+        }
+        return Result.buildFailMessage("流水生成失败");
+    }
+
     public Result addDealAmountChannel(DealOrder order, String generationIp, Boolean flag, BigDecimal amount) {
         log.info("【四方渠道结算手续费流水】当前加入流水账号：" + order.getOrderQrUser() + "，当前流水金额：" + order.getDealAmount() + "，当前流水费率：" + amount + "，");
         BigDecimal dealAmount = order.getDealAmount();

@@ -3,8 +3,14 @@ package alipay.config.task;
 import alipay.config.redis.RedisUtil;
 import alipay.manage.api.channel.deal.jiabao.RSAUtil;
 import alipay.manage.bean.DealOrder;
+import alipay.manage.bean.UserFund;
+import alipay.manage.bean.UserRate;
 import alipay.manage.service.MediumService;
 import alipay.manage.service.OrderService;
+import alipay.manage.service.UserInfoService;
+import alipay.manage.util.amount.AmountPublic;
+import alipay.manage.util.amount.AmountRunUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -15,11 +21,15 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import otc.bean.alipay.Medium;
+import otc.exception.order.OrderException;
+import otc.result.Result;
 import otc.util.RSAUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -147,6 +157,45 @@ public class BankOpen {
         }
 
         // 这里的银行卡流水 暂未完善
+    }
+    @Autowired
+    private AmountPublic amountPublic;
+    @Autowired
+    private AmountRunUtil amountRunUtil;
+    @Autowired private UserInfoService userInfoServiceImpl;
+    @Transactional
+    public void nightBankFee(DealOrder order) {
+        int hour = DateUtil.hour(new Date(), true);
+        if( !(hour>=0 && hour <= 6 ) ){
+            log.info("当前时间不是夜间结算,当前订单号："+order.getOrderId());
+            return;
+        }
+        UserFund userFund = new UserFund();
+            userFund.setUserId(order.getOrderQrUser());
+            UserRate rate = userInfoServiceImpl.findUserRateById(order.getFeeId());
+            log.info("【三方卡商结算夜间额外手续费】当前加入流水账号：" + order.getOrderQrUser() + "，当前流水金额：" + order.getDealAmount() + "，当前流水费率：" + rate.getRetain3() + "，");
+            BigDecimal dealAmount = order.getDealAmount();
+            BigDecimal nigthFee = BigDecimal.ZERO;
+            String retain4 = rate.getRetain4();
+            try {
+                nigthFee = new BigDecimal(retain4);
+            }catch (Exception e ){
+                log.info("夜间费率费率配置错误或未配置");
+            }
+            BigDecimal amount = dealAmount.multiply(nigthFee);
+            if(amount.compareTo(BigDecimal.ZERO)==0){
+                log.info("当前夜间不存在结算费率或配置为0 ，当前订单号为："+order.getOrderId()+"当前账户为："+order.getOrderQrUser());
+                return;
+            }
+            Result addDeal = amountPublic.addDeal(userFund, amount, new BigDecimal(0), order.getOrderId());
+            if (!addDeal.isSuccess()) {
+                throw new OrderException("流水异常", null);
+            }
+            Result addDealAmount = amountRunUtil.addDealAmountNightBankFee(order, order.getGenerationIp(), Boolean.FALSE);
+            if (!addDealAmount.isSuccess()) {
+                throw new OrderException("流水异常", null);
+            }
+
     }
 }
 

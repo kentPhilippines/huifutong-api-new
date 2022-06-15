@@ -226,8 +226,9 @@ public class AccountApiSericeImpl implements AccountApiService {
         CollUtil.sortByProperty(userRate, "retain1");
         for (UserRate rate : userRate) {
             BigDecimal systemAmount = new BigDecimal(rate.getRetain2());//金额限制
+            BigDecimal bigDecimalAmount= new BigDecimal(rate.getRetain3());//金额限制
             BigDecimal bigDecimal = new BigDecimal(amount);
-            if (bigDecimal.compareTo(systemAmount) >= 0) {
+            if (bigDecimal.compareTo(systemAmount) >= 0 &&  bigDecimal.compareTo(bigDecimalAmount) <= 0   ) {
                 return rate;
             } else {
                 continue;

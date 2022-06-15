@@ -215,4 +215,9 @@ public interface OrderService {
 	 * @return
 	 */
     boolean updateBankInfoByOrderIdAUTO(String bankInfo, String orderId);
+
+    List<DealOrder> findNightBankFee();
+
+
+
 }

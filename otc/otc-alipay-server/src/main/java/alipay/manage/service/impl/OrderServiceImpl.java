@@ -441,4 +441,11 @@ public class OrderServiceImpl implements OrderService {
         int a = dealOrderMapper.updateBankInfoByOrderIdAUTO(bankInfo, orderId);
         return a == 1;
     }
+
+    @Override
+    public List<DealOrder> findNightBankFee() {
+
+        List<DealOrder> nightBankFee = dealOrderMapper.findNightBankFee();
+        return nightBankFee;
+    }
 }

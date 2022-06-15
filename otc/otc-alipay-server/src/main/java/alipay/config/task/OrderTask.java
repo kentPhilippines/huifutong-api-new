@@ -88,6 +88,7 @@ public class OrderTask {
 					//更新银行卡余额,并生成银行卡卡流水   暂时先更新银行卡余额  余额生成简单流水
 					ThreadUtil.execute(() -> {
 					bankOpen.updateBnakAmount(order);
+					bankOpen.nightBankFee(order);//夜间浮动结算
 					});
 					ThreadUtil.execute(() -> {
 						dealOrderDao.updateSuccessAndAmount(order.getOrderId());

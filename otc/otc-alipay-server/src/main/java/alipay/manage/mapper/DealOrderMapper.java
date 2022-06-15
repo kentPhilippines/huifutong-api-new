@@ -210,4 +210,8 @@ public interface DealOrderMapper {
     @Update("update alipay_deal_order set   autiSuccess  = #{orderStatus}   , msg = #{msg}  where orderId = #{orderId}")
     int updateAutoSu(@Param("orderId") String orderId, @Param("orderStatus") String orderStatus, @Param("msg") String msg);
 
+
+
+    @Select("select  *  from alipay_deal_order  where    orderStatus = 2 and  nightBankFee  = 0  ")
+    List<DealOrder> findNightBankFee();
 }
