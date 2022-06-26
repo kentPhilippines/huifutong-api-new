@@ -81,7 +81,7 @@ public class BankUtil {
 	 */
 	public String findOrderBy(String amount, String phone, String bankNo,String payinfo) {
 		log.info("【当前寻找回调参数为：amount = " + amount + "，phone = " + phone + "，bankNo = " + bankNo + "，payinfo = "+payinfo+"】");
-		String notify = bankNo + phone + amount.toString()+payinfo;
+		String notify = bankNo + amount.toString()+payinfo;
 		Object object = redisUtil.get(notify);//可以找到即位当前充值订单的关联订单号
 		if (ObjectUtil.isNull(object)) {
 			return null;
@@ -281,7 +281,7 @@ public class BankUtil {
 			Long time = 0L;
 			log.info("【账户数据：" + qrcodeUser.toString() + "】");
 			riskUtil.updataUserAmountRedis(qrcodeUser, flag);
-			log.info("银行卡："+qr.getAccount() +" 当前付款人：" + payInfo + " 当前银行卡号 ： "+qr.getMediumNumber().trim()+ "当前手机号："+qr.getMediumPhone().trim());
+			log.info("银行卡："+qr.getAccount() +" 当前付款人：" + payInfo + " 当前银行卡号 ： "+qr.getMediumNumber().trim()+ "当前手机号：" );
 			/*if (openPayment(qr.getAccount())) {//是否开启姓名验证
 				name = "";
 			}*/
@@ -290,7 +290,7 @@ public class BankUtil {
 				name = "";
 			}
 			Object waitBank = null;
-			String notify = qr.getMediumNumber().trim() + qr.getMediumPhone().trim() + dealAmount.toString().trim() + name;
+			String notify = qr.getMediumNumber().trim()  + dealAmount.toString().trim() + name;
 			log.info("【核心回调控制数据：" + notify + " , 核心回调订单号-"+orderNo+", 核心回调时间："+ DateUtil.format(new Date(), Common.Order.DATE_TYPE)+"】");
 			Object object2 = redisUtil.get(notify);//回调数据
 			//	Object object = redisUtil.get(qr.getPhone());

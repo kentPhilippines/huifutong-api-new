@@ -1060,12 +1060,23 @@ public class OrderUtil {
     private Result witAgent(Withdraw wit, String username, String product, String channelId, UserRate rate, String ip, boolean flag) {
         UserRate userRate = userRateDao.findProductFeeByAll(username, product, channelId);//查询当前代理费率情况
         UserInfo userInfo = userInfoServiceImpl.findUserAgent(username);
-        log.info("【当前代理商为：" + userRate.getUserId() + "】");
+    /*    log.info("【当前代理商为：" + userRate.getUserId() + "】");
         log.info("【当前代理商结算费率：" + userRate.getFee() + "】");
         log.info("【当前当前我方：" + rate.getUserId() + "】");
         log.info("【当前我方结算费率：" + rate.getFee() + "】");
         BigDecimal fee = userRate.getFee();//代理商的费率
         BigDecimal fee2 = rate.getFee();//商户的费率
+        BigDecimal subtract = fee2.subtract(fee);//
+        log.info("【当前结算费率差为：" + subtract + "】");
+        log.info("【当前结算费率差为代理商分润：" + subtract + "】");//这个钱要加给代理商
+        log.info("【开始结算】");
+*/
+        log.info("【当前代理商为：" + userRate.getUserId() + "】");
+        log.info("【当前代理商结算费率：" + userRate.getFee() + "，当前代理商抽点费率为："+userRate.getRetain4()+"】");
+        log.info("【当前当前我方：" + rate.getUserId() + "】");
+        log.info("【当前我方结算费率：" + rate.getFee() + "，当前我方抽点费率为："+rate.getRetain4()+ "】");
+        BigDecimal fee = userRate.getFee().add(new BigDecimal(userRate.getRetain4()).multiply(wit.getAmount()));//代理商的费率
+        BigDecimal fee2 = rate.getFee().add(new BigDecimal(rate.getRetain3()).multiply(wit.getAmount()));//商户的费率
         BigDecimal subtract = fee2.subtract(fee);//
         log.info("【当前结算费率差为：" + subtract + "】");
         log.info("【当前结算费率差为代理商分润：" + subtract + "】");//这个钱要加给代理商
