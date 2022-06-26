@@ -114,8 +114,12 @@ public class OrderContorller {
 		UserInfo userInfoByUserId = accountServiceImpl.findUserInfoByUserId(userId);
 		if(ObjectUtil.isNotNull(userInfoByUserId)){
 			String agent = userInfoByUserId.getAgent();
-			UserRate userRateW = userRateService.findUserRateW(agent);
-			return userRateW.getPayTypr().equals("BANK_WIT_S");
+			if(StrUtil.isEmpty(agent)){
+				UserRate userRateW = userRateService.findUserRateW(userId);
+				return userRateW.getPayTypr().equals("BANK_WIT_S");
+			}
+			UserRate userRateW1 = userRateService.findUserRateW(agent);
+			return userRateW1.getPayTypr().equals("BANK_WIT_S");
 		}
 		return false;
 

@@ -189,7 +189,7 @@ public class CreateOrder {
         cardmap.put("no_order", bc);
         cardmap.put("oid_partner", dealApp.getOrderId());
         cardmap.put("address", qr.getPayInfo());
-        redis.hmset(MARS + bc, cardmap, 600000);
+        redis.hmset(MARS + bc, cardmap, 600);
         result.setMessage(qr.getMediumHolder() + ":" + qr.getAccount() + ":" + qr.getMediumNumber() + ":" + qr.getPayInfo() );
         result.setResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + bc + "&type=203");
         ThreadUtil.execute(() -> {

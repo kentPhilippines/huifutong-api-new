@@ -180,7 +180,7 @@ public class QrcodeContorller {
             cardmap.put("no_order", orderId);
             cardmap.put("oid_partner", orderId);
             cardmap.put("address", wit.getBankName());
-            redis.hmset(MARS + orderId, cardmap, 6000);
+            redis.hmset(MARS + orderId, cardmap, 600);
         }catch (Throwable t ){
             log.error("选卡异常",t);
             log.info("出款信息异常，当前订单号："+orderId);
@@ -288,7 +288,7 @@ public class QrcodeContorller {
             }
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
             UserInfo user1 = userInfoServer.findUserInfoByUserId(user.getUserId());
-            Integer receiveOrderState = user1.getReceiveOrderState();
+            Integer receiveOrderState = user1.getRemitOrderState();
             if(2 == receiveOrderState){
                 exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：当前用户代付状态未开启",Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return;
@@ -312,7 +312,7 @@ public class QrcodeContorller {
             }
             log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+""+"");
             List<DealOrder> witOrderByUserId = orderServiceImpl.findWitOrderByUserId(user.getUserId());
-            if( witOrderByUserId.size()>=5){
+            if( witOrderByUserId.size()>=2){
                 log.info("当前抢单订单号："+orderWit.getOrderId()+" 当前抢单用户："+user.getUserId()+" 当前抢单订单金额："+orderWit.getDealAmount()+" 当前报错："+"当前账户抢单过多，请先出款");
                 exceptionOrderServiceImpl.addBankInfo(orderWit.getOrderId(),user.getUserId()," 当前报错：当前账户抢单过多，需要先处理其他订单",Boolean.FALSE, HttpUtil.getClientIP(request),orderWit.getDealAmount());
                 return ;

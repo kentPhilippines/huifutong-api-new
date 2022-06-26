@@ -169,7 +169,7 @@ public class AgentContorller {
 			bean.setIsDeal(Common.isOk);
 			boolean flag = inviteCodeServiceImpl.addinviteCode(bean);
 			if (flag) {
-				return Result.buildSuccessResult("操作成功", "http://zongbang-pay.com/customerlogin/register?inviteCode=" + createinviteCode);
+				return Result.buildSuccessResult("操作成功", "当前功能禁止使用");
 			}
 			return Result.buildFail();
 		}

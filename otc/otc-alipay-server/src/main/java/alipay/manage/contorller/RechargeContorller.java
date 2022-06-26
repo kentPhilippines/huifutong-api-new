@@ -267,7 +267,7 @@ public class RechargeContorller {
    }
    
    Withdraw createWit(Map<String, String> map,String ip) {
-	   BigDecimal fee = new BigDecimal("2");
+	   BigDecimal fee = new BigDecimal("0");
 	   Withdraw wit = new Withdraw();
 	   wit.setOrderId(Number.getWitOrderQr());
 	   wit.setAccname(map.get(ACC_NAME).toString());
