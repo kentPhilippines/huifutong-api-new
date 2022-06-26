@@ -14,6 +14,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.common.PayApiConstant;
 import otc.result.Result;
@@ -26,6 +27,8 @@ import java.util.Map;
 
 @Component("HuiTongFUSourcePay")
 public class HuiTongFuSourcePay extends PayOrderService {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     private static final String MARS = "SHENFU";
     private static final String PAY_URL = "http://";
 
@@ -73,7 +76,7 @@ public class HuiTongFuSourcePay extends PayOrderService {
         String md5 = PayUtil.md5(createParam + channelInfo.getChannelPassword());
         map.put("sign", md5);
         map.put("url", channelInfo.getDealurl());
-        String post = HttpUtil.post(PayApiConstant.Notfiy.OTHER_URL + "/forwordSendShenFu", map);
+        String post = HttpUtil.post(url + "/forwordSendShenFu", map);
         log.info("【绅付返回数据：" + post + "】");
         log.info(post);////{
         // "bank_name":"建设银行",
@@ -100,7 +103,7 @@ public class HuiTongFuSourcePay extends PayOrderService {
                 cardmap.put("oid_partner", jsonObject.getStr("oid_partner"));
                 orderServiceImpl.updateBankInfoByOrderId(jsonObject.getStr("card_user") + ":" + jsonObject.getStr("bank_name") + ":" + jsonObject.getStr("card_no"), orderId);
                 redis.hmset(MARS + orderId, cardmap, 600000);
-                return Result.buildSuccessResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + orderId + "&type=" + channelInfo.getChannelType());
+                return Result.buildSuccessResult(url + "/pay?orderId=" + orderId + "&type=" + channelInfo.getChannelType());
             } else {
                 return Result.buildFailMessage(jsonObject.getStr("ret_msg"));
             }

@@ -16,6 +16,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.common.PayApiConstant;
 import otc.result.Result;
@@ -28,6 +29,8 @@ import java.util.Map;
 
 @Component("ShenFuSourcePay")
 public class ShenFuSourcePay extends PayOrderService {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     private static final String MARS = "SHENFU";
     private static final String PAY_URL = "http://";
 
@@ -105,7 +108,7 @@ public class ShenFuSourcePay extends PayOrderService {
                 cardmap.put("oid_partner", jsonObject.getStr("oid_partner"));
                 orderServiceImpl.updateBankInfoByOrderId(jsonObject.getStr("card_user") + ":" + jsonObject.getStr("bank_name") + ":" + jsonObject.getStr("card_no"), orderId);
                 redis.hmset(MARS + orderId, cardmap, 600000);
-                return Result.buildSuccessResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + orderId + "&type=" + channelInfo.getChannelType());
+                return Result.buildSuccessResult(url + "/pay?orderId=" + orderId + "&type=" + channelInfo.getChannelType());
             } else {
                 return Result.buildFailMessage(jsonObject.getStr("ret_msg"));
             }

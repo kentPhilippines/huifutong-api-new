@@ -8,6 +8,7 @@ import alipay.manage.service.OrderService;
 import alipay.manage.util.bankcardUtil.CreateOrder;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.common.PayApiConstant;
 import otc.result.Result;
@@ -17,6 +18,8 @@ import otc.result.Result;
  */
 @Component("AlipayToBank")
 public class AlipayToBank extends PayOrderService {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     @Autowired
     private CreateOrder createOrder;
     @Autowired
@@ -33,7 +36,7 @@ public class AlipayToBank extends PayOrderService {
         }
         DealOrder assOrder = orderServiceImpl.findAssOrder(dealOrderApp.getOrderId());
         String orderId = assOrder.getOrderId();
-        return Result.buildSuccessResult("支付处理中", ResultDeal.sendUrl(PayApiConstant.Notfiy.OTHER_URL + "/pay/alipayToCard?order_id="+orderId ));
+        return Result.buildSuccessResult("支付处理中", ResultDeal.sendUrl(url+ "/pay/alipayToCard?order_id="+orderId ));
     }
 
 

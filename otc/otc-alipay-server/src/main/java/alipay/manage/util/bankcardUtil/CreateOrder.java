@@ -12,6 +12,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.api.alipay.Common;
 import otc.bean.alipay.Medium;
@@ -34,6 +35,8 @@ import java.util.Map;
 
 @Component
 public class CreateOrder {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     public static final Log log = LogFactory.get();
     /**
      * 一下几种情况生产卡商订单
@@ -148,18 +151,15 @@ public class CreateOrder {
         String channelFeeId = null;
         Boolean flag = true;
         Integer userFeeId = dealApp.getFeeId();
-        UserInfo accountInfo = userInfoServiceImpl.findUserInfoByUserId(dealApp.getOrderAccount());//这里有为商户配置的 供应队列属性
         String[] queueCode = {};
         String bankInfo = "";
-        if (StrUtil.isNotBlank(accountInfo.getAgent())) {
-            UserInfo agent = findAgent(accountInfo.getAgent());
-            queueCode = agent.getQueueList().split(",");//队列供应标识数组
-        } else {
-            String queueList = accountInfo.getQueueList();
-            queueCode = queueList.split(",");//队列供应标识数组
+        UserRate rateFeeType = userRateServiceImpl.findRateFeeType(userFeeId);
+        if(StrUtil.isEmpty(rateFeeType.getQueueList())){
+            log.info("费率卡池未配置，当前订单号："+dealApp.getOrderId());
+            return Result.buildFailMessage("费率卡池未配置");
         }
+        queueCode = rateFeeType.getQueueList().split(",");
         String bc = GenerateOrderNo.Generate("BA");
-
         String payInfo = dealApp.getDealDescribe();
         if(StrUtil.isNotEmpty(payInfo)) {
             String[] split = payInfo.split(name);
@@ -173,7 +173,7 @@ public class CreateOrder {
         channnelId = qr.getQrcodeId();
         UserRate userRateR = userRateServiceImpl.findUserRateR(channnelId);
         channelFeeId = userRateR.getId().toString();
-        bankInfo = qr.getAccount() + MARK + qr.getMediumHolder() + MARK + qr.getMediumNumber() + MARK + "电话" + MARK + qr.getMediumPhone();
+        bankInfo = qr.getAccount() + MARK + qr.getMediumHolder() + MARK + qr.getMediumNumber() ;
         Result result = addOrder(bc, dealApp.getOrderId(),
                 dealApp.getAppOrderId(), dealApp.getOrderAccount(), dealApp.getOrderAmount().toString(), channnelId,
                 channelFeeId, flag, bankInfo, userFeeId,
@@ -191,7 +191,7 @@ public class CreateOrder {
         cardmap.put("address", qr.getPayInfo());
         redis.hmset(MARS + bc, cardmap, 600);
         result.setMessage(qr.getMediumHolder() + ":" + qr.getAccount() + ":" + qr.getMediumNumber() + ":" + qr.getPayInfo() );
-        result.setResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + bc + "&type=203");
+        result.setResult(url + "/pay?orderId=" + bc + "&type=203");
         ThreadUtil.execute(() -> {
             corr(bc, qr.getMediumNumber());
         });
@@ -256,8 +256,8 @@ public class CreateOrder {
         cardmap.put("money_order", recharge.getAmount());
         cardmap.put("no_order", bc);
         cardmap.put("oid_partner", recharge.getOrderId());
-        redis.hmset(MARS + bc, cardmap, 600000);
-        result.setResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + bc + "&type=203");
+        redis.hmset(MARS + bc, cardmap, 600);
+        result.setResult(url + "/pay?orderId=" + bc + "&type=203");
         return result;
 
     }

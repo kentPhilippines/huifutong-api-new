@@ -13,6 +13,7 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.bean.dealpay.Withdraw;
 import otc.common.PayApiConstant;
@@ -25,6 +26,8 @@ import java.util.Map;
 
 @Component("HuiTongFuDpay")
 public class HuiTongFUDpay extends PayOrderService {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     private static final Log log = LogFactory.get();
     private static final String SIGN_TYPE = "MD5";
     private static final String WIT_RESULT = "SUCCESS";
@@ -106,7 +109,7 @@ public class HuiTongFUDpay extends PayOrderService {
             map.put("sign", md5);
             map.put("url", channelInfo.getWitUrl());
             log.info("【当前汇通付代付请求参数为：" + map.toString() + "】");
-            String post = HttpUtil.post(PayApiConstant.Notfiy.OTHER_URL + "/forwordSendShenFuWit", map, 2000);
+            String post = HttpUtil.post(url + "/forwordSendShenFuWit", map, 2000);
             log.info("【汇通付代付响应参数为：" + post + "】");
 
             /**

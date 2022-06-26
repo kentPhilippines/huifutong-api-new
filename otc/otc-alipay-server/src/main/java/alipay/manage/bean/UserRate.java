@@ -26,6 +26,15 @@ public class UserRate implements Serializable{
     private String retain2;
     private String retain3;
     private String retain4;
+    private String queueList;
+    public String getQueueList() {
+        return queueList;
+    }
+
+    public void setQueueList(String queueList) {
+        this.queueList = queueList;
+    }
+
     public String getChannelId() {
 		return channelId;
 	}

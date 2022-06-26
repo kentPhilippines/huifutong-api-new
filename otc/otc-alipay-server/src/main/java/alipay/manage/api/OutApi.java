@@ -16,6 +16,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,6 +75,12 @@ OutApi {
     @Autowired
     private MediumService mediumServiceImpl;
 
+    @Value("${otc.payInfo.url}")
+    public   String url;
+    @RequestMapping("/geturl")
+    public Result geturl() {
+        return Result.buildSuccessResult( url);
+    }
 
 
 

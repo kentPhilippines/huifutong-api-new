@@ -20,6 +20,7 @@ import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,8 @@ import java.util.Map;
 @RequestMapping("/qrcode")
 public class QrcodeContorller {
     Logger log= LoggerFactory.getLogger(QrcodeContorller.class);
+    @Value("${otc.payInfo.url}")
+    public   String url;
     private static final String MARS = "SHENFU";
     private static final String MARK = ":";
     @Autowired
@@ -195,7 +198,7 @@ public class QrcodeContorller {
             log.info("出款卡锁定异常");
         }
         exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),user.getUserId(),"当前用户成功选卡出款，请关注",Boolean.TRUE, HttpUtil.getClientIP(request),order.getDealAmount());
-        return Result.buildSuccessResult(PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + orderId + "&type=203");
+        return Result.buildSuccessResult(url + "/pay?orderId=" + orderId + "&type=203");
     }
     String getAmount(BigDecimal dealAmount) {
         String amount = "";

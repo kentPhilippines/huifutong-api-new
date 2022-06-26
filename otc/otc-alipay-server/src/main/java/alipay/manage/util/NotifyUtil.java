@@ -16,6 +16,7 @@ import cn.hutool.http.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.api.alipay.Common;
 import otc.bean.dealpay.Withdraw;
@@ -32,6 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class NotifyUtil {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     Logger log = LoggerFactory.getLogger(NotifyUtil.class);
     @Autowired
     OrderService orderSerciceImpl;
@@ -95,7 +98,7 @@ public class NotifyUtil {
         String result = "";
         if (url.contains("https")) {
             msg.put("url", url);
-            result = HttpUtil.post(PayApiConstant.Notfiy.OTHER_URL + "/witForword", msg);
+            result = HttpUtil.post(url+ "/witForword", msg);
         } else {
             result = HttpUtil.post(url, msg, 2000);
         }
@@ -171,7 +174,7 @@ public class NotifyUtil {
         try {
             if (url.contains("https")) {
                 msg.put("url", url);
-                result = HttpUtil.post(PayApiConstant.Notfiy.OTHER_URL + "/forword", msg);
+                result = HttpUtil.post(url + "/forword", msg);
             } else {
                 result = HttpUtil.post(url, msg, 2000);
             }

@@ -17,6 +17,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.support.TransactionTemplate;
 import otc.api.alipay.Common;
 import otc.bean.alipay.Medium;
@@ -40,6 +41,8 @@ import java.util.Map;
  * @author kent
  */
 public abstract class PayOrderService implements PayService {
+	@Value("${otc.payInfo.url}")
+	public   String url;
 	public static final Log log = LogFactory.get();
 	private static final String ORDER = "orderid";
 	@Autowired
@@ -148,7 +151,7 @@ public abstract class PayOrderService implements PayService {
 		 * 生成预订单病返回支付连接
 		 */
 		//String encryptPublicKey = RSAUtils.getEncryptPublicKey(param, SystemConstants.INNER_PLATFORM_PUBLIC_KEY);
-		String URL = PayApiConstant.Notfiy.OTHER_URL;//configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.SERVER_IP).getResult().toString();补充链接即可成为三方支付服务
+		String URL = url;//configServiceClientImpl.getConfig(ConfigFile.ALIPAY, ConfigFile.Alipay.SERVER_IP).getResult().toString();补充链接即可成为三方支付服务
 		return Result.buildSuccessResult("支付处理中",ResultDeal.sendUrl(URL + "/pay/alipayScan?order_id="+dealOrderApp.getOrderId()));
 	}
 	/**

@@ -5,3 +5,6 @@ spring:
     #active: huifutong  #google云数据库       使用aliyun 缓存服务
     #active: zongbang  #google云数据库       使用aliyun 缓存服务
     #active: online-online-data   #google云数据库，但是使用服务器本地redis
+otc:
+  payInfo:
+    url : http://127.0.0.1:8768/eureka/
