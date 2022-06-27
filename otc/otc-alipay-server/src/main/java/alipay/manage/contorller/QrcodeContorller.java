@@ -262,7 +262,7 @@ public class QrcodeContorller {
             exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),order.getOrderQrUser()," 当前报错：当前银行卡 正在出款， 请更换银行卡出款",Boolean.FALSE, HttpUtil.getClientIP(request),order.getDealAmount());
             return Result.buildFailMessage("当前银行卡 正在出款， 请更换银行卡出款");
         }
-        bankInfo = account + MARK + mediumHolder + MARK + mediumNumber + MARK + "电话" + MARK + mediumPhone;
+        bankInfo = account + MARK + mediumHolder + MARK + mediumNumber ;
 
         boolean b = orderServiceImpl.updateBankInfoByOrderId(bankInfo, orderId);
         if (b) {

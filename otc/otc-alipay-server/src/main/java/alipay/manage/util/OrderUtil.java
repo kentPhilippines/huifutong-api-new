@@ -1076,7 +1076,7 @@ public class OrderUtil {
         log.info("【当前当前我方：" + rate.getUserId() + "】");
         log.info("【当前我方结算费率：" + rate.getFee() + "，当前我方抽点费率为："+rate.getRetain4()+ "】");
         BigDecimal fee = userRate.getFee().add(new BigDecimal(userRate.getRetain4()).multiply(wit.getAmount()));//代理商的费率
-        BigDecimal fee2 = rate.getFee().add(new BigDecimal(rate.getRetain3()).multiply(wit.getAmount()));//商户的费率
+        BigDecimal fee2 = rate.getFee().add(new BigDecimal(rate.getRetain4()).multiply(wit.getAmount()));//商户的费率
         BigDecimal subtract = fee2.subtract(fee);//
         log.info("【当前结算费率差为：" + subtract + "】");
         log.info("【当前结算费率差为代理商分润：" + subtract + "】");//这个钱要加给代理商

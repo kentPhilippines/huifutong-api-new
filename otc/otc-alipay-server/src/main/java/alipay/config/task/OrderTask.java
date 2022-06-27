@@ -51,7 +51,6 @@ public class OrderTask {
 	@Autowired
 	private WitPay WitPayImpl;
 	@Autowired BankOpen bankOpen;
-	private List<Withdraw> orderList;
 
 	/**
 	 * 每十秒结算一次

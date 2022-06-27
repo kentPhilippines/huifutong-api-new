@@ -15,6 +15,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import otc.common.PayApiConstant;
 import otc.result.Result;
@@ -34,6 +35,8 @@ import java.util.Map;
  */
 @Component("ZongbangToBank")
 public class ZongbangToBank extends PayOrderService {
+    @Value("${otc.payInfo.url}")
+    public   String url;
     private static final String MARS = "SHENFU";
     private static SimpleDateFormat d = new SimpleDateFormat("yyyyMMddHHmmss");
     @Autowired
@@ -136,7 +139,7 @@ public class ZongbangToBank extends PayOrderService {
                     log.error("众邦手动异常",e);
                     return Result.buildSuccessResult(returnUrl);
                 }
-                return Result.buildSuccessResult(pay,PayApiConstant.Notfiy.OTHER_URL + "/pay?orderId=" + orderId + "&type=" + channelInfo.getChannelType());
+                return Result.buildSuccessResult(pay,url + "/pay?orderId=" + orderId + "&type=" + channelInfo.getChannelType());
             } else {
                 orderAppEr(dealOrderApp,jsonObject.getStr("message"));
                 return Result.buildFailMessage(jsonObject.getStr("message"));
