@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 @Component
@@ -190,7 +191,7 @@ public class WitPay extends PayOrderService {
 
 
         //TODO 新增 代付取款抽点收费逻辑
-        BigDecimal psf = new BigDecimal(userRate.getRetain4()) ;//抽点收费比例
+        BigDecimal psf = new BigDecimal(Optional.ofNullable(userRate.getRetain4()).orElse("0")) ;//抽点收费比例
         BigDecimal fee = userRate.getFee();//单笔收费
         fee =   psf.multiply(new BigDecimal(wit.getAmount())).add(fee);
         witb.setFee(fee);
