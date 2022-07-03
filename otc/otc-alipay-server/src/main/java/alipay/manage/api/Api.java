@@ -307,7 +307,7 @@ public class Api {
 
         if (StrUtil.isNotEmpty(transactionType) && transactionType.contains("expenditure")) {
             //  根据出款的短信匹配卡商的出款订单  将订单标记为已 验证出款短信
-            String witNotify = bankId + phoneId + amount; //验证当前 银行卡是否处于出款状态
+            String witNotify = bankId  + amount; //验证当前 银行卡是否处于出款状态
             Object o = redisUtil.get("WIT:" + witNotify);//存在  则存在出款短信对应的订单号
             if (null != o) {
                 String witOrderId = o.toString();

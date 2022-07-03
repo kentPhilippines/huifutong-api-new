@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 public class NotifyUtil {
     @Value("${otc.payInfo.url}")
-    public   String url;
+    public   String url11;
     Logger log = LoggerFactory.getLogger(NotifyUtil.class);
     @Autowired
     OrderService orderSerciceImpl;
@@ -98,7 +98,7 @@ public class NotifyUtil {
         String result = "";
         if (url.contains("https")) {
             msg.put("url", url);
-            result = HttpUtil.post(url+ "/witForword", msg);
+            result = HttpUtil.post(url11+ "/witForword", msg);
         } else {
             result = HttpUtil.post(url, msg, 2000);
         }
@@ -174,7 +174,7 @@ public class NotifyUtil {
         try {
             if (url.contains("https")) {
                 msg.put("url", url);
-                result = HttpUtil.post(url + "/forword", msg);
+                result = HttpUtil.post(url11 + "/forword", msg);
             } else {
                 result = HttpUtil.post(url, msg, 2000);
             }
@@ -184,7 +184,7 @@ public class NotifyUtil {
                 push(url, orderId, msg);
             }
         }
-        log.info("服务器返回结果为: " + result.toString());
+        log.info("服务器返回结果为: " + result.toString()+"，订单号："+orderId);
         String isNotify = "NO";
         if ("success".equalsIgnoreCase(result)) {
             isNotify = "YES";
