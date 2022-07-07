@@ -207,8 +207,11 @@ public class WitPay extends PayOrderService {
         witb.setBankNo(wit.getAcctno());
         witb.setAccname(wit.getAcctname());
         bankName = wit.getBankName();
+
         if (StrUtil.isBlank(bankName)) {
-            bankName = BankTypeUtil.getBankName(wit.getBankcode());
+            //bankName = BankTypeUtil.getBankName(wit.getBankcode());
+            AlipayBankConfig alipayBankConfig = Optional.ofNullable(bankConfigService.selectAlipayBankConfig(wit.getBankcode())).orElseGet(()-> new AlipayBankConfig());
+            bankName = alipayBankConfig.getBankName() ;
         }
 
 
