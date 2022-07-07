@@ -152,7 +152,7 @@ public interface DealOrderMapper {
      *
      * @return
      */
-    @Update("update alipay_deal_order set orderStatus = 3 where ( orderType = 1 or orderType = 3  ) and orderStatus = 1  and  createTime <= CURRENT_TIMESTAMP - INTERVAL 5 MINUTE ")
+    @Update("update alipay_deal_order set orderStatus = '3' where ( orderType = '1' or orderType = '3'  ) and orderStatus = '1'  and  createTime <= CURRENT_TIMESTAMP - INTERVAL 5 MINUTE ")
     int updateUnNotify();
 
     @CacheEvict(value = ORDER_INFO_CHANNEL, allEntries = true)
@@ -185,18 +185,22 @@ public interface DealOrderMapper {
             " retain1 = #{order.retain1} ,  retain3 = #{order.retain3}  , retain2 = #{order.retain2}  , feeId = #{order.feeId} where orderId = #{order.orderId} ")
     boolean updateWitQr(@Param("order")  DealOrder order);
 
-    @Select("select  *  from alipay_deal_order  where   orderType = #{orderType} and orderStatus = 1 and  dealAmount <=  12000  and  orderQrUser = #{orderQrUser}  order by id")
+    @Cacheable(cacheNames = {ORDER_INFO_CHANNEL}, unless = "#result == null")
+    @Select("select  *  from alipay_deal_order  where   orderType = #{orderType} and orderStatus = '1' and  dealAmount <=  12000  and  orderQrUser = #{orderQrUser}  order by id")
     List<DealOrder> grabAnOrderListFind(@Param("orderType") String orderType,@Param("orderQrUser") String orderQrUser);
 
     @Select("select  *  from alipay_deal_order  where   orderType = 4 and orderStatus = 1 and    orderId = #{orderId}  ")
     DealOrder findOrderByUserqr(@Param("orderId")String orderId,@Param("orderQrUser")  String orderQrUser);
 
+    @CacheEvict(value = ORDER_INFO_CHANNEL, allEntries = true)
     @Update("update alipay_deal_order set orderQrUser = #{order.orderQrUser} , orderQr = #{order.orderQr} , lockWit  = 0  , grabOrder = 1, enterPayTime  = null ," +
             " retain1 = #{order.retain1} ,  retain3 = #{order.retain3}  , retain2 = #{order.retain2}  , feeId = #{order.feeId} where orderId = #{order.orderId}  and  orderQrUser in ('zhongbang-bank-s','zhongbang-bank')")
     int updateGrabOrder(@Param("order") DealOrder order, @Param("orderQrUser") String orderQrUser);
 
+    @CacheEvict(value = ORDER_INFO_CHANNEL, allEntries = true)
     @Update("update alipay_deal_order set grabOrder = 2   where orderId  = #{orderId} " )
     void unGrabOrder(@Param("orderId")  String orderId);
+
 
 
     @Update("update alipay_deal_order set  systemAmount = #{bu}    where orderId  = #{orderId} " )
@@ -204,6 +208,7 @@ public interface DealOrderMapper {
 
     @Update("update alipay_deal_order set   lockWit  =  2 ,  lockWitTime = now()  where orderId = #{orderId}")
     int updateBankInfoByOrderIdAUTO(String bankInfo, String orderId);
+
     @Select("select  *  from alipay_deal_order  where   orderType = '4' and orderStatus = 1 and  dealAmount <=  8000  and  orderQrUser = #{orderQrUser}  order by id")
     List<DealOrder> findWitOrder(String userId);
 

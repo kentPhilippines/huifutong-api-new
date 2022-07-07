@@ -244,7 +244,7 @@ public class QrcodeContorller {
         account = mediumId.getAccount();//开户行
         mediumPhone = mediumId.getMediumPhone();
         String bankInfo = "";
-        String isWit = mediumNumber + mediumPhone + getAmount(order.getDealAmount());
+        String isWit = mediumNumber  + getAmount(order.getDealAmount());
         boolean b1 = redisUtil.hasKey(isWit);
         if (b1) {
             exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),order.getOrderQrUser()," 当前报错：当前银行卡限制出款，请用户稍等几分钟后重新拉单",Boolean.FALSE, HttpUtil.getClientIP(request),order.getDealAmount());
@@ -256,7 +256,7 @@ public class QrcodeContorller {
             return Result.buildFailMessage("当前银行卡未绑定监控，无法出款");
         }
         String amount1 = getAmount(order.getDealAmount());
-        String witNotify1 = mediumNumber + mediumPhone + amount1 ; //验证当前 银行卡是否处于出款状态
+        String witNotify1 = mediumNumber  + amount1 ; //验证当前 银行卡是否处于出款状态
         Object o = redisUtil.get("WIT:" + witNotify1);
         if (null != o) {
             exceptionOrderServiceImpl.addFindBankInfo(order.getOrderId(),order.getOrderQrUser()," 当前报错：当前银行卡 正在出款， 请更换银行卡出款",Boolean.FALSE, HttpUtil.getClientIP(request),order.getDealAmount());
@@ -267,7 +267,7 @@ public class QrcodeContorller {
         boolean b = orderServiceImpl.updateBankInfoByOrderId(bankInfo, orderId);
         if (b) {
             String amount = getAmount(order.getDealAmount());
-            String witNotify = mediumNumber + mediumPhone + amount; //代付回调成功 标记
+            String witNotify = mediumNumber  + amount; //代付回调成功 标记
             log.info("当前订单号为："+witNotify+"");
             redisUtil.set("WIT:" + witNotify, order.getOrderId(), 500);
         }
