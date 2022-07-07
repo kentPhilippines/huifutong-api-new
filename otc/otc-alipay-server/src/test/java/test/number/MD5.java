@@ -46,7 +46,7 @@ public class MD5 {
 		try {
 			if (url.contains("https")) {
 				msg.put("url", url);
-				result = HttpUtil.post(PayApiConstant.Notfiy.OTHER_URL + "/forword", msg);
+				//result = HttpUtil.post(PayApiConstant.Notfiy.OTHER_URL + "/forword", msg);
 			} else {
 				result = HttpUtil.post(url, msg, 2000);
 			}

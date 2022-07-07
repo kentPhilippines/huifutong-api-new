@@ -3,16 +3,16 @@ package alipay.manage.util;
 import alipay.manage.api.channel.util.zhaunshi.BankEnum;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 public class BankTypeUtil {
 	private static final Log log = LogFactory.get();
 	static   Map BANK_MAP = new ConcurrentHashMap();
 	static   Map BANK_MAP_NAME = new ConcurrentHashMap();
 
-
+	
 	static {
 		initbank();
 	}

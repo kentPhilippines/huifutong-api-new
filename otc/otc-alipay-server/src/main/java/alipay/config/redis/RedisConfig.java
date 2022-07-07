@@ -11,9 +11,13 @@ import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -100,7 +104,20 @@ public class RedisConfig extends CachingConfigurerSupport {
         };
     }
 
-
+    /*
+     * @description Redis缓存的序列化方式使用redisTemplate.getValueSerializer()，不在使用JDK默认的序列化方式
+     * @author xianping
+     * @date 2020/9/25
+     * @param redisTemplate
+     * @return RedisCacheManager
+     **/
+    @Bean
+    public RedisCacheManager redisCacheManager(RedisTemplate redisTemplate) {
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisTemplate.getConnectionFactory());
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisTemplate.getValueSerializer()));
+        return new CustomRedisCacheManager(redisCacheWriter, redisCacheConfiguration);
+    }
     @Override
     @Bean
     public CacheErrorHandler errorHandler() {

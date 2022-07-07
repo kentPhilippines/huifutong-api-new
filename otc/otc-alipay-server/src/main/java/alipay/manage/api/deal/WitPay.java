@@ -7,13 +7,11 @@ import alipay.manage.api.DealAppApi;
 import alipay.manage.api.VendorRequestApi;
 import alipay.manage.api.config.FactoryForStrategy;
 import alipay.manage.api.config.PayOrderService;
-import alipay.manage.bean.ChannelFee;
-import alipay.manage.bean.UserFund;
-import alipay.manage.bean.UserInfo;
-import alipay.manage.bean.UserRate;
+import alipay.manage.bean.*;
 import alipay.manage.bean.util.WithdrawalBean;
 import alipay.manage.mapper.ChannelFeeMapper;
 import alipay.manage.service.ExceptionOrderService;
+import alipay.manage.service.IAlipayBankConfigService;
 import alipay.manage.service.UserInfoService;
 import alipay.manage.service.WithdrawService;
 import alipay.manage.util.BankTypeUtil;
@@ -62,6 +60,8 @@ public class WitPay extends PayOrderService {
     private RedisLockUtil redisLockUtil;
     @Autowired
     private RedisUtil redis;
+    @Autowired
+    private IAlipayBankConfigService bankConfigService;
 
     static final String COMMENT = "等待推送中";
 
@@ -114,7 +114,9 @@ public class WitPay extends PayOrderService {
             exceptionOrderServiceImpl.addWitOrder(wit, "用户报错：通道实体不存在，费率配置错误；处理方法：请检查商户提交的通道编码，反复确认", HttpUtil.getClientIP(request));
             return Result.buildFailMessage("通道实体不存在，费率配置错误");
         }
-        String bankcode = BankTypeUtil.getBank(wit.getBankcode());
+        //String bankcode = BankTypeUtil.getBank(wit.getBankcode());
+        AlipayBankConfig alipayBankConfig = Optional.ofNullable(bankConfigService.selectAlipayBankConfig(wit.getBankcode())).orElseGet(()-> new AlipayBankConfig());
+        String bankcode = alipayBankConfig.getAlias1() ;
         if (StrUtil.isBlank(bankcode)) {
             log.info("【当前银行不支持代付，当前商户：" + wit.getAppid() + "，当前订单号:" + wit.getApporderid() + "】");
             exceptionOrderServiceImpl.addWitOrder(wit, "用户报错：当前银行不支持合， 银行code值错误；处理方法：请商户检查提交的银行卡code是否正确，商户code值为：" + bankcode, HttpUtil.getClientIP(request));
