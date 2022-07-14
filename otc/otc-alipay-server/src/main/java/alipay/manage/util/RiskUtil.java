@@ -147,7 +147,10 @@ public class RiskUtil {
         }
         UserFund user2 = usercollect.get(userId);
         log.info("【当前入款订单缓存冻结金额为：" + amount + "】");
-        return amount.compareTo(user2.getAccountBalance().subtract(user2.getSumProfit()).add(user2.getQuota()).subtract(user2.getFreezeBalance())) == -1;
+        if(null == user2.getCredit()){
+                user2.setCredit(BigDecimal.ZERO);
+        }
+        return amount.compareTo(user2.getAccountBalance().subtract(user2.getSumProfit()).add(user2.getQuota()).subtract(user2.getFreezeBalance()).subtract(user2.getCredit())) == -1;
     }
 	
 	

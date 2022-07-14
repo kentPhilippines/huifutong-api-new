@@ -346,10 +346,10 @@ public class OrderUtil {
             if (!result1.isSuccess()) {
                 return result1;
             }
-            Result result = agentDpayChannel(orderWit, order.getGenerationIp(), true);
+          /*  Result result = agentDpayChannel(orderWit, order.getGenerationIp(), true);
             if (!result.isSuccess()) {
                 return result1;
-            }
+            }*/
             notifyUtil.wit(orderWit.getOrderId());
             return Result.buildSuccessMessage("订单修改成功");
         } else if (Common.Order.ORDER_TYPE_BANKCARD_R.toString().equals(order.getOrderType().toString())) {

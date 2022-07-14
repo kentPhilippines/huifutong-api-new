@@ -6,8 +6,8 @@ public class OnlineVO implements Serializable {
 
     private static final long serialVersionUID = -4273487630583486431L;
 
-    private int loginOnlineCount;
-    private int bizOnlineCount;
+    private int loginOnlineCount = 0;
+    private int bizOnlineCount = 0;
     private String onlineList;
     private String bizList;
     private String isAgent;

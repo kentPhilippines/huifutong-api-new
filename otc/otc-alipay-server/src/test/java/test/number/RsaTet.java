@@ -14,7 +14,7 @@ public class RsaTet {
     private static final String ENCODE_TYPE = "md5";
 
     public static void main(String[] args) {
-        System.out.println(md5("6216698400004335670"));;
+        System.out.println(md5("6217995200302198426"));;
 
 
     }

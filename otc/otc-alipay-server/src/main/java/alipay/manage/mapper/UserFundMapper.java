@@ -30,14 +30,14 @@ public interface UserFundMapper {
     int updateByPrimaryKey(UserFund record);
 
 
-    @Select("select * from alipay_user_fund auf " +
+    @Select(" select auf.* , aui.credit  from alipay_user_fund auf " +
             " left join alipay_user_info aui on auf.userId = aui.userId " +
             "   left join  ( " +
             "             select SUM(mountNow) as mountNow , qrcodeId from " +
             "             alipay_medium WHERE  isDeal = '2' " +
             "             group by qrcodeId " +
             "             ) as am  on auf.userId =  am.qrcodeId  " +
-            " where aui.userType = 2 and  ( ( auf.accountBalance + auf.quota  - auf.sumProfit - auf.freezeBalance - ((100 - aui.credit   ) / 100 *  (auf.deposit)) ) > #{amount}  ) and" +
+            " where aui.userType = 2 and  ( ( auf.accountBalance    - auf.sumProfit - auf.freezeBalance  - aui.credit  ) ) > #{amount}  ) and" +
             " ( auf.accountBalance  - auf.sumProfit  - 3000  <=  auf.deposit ) " +
             " and aui.switchs = 1 and aui.receiveOrderState = 1 " +
             " and am.mountNow < auf .deposit " +

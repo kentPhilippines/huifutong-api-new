@@ -40,7 +40,15 @@ public class UserFund implements Serializable{
     private Integer status;
     private Integer version;                //版本号
     private String currency;
+    private BigDecimal credit;			//信用等级为默认为100,掉单一次,或者出现故障一次减分0.001分,可人为加分
 
+    public BigDecimal getCredit() {
+        return credit;
+    }
+
+    public void setCredit(BigDecimal credit) {
+        this.credit = credit;
+    }
 
     public BigDecimal getDeposit() {
         return deposit;
