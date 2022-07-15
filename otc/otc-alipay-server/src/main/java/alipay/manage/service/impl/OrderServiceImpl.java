@@ -19,6 +19,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -389,34 +391,49 @@ public class OrderServiceImpl implements OrderService {
            publicAccount = "zhongbang-bank";
            List<DealOrder> dealOrders = dealOrderMapper.grabAnOrderListFind(orderType, publicAccount);
            List<DealOrder> dealOrderss = dealOrderMapper.grabAnOrderListFind(orderType, publicAccounts);
+
+           log.info("dealOrders----{}",dealOrders.stream().map(DealOrder::getId).collect(Collectors.toList()));
+           log.info("dealOrderss----{}",dealOrderss.stream().map(DealOrder::getId).collect(Collectors.toList()));
+            dealOrders.addAll(dealOrderss);
+            log.info("dealOrdersall----{}",dealOrders.stream().map(DealOrder::getId).collect(Collectors.toList()));
             String agent = findAgent(userId);
+            log.info("{}----{}",userId,agent);
              DealOrder[]  mark = new DealOrder[dealOrders.size()];
              DealOrder[]  mark1 = new DealOrder[dealOrders.size()];
             if(agent.equals("lang916")){
-                for(DealOrder deal :  dealOrders ){
+                dealOrders1 = dealOrders.stream().filter(dealOrder -> "al918".equals(dealOrder.getOrderAccount())).collect(Collectors.toList());
+                /*for(DealOrder deal :  dealOrders ){
                     if("al918".equals(deal.getOrderAccount())){
                         dealOrders1.add(deal);
                     }
-                }
-                for(DealOrder deal :  dealOrderss ){
+                }*/
+                log.info("dealOrders1----{}",dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
+               /* for(DealOrder deal :  dealOrderss ){
                     if("al918".equals(deal.getOrderAccount())){
                         dealOrders1.add(deal);
                     }
-                }
+                }*/
+                log.info("dealOrders2----{}",dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
             }else{
-                for(int a = 0 ; a <  dealOrders.size();a++){
+                dealOrders1 = dealOrders.stream().filter(dealOrder -> !"al918".equals(dealOrder.getOrderAccount())).collect(Collectors.toList());
+                /*for(int a = 0 ; a <  dealOrders.size();a++){
                     if("al918".equals(dealOrders.get(a).getOrderAccount())){
                         mark[a] = dealOrders.get(a);
                     }
                 }
+                log.info("mark1----{}", Stream.of(mark).map(DealOrder::getId).collect(Collectors.toList()));
                 CollUtil.removeAny(dealOrders,mark);
+                log.info("mark2----{}", Stream.of(mark).map(DealOrder::getId).collect(Collectors.toList()));
                 for(int a = 0 ; a <  dealOrderss.size();a++){
                     if("al918".equals(dealOrderss.get(a).getOrderAccount())){
                         mark1[a] = dealOrderss.get(a);
                     }
                 }
+                log.info("mark3----{}", Stream.of(mark1).map(DealOrder::getId).collect(Collectors.toList()));
                 CollUtil.removeAny(dealOrderss,mark1);
-                dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);
+                log.info("mark4----{}", Stream.of(mark1).map(DealOrder::getId).collect(Collectors.toList()));
+                dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);*/
+                log.info("mark5----{}", dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
             }
        }catch (Throwable e ){
             e.printStackTrace();
