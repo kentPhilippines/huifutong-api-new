@@ -419,6 +419,8 @@ public class OrderServiceImpl implements OrderService {
                 dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);
             }
        }catch (Throwable e ){
+            e.printStackTrace();
+            log.error("查询抢单异常",e);
             if(islittle){
                 publicAccount = "zhongbang-bank-s";
             }else {
