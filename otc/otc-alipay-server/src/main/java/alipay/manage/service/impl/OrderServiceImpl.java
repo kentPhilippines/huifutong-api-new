@@ -33,6 +33,8 @@ public class OrderServiceImpl implements OrderService {
     private RechargeMapper rechargeDao;
     @Resource
     private WithdrawMapper withdrawMapper;
+    @Resource
+    private UserInfoMapper userInfoDao;
     @Autowired
     private SettingFile settingFile;
     @Autowired
@@ -378,7 +380,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle) {
+    public List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle, String userId) {
         List<DealOrder> dealOrders1 = new ArrayList<>();
         String publicAccount = "";
         String publicAccounts = "";
@@ -387,7 +389,35 @@ public class OrderServiceImpl implements OrderService {
            publicAccount = "zhongbang-bank";
            List<DealOrder> dealOrders = dealOrderMapper.grabAnOrderListFind(orderType, publicAccount);
            List<DealOrder> dealOrderss = dealOrderMapper.grabAnOrderListFind(orderType, publicAccounts);
-            dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);
+            String agent = findAgent(userId);
+             DealOrder[]  mark = new DealOrder[dealOrders.size()];
+             DealOrder[]  mark1 = new DealOrder[dealOrders.size()];
+            if(agent.equals("lang916")){
+                for(DealOrder deal :  dealOrders ){
+                    if("al918".equals(deal.getOrderAccount())){
+                        dealOrders1.add(deal);
+                    }
+                }
+                for(DealOrder deal :  dealOrderss ){
+                    if("al918".equals(deal.getOrderAccount())){
+                        dealOrders1.add(deal);
+                    }
+                }
+            }else{
+                for(int a = 0 ; a <  dealOrders.size();a++){
+                    if("al918".equals(dealOrders.get(a).getOrderAccount())){
+                        mark[a] = dealOrders.get(a);
+                    }
+                }
+                CollUtil.removeAny(dealOrders,mark);
+                for(int a = 0 ; a <  dealOrderss.size();a++){
+                    if("al918".equals(dealOrderss.get(a).getOrderAccount())){
+                        mark1[a] = dealOrderss.get(a);
+                    }
+                }
+                CollUtil.removeAny(dealOrderss,mark1);
+                dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);
+            }
        }catch (Throwable e ){
             if(islittle){
                 publicAccount = "zhongbang-bank-s";
@@ -398,6 +428,19 @@ public class OrderServiceImpl implements OrderService {
         }
         return dealOrders1;
     }
+
+   String findAgent(String userId){
+       UserInfo userAgent = userInfoDao.findUserAgent(userId);
+       if(StrUtil.isEmpty(userAgent.getAgent())){
+           return  userAgent.getUserName();
+       }else{
+           return findAgent(userAgent.getAgent());
+       }
+
+
+
+   }
+
 
     @Override
     public DealOrder findOrderByUserqr(String orderId, String userId) {

@@ -196,7 +196,7 @@ public interface OrderService {
 
 	boolean updateWitQr(DealOrder order);
 
-    List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle);
+    List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle, String userId);
 
     DealOrder findOrderByUserqr(String orderId, String userId);
 

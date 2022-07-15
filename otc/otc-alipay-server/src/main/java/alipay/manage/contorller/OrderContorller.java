@@ -107,7 +107,8 @@ public class OrderContorller {
 		}
 		//按时间段查询
 		log.info("当前用户进入抢单查询："+user.getUserId());
-		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType ,islittle(user.getUserId()));
+		List<DealOrder> listOrder = orderServiceImpl.grabAnOrderListFind( orderType ,islittle(user.getUserId()),user.getUserId());
+
 		return Result.buildSuccessResult(listOrder);
 	}
 	boolean islittle (String userId){

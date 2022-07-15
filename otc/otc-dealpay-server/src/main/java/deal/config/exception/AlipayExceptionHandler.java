@@ -25,8 +25,10 @@ public class AlipayExceptionHandler {
 	 * 拦截未知的运行时异常
 	 */
 	@ExceptionHandler(RuntimeException.class)
-	public Result notFount(RuntimeException e) {
+	public Result notFount(Throwable e) {
+
 		log.error("运行时异常:", e);
+
 		return Result.buildFailMessage("运行时异常:" + e.getMessage());
 	}
 	/**

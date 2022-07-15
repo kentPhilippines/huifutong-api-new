@@ -92,7 +92,6 @@ public interface UserRateMapper {
      * @param feeId
      * @return
      */
-    @Cacheable(cacheNames = {RATE}, unless = "#result == null")
     @Select("select * from alipay_user_rate where id = #{id}")
     UserRate findRateFeeType(@Param("id") Integer id);
 

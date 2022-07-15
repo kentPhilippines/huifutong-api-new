@@ -10,7 +10,6 @@ import alipay.manage.mapper.UserInfoMapper;
 import alipay.manage.service.*;
 import alipay.manage.util.bankcardUtil.ReWit;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,7 @@ import otc.result.Result;
 import otc.util.RSAUtils;
 
 import javax.annotation.Resource;
-import java.lang.annotation.Target;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -123,7 +120,7 @@ public class AutoWit {
       /**
        * grabAnOrderListFind  查询出款订单， 如果出现异常 参数 true 默认查询小额出款 false 默认查询大额出款
        */
-      List<DealOrder> dealOrders = orderService.grabAnOrderListFind("4", true);
+      List<DealOrder> dealOrders = orderService.grabAnOrderListFind("4", true,"");
       AutoWitBean banks = getBank(dealOrders,bankNo,amount,medium,ip);
       if(ObjectUtil.isNotNull(banks)){
           log.info("出款信息为："+banks.toString());

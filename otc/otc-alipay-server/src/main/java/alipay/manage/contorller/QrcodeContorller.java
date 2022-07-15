@@ -286,7 +286,7 @@ public class QrcodeContorller {
             String publicAccount = "";
             if(islittle(user.getUserId())){
                 publicAccount = "zhongbang-bank-s";
-            }else {
+            } else {
                 publicAccount = "zhongbang-bank";
             }
             DealOrder orderWit = orderServiceImpl.findOrderByUserqr(orderId,publicAccount);
