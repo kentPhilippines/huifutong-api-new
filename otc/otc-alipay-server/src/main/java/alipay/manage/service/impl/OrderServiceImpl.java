@@ -450,11 +450,12 @@ public class OrderServiceImpl implements OrderService {
 
    String findAgent(String userId){
        UserInfo userAgent = userInfoDao.findUserAgent(userId);
-       if(StrUtil.isEmpty(userAgent.getAgent())){
+       return userAgent.getAgent();
+       /*if(StrUtil.isEmpty(userAgent.getAgent())){
            return  userAgent.getUserName();
        }else{
            return findAgent(userAgent.getAgent());
-       }
+       }*/
 
 
 
