@@ -32,6 +32,8 @@ public interface UserRateService {
 	 */
 	boolean updateRateR(String userId, String fee, String payTypr);
 
+	List<UserRate> getMerchantWitRateFromAdminCache();
+
 	/**
 	 * <p>根据费率ID查询费率</p>
 	 *

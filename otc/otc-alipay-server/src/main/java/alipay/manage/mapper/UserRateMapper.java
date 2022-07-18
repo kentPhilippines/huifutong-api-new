@@ -85,6 +85,8 @@ public interface UserRateMapper {
     @Select("select * from alipay_user_rate where userId = #{userId} and payTypr = #{product} and channelId = #{channel}")
     UserRate findProductFeeByAll(@Param("userId") String userId, @Param("product") String product, @Param("channel") String channelId);
 
+    @Select("select * from alipay_user_rate where feeType = #{feeType} and userType ='1'")
+    List<UserRate> findAllMerchantRateByFeeType(@Param("feeType") String feeType);
 
     /**
      * 根据ip查询费率数据，不做费率计算和条件判断，可以做长久缓存

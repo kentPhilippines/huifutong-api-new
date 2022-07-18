@@ -3,6 +3,10 @@ package alipay.manage.service.impl;
 import alipay.manage.bean.UserRate;
 import alipay.manage.mapper.UserRateMapper;
 import alipay.manage.service.UserRateService;
+import cn.hutool.json.JSONUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -12,6 +16,9 @@ import java.util.List;
 public class UserRateServiceImpl implements UserRateService {
 	@Resource
 	UserRateMapper userRateMapper;
+
+	@Autowired
+	private RedisTemplate<String,String> redisTemplate;
 
 	@Override
 	public List<UserRate> findUserRateInfoByUserId(String userId) {
@@ -36,6 +43,26 @@ public class UserRateServiceImpl implements UserRateService {
 		//修改一个码商的入款费率
 		int a = userRateMapper.updateRateR(userId, fee, payTypr);
 		return a > 0 && a < 2;
+	}
+
+	/**
+	 * 从admin写入的缓存中读取
+	 */
+	@Override
+	public List<UserRate> getMerchantWitRateFromAdminCache()
+	{
+		/**
+		 * 从admin写入的缓存中读取
+		 */
+		String str = redisTemplate.opsForValue().get("com.ruoyi.alipay.service.impl.AlipayUserRateEntityServiceImpl:getAndRefreshAlipayMerchantRateCache:2");
+		if(StringUtils.isNotEmpty(str))
+		{
+			List<UserRate> list = JSONUtil.parseArray(str).toList(UserRate.class);
+			return list;
+		}
+
+
+		return userRateMapper.findAllMerchantRateByFeeType("2");
 	}
 
 	@Override

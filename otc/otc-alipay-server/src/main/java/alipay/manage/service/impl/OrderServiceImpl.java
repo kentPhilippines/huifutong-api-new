@@ -8,6 +8,11 @@ import alipay.manage.service.OrderService;
 import alipay.manage.util.SettingFile;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.google.common.base.Splitter;
+import com.google.common.collect.*;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,6 +47,9 @@ public class OrderServiceImpl implements OrderService {
     private SettingFile settingFile;
     @Autowired
     private CorrelationService correlationServiceImpl;
+
+    @Autowired
+    private UserRateServiceImpl userRateServiceImpl;
 
     @Override
     public List<DealOrder> findOrderByUser(String userId, String createTime, String orderStatus,String orderType) {
@@ -381,60 +390,71 @@ public class OrderServiceImpl implements OrderService {
         return dealOrderMapper.updateWitQr(order);
     }
 
+
+    /**
+     * 获取卡商和商户的对应关系
+     * multimap c- [1,2,3]   b- [2,3]
+     * TreeMultimap
+     * get(1) == Set[c]
+     * get(2) ==Set[b,c]
+     * @return
+     */
+    public TreeMultimap<String, String> getCardDealerMapToMerchant(List<UserRate> merchantRates)
+    {
+
+        Map<String,List<String>> cardDerlerMapToMerchants = Maps.newHashMap();
+        merchantRates = merchantRates.stream().filter(userRate -> StringUtils.isNotEmpty(userRate.getQueueList())).collect(Collectors.toList());
+        ArrayListMultimap<String, String> multimap = ArrayListMultimap.create();
+        merchantRates.forEach(merchantRate->{
+            multimap.putAll(merchantRate.getUserId(), Sets.newHashSet(merchantRate.getQueueList().split(",")) );
+        });
+        TreeMultimap<String, String> inverse = Multimaps.invertFrom(multimap, TreeMultimap.create());
+        return inverse;
+    }
+
+
     @Override
     public List<DealOrder> grabAnOrderListFind(String orderType, boolean islittle, String userId) {
         List<DealOrder> dealOrders1 = new ArrayList<>();
         String publicAccount = "";
         String publicAccounts = "";
         try {
+            //卡商只接指定商户的单子
+
            publicAccounts = "zhongbang-bank-s";
            publicAccount = "zhongbang-bank";
            List<DealOrder> dealOrders = dealOrderMapper.grabAnOrderListFind(orderType, publicAccount);
            List<DealOrder> dealOrderss = dealOrderMapper.grabAnOrderListFind(orderType, publicAccounts);
 
-           log.info("dealOrders----{}",dealOrders.stream().map(DealOrder::getId).collect(Collectors.toList()));
-           log.info("dealOrderss----{}",dealOrderss.stream().map(DealOrder::getId).collect(Collectors.toList()));
-            dealOrders.addAll(dealOrderss);
+            dealOrders.addAll(dealOrderss);//合并大额 小额单
+
             log.info("dealOrdersall----{}",dealOrders.stream().map(DealOrder::getId).collect(Collectors.toList()));
             String agent = findAgent(userId);
             log.info("{}----{}",userId,agent);
-             DealOrder[]  mark = new DealOrder[dealOrders.size()];
-             DealOrder[]  mark1 = new DealOrder[dealOrders.size()];
-            if(agent.equals("lang916")){
-                dealOrders1 = dealOrders.stream().filter(dealOrder -> "al918".equals(dealOrder.getOrderAccount())).collect(Collectors.toList());
-                /*for(DealOrder deal :  dealOrders ){
-                    if("al918".equals(deal.getOrderAccount())){
-                        dealOrders1.add(deal);
-                    }
-                }*/
+            //从admin写入的缓存里获取到商户-顶代卡商的映射关系，
+            List<UserRate> merchantRates = userRateServiceImpl.getMerchantWitRateFromAdminCache();
+            //然后反向映射出顶代卡商-商户的关系
+            //这里实际是string-HashSet<Stirng> 的map
+            TreeMultimap<String, String> cardDerlerToMerchantsMap = getCardDealerMapToMerchant(merchantRates);
+
+            //如果当前卡商顶代有对应的商户,那么相关商户的单子都可以抢
+            if(cardDerlerToMerchantsMap.containsKey(agent))
+            {
+                Set<String> merchants = cardDerlerToMerchantsMap.get(agent);
+                log.info("merchants----{}", JSONUtil.toJsonStr(merchants));
+                dealOrders1 = dealOrders.stream().filter(dealOrder -> merchants.contains(dealOrder.getOrderAccount())).collect(Collectors.toList());
                 log.info("dealOrders1----{}",dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
-               /* for(DealOrder deal :  dealOrderss ){
-                    if("al918".equals(deal.getOrderAccount())){
-                        dealOrders1.add(deal);
-                    }
-                }*/
-                log.info("dealOrders2----{}",dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
+            }
+            //否则不显示任何单子给卡商
+
+            /*if(agent.equals("lang916")){
+                dealOrders1 = dealOrders.stream().filter(dealOrder -> "al918".equals(dealOrder.getOrderAccount())).collect(Collectors.toList());
+
+                log.info("dealOrders1----{}",dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
             }else{
                 dealOrders1 = dealOrders.stream().filter(dealOrder -> !"al918".equals(dealOrder.getOrderAccount())).collect(Collectors.toList());
-                /*for(int a = 0 ; a <  dealOrders.size();a++){
-                    if("al918".equals(dealOrders.get(a).getOrderAccount())){
-                        mark[a] = dealOrders.get(a);
-                    }
-                }
-                log.info("mark1----{}", Stream.of(mark).map(DealOrder::getId).collect(Collectors.toList()));
-                CollUtil.removeAny(dealOrders,mark);
-                log.info("mark2----{}", Stream.of(mark).map(DealOrder::getId).collect(Collectors.toList()));
-                for(int a = 0 ; a <  dealOrderss.size();a++){
-                    if("al918".equals(dealOrderss.get(a).getOrderAccount())){
-                        mark1[a] = dealOrderss.get(a);
-                    }
-                }
-                log.info("mark3----{}", Stream.of(mark1).map(DealOrder::getId).collect(Collectors.toList()));
-                CollUtil.removeAny(dealOrderss,mark1);
-                log.info("mark4----{}", Stream.of(mark1).map(DealOrder::getId).collect(Collectors.toList()));
-                dealOrders1 = CollUtil.addAllIfNotContains(dealOrders, dealOrderss);*/
                 log.info("mark5----{}", dealOrders1.stream().map(DealOrder::getId).collect(Collectors.toList()));
-            }
+            }*/
        }catch (Throwable e ){
             e.printStackTrace();
             log.error("查询抢单异常",e);
@@ -452,7 +472,7 @@ public class OrderServiceImpl implements OrderService {
        UserInfo userAgent = userInfoDao.findUserAgent(userId);
 
        if(StrUtil.isEmpty(userAgent.getAgent())){
-           return userAgent.getAgent();
+           return userId;
        }else{
            return findAgent(userAgent.getAgent());
        }
